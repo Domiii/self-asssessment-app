@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --display-chunks --progress",
-    "clean": "del-cli target",
+    "clean": "del-cli dist",
     "lint": "eslint -c .eslintrc.yml *.js src server",
     "prebuild": "run-s clean lint test",
     "server": "cross-env NODE_ENV=development nodemon -w 'server/**/*.*' server/main.js",
