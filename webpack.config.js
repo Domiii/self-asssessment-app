@@ -68,7 +68,7 @@ if (ENV_DEVELOPMENT || ENV_PRODUCTION) {
 
   config.output = {
     filename: '[name].js',
-    path: path.resolve('./target'),
+    path: path.resolve('./dist'),
     publicPath: '/'
   };
 
@@ -116,6 +116,7 @@ if (ENV_DEVELOPMENT) {
     port: PORT,
     publicPath: config.output.publicPath,
     stats: {
+      errorDetails: true, // this does show errors
       cached: true,
       cachedAssets: true,
       chunks: true,

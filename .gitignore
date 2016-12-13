@@ -2,7 +2,7 @@
 # Directories
 #---------------------------------
 **/node_modules/
-target/
+dist/
 tmp/
 
 
@@ -17,11 +17,12 @@ tmp/
 
 
 #---------------------------------
-# IDE generated
+# IDEs + Editors
 #---------------------------------
 .idea/
 .project
 *.iml
+*.sublime-workspace
 
 
 #---------------------------------

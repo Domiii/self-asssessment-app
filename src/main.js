@@ -16,12 +16,18 @@ const rootElement = document.getElementById('root');
 
 
 function render(Root) {
+  // try {
   ReactDOM.render(
     <AppContainer>
       <Root history={syncedHistory} store={store} />
     </AppContainer>,
     rootElement
   );
+    // console.log("render success");
+  // }
+  // catch (err) {
+  //   console.error(err.stack);
+  // }
 }
 
 if (module.hot) {

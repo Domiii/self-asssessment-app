@@ -11,6 +11,9 @@ import 'react-router-redux';
 import 'redux';
 import 'redux-thunk';
 
+
+import 'react-bootstrap';
+
 //
 import 'classnames';
 import 'firebase';

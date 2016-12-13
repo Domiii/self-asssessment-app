@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { List } from 'immutable';
 import TaskItem from '../task-item';
+import { Jumbotron } from 'react-bootstrap';
 
 
 function TaskList({deleteTask, tasks, updateTask}) {
@@ -16,9 +17,9 @@ function TaskList({deleteTask, tasks, updateTask}) {
   });
 
   return (
-    <div className="task-list">
+    <Jumbotron>
       {taskItems}
-    </div>
+    </Jumbotron>
   );
 }
 

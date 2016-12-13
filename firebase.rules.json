@@ -1,10 +1,8 @@
 {
   "rules": {
-    "tasks": {
-      "$uid": {
-        ".read": "auth !== null",
-        ".write": "auth !== null && auth.uid === $uid"
-      }
+    "Users": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && root.child('Users').child(auth.uid).child('isAdmin').val() == true"
     }
   }
 }

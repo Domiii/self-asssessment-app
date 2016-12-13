@@ -221,11 +221,17 @@ rules:
   space-in-parens: 0
   space-infix-ops: 2
   space-unary-ops: [2, {words: true, nonwords: false}]
-  spaced-comment: [2, "always", {exceptions: ["-", "="]}]
+  spaced-comment: "off"
   strict: 0
   template-curly-spacing: 0
   use-isnan: 2
-  valid-jsdoc: [2, {prefer: {return: "returns"}}]
+  valid-jsdoc: [2, {
+    prefer: {return: "returns"},
+    requireReturn: false,
+    requireReturnType: false,
+    requireParamDescription: false,
+    requireReturnDescription: false
+  }]
   valid-typeof: 2
   vars-on-top: 0
   wrap-iife: 2
