@@ -1,6 +1,7 @@
 export const firebaseConfig = {
-  apiKey: 'AIzaSyBsVVpEDrlNPEmshLcmOuE0FxhjPn0AqMg',
-  authDomain: 'todo-react-redux.firebaseapp.com',
-  databaseURL: 'https://todo-react-redux.firebaseio.com',
-  storageBucket: 'firebase-todo-react-redux.appspot.com'
+  apiKey: 'AIzaSyBtHF7eYytrXe6NuKHI6kLSeFNrUDRnUVU',
+  authDomain: 'test-app-3ecc2.firebaseapp.com',
+  databaseURL: 'https://test-app-3ecc2.firebaseio.com',
+  storageBucket: 'test-app-3ecc2.appspot.com',
+  messagingSenderId: '774073717986'
 };

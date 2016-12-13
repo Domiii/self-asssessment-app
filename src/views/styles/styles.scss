@@ -1,31 +1,9 @@
-@import
-"settings";
-
-@import
-"~minx/src/settings",
-"~minx/src/functions",
-"~minx/src/mixins",
-"~minx/src/reset",
-"~minx/src/elements";
-
-@import
-"grid",
-'button',
-"header",
-"sign-in",
-"notification",
-"task-filters",
-"task-form",
-"task-item",
-"task-list";
-
-
 html {
   overflow-y: scroll;
 }
 
 body {
-  padding-bottom: 120px;
+  padding: 0;
 }
 
 a {
