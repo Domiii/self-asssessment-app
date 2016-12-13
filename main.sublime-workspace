@@ -526,46 +526,6 @@
 				"buffer_size": 56,
 				"line_ending": "Windows"
 			}
-		},
-		{
-			"file": "src/core/firebase/config.js",
-			"settings":
-			{
-				"buffer_size": 275,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/views/styles/styles.scss",
-			"settings":
-			{
-				"buffer_size": 197,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "firebase.rules.json",
-			"settings":
-			{
-				"buffer_size": 155,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "README.md",
-			"settings":
-			{
-				"buffer_size": 542,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/views/components/task-item/index.js",
-			"settings":
-			{
-				"buffer_size": 4777,
-				"line_ending": "Windows"
-			}
 		}
 	],
 	"build_system": "",
@@ -609,24 +569,15 @@
 	},
 	"expanded_folders":
 	[
-		"/D/code/firebase/todo-react-redux",
-		"/D/code/firebase/todo-react-redux/src",
-		"/D/code/firebase/todo-react-redux/src/core",
-		"/D/code/firebase/todo-react-redux/src/core/firebase",
-		"/D/code/firebase/todo-react-redux/src/core/notification",
-		"/D/code/firebase/todo-react-redux/src/core/tasks",
-		"/D/code/firebase/todo-react-redux/src/views",
-		"/D/code/firebase/todo-react-redux/src/views/app",
-		"/D/code/firebase/todo-react-redux/src/views/components",
-		"/D/code/firebase/todo-react-redux/src/views/components/notification",
-		"/D/code/firebase/todo-react-redux/src/views/components/task-filters",
-		"/D/code/firebase/todo-react-redux/src/views/components/task-form",
-		"/D/code/firebase/todo-react-redux/src/views/components/task-item",
-		"/D/code/firebase/todo-react-redux/src/views/pages",
-		"/D/code/firebase/todo-react-redux/src/views/styles"
+		"/D/code/firebase/self-assessment-app"
 	],
 	"file_history":
 	[
+		"/D/code/firebase/self-assessment-app/src/views/components/task-item/index.js",
+		"/D/code/firebase/self-assessment-app/README.md",
+		"/D/code/firebase/self-assessment-app/firebase.rules.json",
+		"/D/code/firebase/self-assessment-app/src/views/styles/styles.scss",
+		"/D/code/firebase/self-assessment-app/src/core/firebase/config.js",
 		"/D/code/firebase/todo-react-redux/src/views/styles/styles.css",
 		"/D/code/firebase/todo-react-redux/src/views/styles/styles.scss",
 		"/D/code/firebase/todo-react-redux/src/views/styles/_task-list.scss",
@@ -749,12 +700,7 @@
 		"/D/code/games/unity-crushit/.gitignore.txt",
 		"/D/code/games/CrushIt/.gitignore.txt",
 		"/D/code/simple-todos/client/main.css",
-		"/D/code/simple-todos/server/main.js",
-		"/D/code/simple-todos/imports/ui/AccountsUIWrapper.jsx",
-		"/D/code/simple-todos/imports/ui/App.jsx",
-		"/D/code/simple-todos/.meteor/local/build/programs/web.browser/app/app.js",
-		"/C/Users/Domi/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Domi/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings"
+		"/D/code/simple-todos/server/main.js"
 	],
 	"find":
 	{
@@ -1083,7 +1029,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1111,149 +1057,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/core/firebase/config.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 275,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								275,
-								275
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/views/styles/styles.scss",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 197,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								52,
-								52
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "firebase.rules.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 155,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								79,
-								79
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "README.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 542,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								542,
-								542
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 22.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/views/components/task-item/index.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4777,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2339,
-								2339
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1836.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -1295,7 +1099,7 @@
 		"height": 118.0
 	},
 	"pinned_build_system": "",
-	"project": "test-app.sublime-project",
+	"project": "main.sublime-project",
 	"replace":
 	{
 		"height": 70.0
