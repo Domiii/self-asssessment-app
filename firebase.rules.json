@@ -2,7 +2,7 @@
   "rules": {
     "users": {
       ".read": "auth !== null",
-      ".write": "auth !== null && root.child('users').child(auth.uid).child('isAdmin').val() == true"
+      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true || !data.exists())"
     }
   }
 }
