@@ -30,8 +30,6 @@ export class App extends Component {
   }
 
   render() {
-    console.log('Logged in as: ');
-    console.log(this.props.auth.uid);
     return (
       <div className="container">
         <Header

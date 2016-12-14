@@ -6,6 +6,12 @@ export class FirebaseList {
     this._actions = actions;
     this._modelClass = modelClass;
     this._path = path;
+    this._list = null;
+    this._isInitialized = false;
+  }
+
+  get isInitialized() {
+    return this._isInitialized;
   }
 
   get path() {
@@ -45,17 +51,30 @@ export class FirebaseList {
   }
 
   subscribe(emit) {
+    let list = this._list;
+
+    if (this._isInitialized) {
+      // started already... re-trigger load event!?
+      emit(this._actions.onLoad(list));
+      return;
+    }
+    else if (this._unsubscribe)
+    {
+      // already started process -> Will trigger events soon enough!
+      return;
+    }
+
+    // go!
     let ref = firebaseDb.ref(this._path);
-    let initialized = false;
-    let list = [];
+    list = this._list = [];
 
     ref.once('value', () => {
-      initialized = true;
+      this._isInitialized = true;
       emit(this._actions.onLoad(list));
     });
 
     ref.on('child_added', snapshot => {
-      if (initialized) {
+      if (this._isInitialized) {
         emit(this._actions.onAdd(this.unwrapSnapshot(snapshot)));
       }
       else {

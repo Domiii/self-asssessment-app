@@ -19,15 +19,17 @@ export class Tasks extends Component {
     filterTasks: PropTypes.func.isRequired,
     filterType: PropTypes.string.isRequired,
     loadTasks: PropTypes.func.isRequired,
+
     location: PropTypes.object.isRequired,
     notification: PropTypes.object.isRequired,
     tasks: PropTypes.instanceOf(List).isRequired,
+    
     undeleteTask: PropTypes.func.isRequired,
     unloadTasks: PropTypes.func.isRequired,
     updateTask: PropTypes.func.isRequired
   };
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.loadTasks();
     this.props.filterTasks(this.props.location.query.filter);
   }

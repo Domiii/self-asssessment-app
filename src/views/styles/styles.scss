@@ -22,3 +22,64 @@ a {
 .navbar-nav.navbar-right:last-child {
     margin-right: 0;
 }
+
+
+/* Remove border around blocks */
+.blocklyMainBackground {
+  stroke: rgba(0,0,0,0) !important;
+}
+
+/* Remove the drag surface from the workspace entirely */
+.blocklyDragSurface {
+  display: none;
+}
+
+.flex-row-multi {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;  
+  
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+.quiz-wrapper > * {
+  flex: 1 100%;
+}
+
+.quiz-main { 
+  flex: 7 0px;
+  order: 1;
+}
+.quiz-sideBar { 
+  flex: 1 auto;
+  order: 2;
+}
+
+.quiz-sideBar > * {
+  min-height: 100%;
+  display: flex;
+  flex: 1 100%;
+  flex-flow: column wrap;
+  > * {
+    flex: 1 auto;
+  }
+}
+
+.footer  { order: 3; }
+
+.no-margin {
+  margin: 0 !important;
+}
+.no-padding {
+  padding: 0 !important;
+}
+.no-border {
+  border: 0 !important;
+}
+
+.some-margin1 {
+  margin: 0.5em;
+}

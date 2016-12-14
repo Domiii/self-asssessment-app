@@ -3,9 +3,14 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
-* Change permissions: let "admin" (and only "admin") see all TODOs
 * Re-implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
-* Add persistance: store data using Firebase
+* Reduce boilerplate!
+** https://github.com/pauldijou/redux-act
+** https://github.com/acdlite/redux-actions
+* Convert question data to new format
+* Store question data in FB
+* Store responses in FB
+* Visualize responses
 
 ### Done
 * Add bootstrap + react-bootstrap
