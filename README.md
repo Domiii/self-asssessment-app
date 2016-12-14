@@ -4,6 +4,8 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 ### TODO
 * Re-implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
+* Use redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
+** Usage w/ Thunk: https://github.com/pauldijou/redux-act#async-actions
 * Reduce boilerplate!
 ** https://github.com/pauldijou/redux-act
 ** https://github.com/acdlite/redux-actions
