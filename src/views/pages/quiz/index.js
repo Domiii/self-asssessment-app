@@ -1,11 +1,15 @@
 import { List } from 'immutable';
 import React, { Component, PropTypes } from 'react';
+import { Button, Jumbotron, Well } from 'react-bootstrap';
+import _ from 'lodash';
 
-import { Button, Jumbotron } from 'react-bootstrap';
+import { FAIcon } from 'src/views/components/util';
 
 import ScratchVM from 'src/core/scratch/ScratchVM';
 
-import _ from 'lodash';
+import { firebase, helpers } from 'redux-react-firebase'
+const { isLoaded, isEmpty, dataToJS } = helpers;
+
 
 // simple stand-alone Workspace to just render a bunch of code
 class InlineScratchWorkspace extends React.Component {
@@ -157,9 +161,9 @@ class QuizProblem extends React.Component {
   }
 }
 
-class SideBar extends React.Component {
+class QuizResponseMenu extends React.Component {
   render() {
-    return (<div className="quiz-sideBar">
+    return (<div className="quiz-response-menu">
         <div>
       <Button
           block bsSize="large" bsStyle="warning"
@@ -192,8 +196,6 @@ class SideBar extends React.Component {
 
 export class Quiz extends Component {
   static propTypes = {
-    createOrUpdateResponse: PropTypes.func.isRequired,
-
     laodCategories: PropTypes.func.isRequired,
     loadQuestions: PropTypes.func.isRequired,
     unloadQuestions: PropTypes.func.isRequired,
@@ -219,12 +221,22 @@ export class Quiz extends Component {
   }
   
   render() {
-    const question = this.state.currentQuestion;
-    const navArgs = {
-        nextQuestion: this.nextQuestion.bind(this),
-        previousQuestion: this.previousQuestion.bind(this)
-    };
-    const sideBarArgs = {};
+    // TODO: Actions!
+    const gotoNextQuestion = ...;
+    const gotoPreviousQuestion = ...;
+    const getQuizById = ...;
+    const getQuestionById = ...;
+
+
+    const quizId = this.props.params.quizId;
+    const questionId = this.props.params.questionId;
+
+    // TODO: State!
+    const quiz = getQuiz(quizId);
+    const question = getQuestionById(questionId);
+
+
+    const QuizResponseMenuArgs = {};
     
     const navBtnStyle = {
       width: '50%'
@@ -233,23 +245,35 @@ export class Quiz extends Component {
     const mainStyle = {
       minHeight: '400px'
     };
+
+
+
+    const questionDOM = (!isLoaded(question) ?
+      (<FAIcon name="cog" spinning={true}>) 
+      : (isEmpty(question) ? 
+        <Well>no questions added</Well>
+        : (
+          <div className="quiz-main" style={mainStyle}>
+            <QuizQuestion question={question} />
+          </div>
+          <QuizResponseMenu className="quiz-response-menu"
+            {...QuizResponseMenuArgs}>
+          </QuizResponseMenu>
+        )
+      )
+    );
     
     return (<div className="quiz-wrapper flex-row-multi">
-        <div className="quiz-main" style={mainStyle}>
-          <QuizQuestion question={question} />
-        </div>
-        <SideBar className="quiz-sideBar"
-          {...sideBarArgs}/>
-        
+        {questionDOM}
         <footer className="footer" style={{position: 'relative'}}>
           <div className="some-margin2" />
           <div>
             <Button style={navBtnStyle}
               bsStyle="primary" bsSize="large"
-              onClick={navArgs.previousQuestion}>&lt;&lt;&lt;</Button>
+              onClick={gotoPreviousQuestion}>&lt;&lt;&lt;</Button>
             <Button  style={navBtnStyle}
               bsStyle="primary" bsSize="large"
-              onClick={navArgs.nextQuestion}>>>></Button>
+              onClick={gotoNextQuestion}>>>></Button>
           </div>
         </footer>
       </div>);

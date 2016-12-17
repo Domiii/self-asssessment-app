@@ -3,12 +3,9 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
+* Implement redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
+* Implement generalized Firebase interface
 * Re-implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
-* Use redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
-** Usage w/ Thunk: https://github.com/pauldijou/redux-act#async-actions
-* Reduce boilerplate!
-** https://github.com/pauldijou/redux-act
-** https://github.com/acdlite/redux-actions
 * Convert question data to new format (and keep as separate file)
 * Store responses in FB
 * Visualize responses of each individual Question

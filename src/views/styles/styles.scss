@@ -53,12 +53,12 @@ a {
   flex: 7 0px;
   order: 1;
 }
-.quiz-sideBar { 
+.quiz-response-menu { 
   flex: 1 auto;
   order: 2;
 }
 
-.quiz-sideBar > * {
+.quiz-response-menu > * {
   min-height: 100%;
   display: flex;
   flex: 1 100%;

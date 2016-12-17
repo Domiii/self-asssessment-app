@@ -1,9 +1,11 @@
 import { applyMiddleware, compose, createStore } from 'redux';
+import { reduxReactFirebase } from 'redux-react-firebase'
+
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 
 
-export default (initialState = {}) => {
+export default (firebaseConfig, initialState = {}) => {
   let middleware = applyMiddleware(thunk);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -15,7 +17,12 @@ export default (initialState = {}) => {
     }
   }
 
-  const store = createStore(reducers, initialState, middleware);
+  // insert firebase "middleware"
+  const createStoreWithFirebase = compose(
+    reduxReactFirebase(firebaseConfig)
+  )(createStore.bind(null, reducers, initialState, middleware))
+
+  const store = createStoreWithFirebase();
 
   if (module.hot) {
     module.hot.accept('./reducers', () => {

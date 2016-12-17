@@ -1,10 +1,14 @@
+import { actionCreator } from 'src/util/actionUtil';
+
+const createAction = actionCreator('CONCEPT_QUESTION_');
+
+export const createSuccess = createAction('createSuccess');
+export const updateSuccess = createAction('updateSuccess');
+export const readListSuccess = createAction('readListSuccess');
+export const deleteSuccess = createAction('deleteSuccess');
 
 
-/**
- * TODO:
- * -> Create actions (need each: 1) X, 2) XSuccess + 3) XError)
- *    create
- *    readList
- *    update
- *    delete
- */
+
+// TODO:
+// var todosRef = new Firebase("https://yourdb.firebaseio.com/todos/" + uid);
+// var privateTodosRef = todos.orderByChild("x/y/z/categoryId").equalTo(true);

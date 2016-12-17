@@ -8,9 +8,10 @@ import { initAuth } from './core/auth';
 import configureStore from './core/store';
 import Root from './views/root';
 import './views/styles/styles.scss';
+import firebaseConfig from './config/firebase.cfg';
 
 
-const store = configureStore();
+const store = configureStore(firebaseConfig);
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
 

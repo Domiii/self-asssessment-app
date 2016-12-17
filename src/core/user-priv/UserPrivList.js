@@ -3,7 +3,7 @@ import * as userActions from './actions';
 import { User } from './user';
 
 
-export const userList = new FirebaseList({
+export const userPrivList = new FirebaseList({
   onAdd: userActions.createUserSuccess,
   onChange: userActions.updateUserSuccess,
   onLoad: userActions.loadUsersSuccess,

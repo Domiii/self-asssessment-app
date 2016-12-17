@@ -1,11 +1,15 @@
 import firebase from 'firebase';
 import { firebaseAuth } from 'src/core/firebase';
-import {
-  INIT_AUTH,
-  SIGN_IN_ERROR,
-  SIGN_IN_SUCCESS,
-  SIGN_OUT_SUCCESS
-} from './action-types';
+import { actionCreator } from 'src/util/actionUtil';
+
+const createAction = actionCreator('AUTH_');
+
+
+export const initAuth = createAction('initAuth');
+export const signInSuccess = createAction('signInSuccess', () => result.user);
+export const signInError = createAction('signInError');
+export const signOutSuccess = createAction('signOutSuccess');
+
 
 
 function authenticate(provider) {
@@ -13,27 +17,6 @@ function authenticate(provider) {
     firebaseAuth.signInWithPopup(provider)
       .then(result => dispatch(signInSuccess(result)))
       .catch(error => dispatch(signInError(error)));
-  };
-}
-
-export function initAuth(user) {
-  return {
-    type: INIT_AUTH,
-    payload: user
-  };
-}
-
-export function signInError(error) {
-  return {
-    type: SIGN_IN_ERROR,
-    payload: error
-  };
-}
-
-export function signInSuccess(result) {
-  return {
-    type: SIGN_IN_SUCCESS,
-    payload: result.user
   };
 }
 
@@ -55,11 +38,5 @@ export function signOut() {
   return dispatch => {
     firebaseAuth.signOut()
       .then(() => dispatch(signOutSuccess()));
-  };
-}
-
-export function signOutSuccess() {
-  return {
-    type: SIGN_OUT_SUCCESS
   };
 }

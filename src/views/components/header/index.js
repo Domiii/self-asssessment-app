@@ -10,7 +10,7 @@ const Header = ({currentUser, signOut, openURL}) => {
       <Navbar inverse collapseOnSelect>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href="#">Sample App</a>
+            <NavLink to="/" onlyActiveOnIndex={true}>Home</NavLink>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
