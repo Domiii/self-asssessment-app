@@ -1,134 +1,17 @@
 import { List } from 'immutable';
 import React, { Component, PropTypes } from 'react';
 import { Button, Jumbotron, Well } from 'react-bootstrap';
+import { firebase, helpers } from 'redux-react-firebase'
 import _ from 'lodash';
 
 import { FAIcon } from 'src/views/components/util';
+import { ScratchMarkdown } from 'src/views/components/scratch/ScratchMarkdown';
 
-import ScratchVM from 'src/core/scratch/ScratchVM';
-
-import { firebase, helpers } from 'redux-react-firebase'
-const { isLoaded, isEmpty, dataToJS } = helpers;
+import { problems } from 'src/data';
 
 
-// simple stand-alone Workspace to just render a bunch of code
-class InlineScratchWorkspace extends React.Component {
-  onWorkspaceRef(el) {
-    this.workspaceEl = el;
-  }
-  
-  componentDidMount() {
-    //const canvasEl = this.refs.canvas;
-    const defaultWorkspaceConfig = {
-      divEl: this.workspaceEl,
-      cfg: {
-        readOnly: true,
-        zoom: { controls: false }
-      }
-    };
-    
-    const workspaceCfgProps = this.props.workspaceConfig;
-    const workspaceCfg = _.merge(defaultWorkspaceConfig,
-                                 workspaceCfgProps);
-    this.scratchVM = new ScratchVM(workspaceCfg);
-    const vm = this.scratchVM;
-    
-    if (this.props.xml) {
-      vm.loadXml(this.props.xml);
-    }
-    else if (this.props.simpleCode) {
-      vm.loadSimpleCode(this.props.simpleCode);
-    }
-    
-    this.resizeToFit();
-  }
-  
-  resizeToFit() {
-    // see: https://github.com/google/blockly/blob/c0c43596615d714c745290078f5408200d382fa2/demos/blockfactory/block_option.js#L140
-    // Get metrics
-    const workspace = this.scratchVM.workspace;
-    const metrics = workspace.getMetrics();
-    const bounds = workspace.getBlocksBoundingBox();
-    
-    const $el = $(this.workspaceEl);
-    const w = bounds.width * workspace.scale;
-    const h = bounds.height * workspace.scale;
-    $el.innerWidth(w);
-    $el.innerHeight(h);
-    
-    // trigger resize event to get Blockly to revalidate its layout
-    var evt = document.createEvent('UIEvents');
-    evt.initUIEvent('resize', true, false, window, 0); 
-    window.dispatchEvent(evt);
-  }
-  
-  render() {
-    const style = {
-      'marginLeft': '0.5em',
-      'marginRight': '0.5em',
-      width: '480px', 
-      height: '360px', 
-      display: 'inline-block'
-    };
-    return (
-      <div ref={this.onWorkspaceRef.bind(this)}
-        style={style}>
-      </div>);
-  }
-}
+const { dataToJS } = helpers;
 
-class ScratchMarkdown extends React.Component {
-  textToComponents(text, comps) {
-    let lastKey = 0;
-    function makeKey(text) {
-      return text + (++lastKey);
-    }
-    function textNode(text) {
-      const style = {
-        //display: 'inline-block'
-      };
-      return (<span key={makeKey(text)} style={style}>{text}</span>);
-    }
-
-    function codeNode(text) {
-      return (<InlineScratchWorkspace key={makeKey(text)} simpleCode={text} />);
-    }
-
-    try {
-      const re = /\{\{([^}]+)\}\}/g;
-      let lastIndex = 0;
-      let match;
-      while ((match = re.exec(text)) != null) {
-        const matchStart = match.index, matchEnd = re.lastIndex;
-        let prevText = text.substring(lastIndex, matchStart);
-        let matchText = match[1];
-
-        comps.push(textNode(prevText));
-        comps.push(codeNode(matchText));
-
-        lastIndex = matchEnd;
-      }
-
-      let prevText = text.substring(lastIndex, text.length);
-      comps.push(textNode(prevText));
-    }
-    catch (err) {
-      console.error('Invalid string: ' + text);
-      console.error(err.stack);
-    }
-    return comps;
-  }
-  
-  render() {
-    const style = {
-      'verticalAlign': 'middle'
-    };
-    const text = this.props.text;
-    const comps = [];
-    this.textToComponents(text, comps);
-    return <div style={style}>{comps}</div>;
-  }
-}
 
 class QuizProblem extends React.Component {
   render () {
@@ -196,7 +79,7 @@ class QuizResponseMenu extends React.Component {
 
 export class Quiz extends Component {
   static propTypes = {
-    laodCategories: PropTypes.func.isRequired,
+    loadCategories: PropTypes.func.isRequired,
     loadQuestions: PropTypes.func.isRequired,
     unloadQuestions: PropTypes.func.isRequired,
     unloadCategories: PropTypes.func.isRequired,
@@ -233,7 +116,14 @@ export class Quiz extends Component {
 
     // TODO: State!
     const quiz = getQuiz(quizId);
+    if (!quiz) {
+      // TODO!
+    }
+
     const question = getQuestionById(questionId);
+    if (!question) {
+      // TODO!
+    }
 
 
     const QuizResponseMenuArgs = {};
@@ -248,11 +138,10 @@ export class Quiz extends Component {
 
 
 
-    const questionDOM = (!isLoaded(question) ?
-      (<FAIcon name="cog" spinning={true}>) 
-      : (isEmpty(question) ? 
-        <Well>no questions added</Well>
-        : (
+    const questionDOM = renderData(question,
+      () => (<FAIcon name="cog" spinning={true} />),
+      () => (<Well>no questions added</Well>),
+      () => (
           <div className="quiz-main" style={mainStyle}>
             <QuizQuestion question={question} />
           </div>
@@ -260,7 +149,6 @@ export class Quiz extends Component {
             {...QuizResponseMenuArgs}>
           </QuizResponseMenu>
         )
-      )
     );
     
     return (<div className="quiz-wrapper flex-row-multi">
@@ -276,6 +164,7 @@ export class Quiz extends Component {
               onClick={gotoNextQuestion}>>>></Button>
           </div>
         </footer>
-      </div>);
+      </div>
+    );
   }
 }

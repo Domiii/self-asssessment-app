@@ -7,7 +7,8 @@
 
 import _ from 'lodash';
 
-export default class ScratchVM {
+// wraps the Scratch VM
+export class ScratchVM {
   constructor(workspaceCfg, renderCfg) {
     this.vm = new window.VirtualMachine();
     
