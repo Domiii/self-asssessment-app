@@ -3,14 +3,13 @@ import App from './app';
 import SignIn from './pages/sign-in';
 import Quizzes from './pages/quizzes';
 import Quiz from './pages/quiz';
-import QuizQuestion from './pages/quiz-question';
 
 
 export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
   QUIZ: 'quiz/:quizId',
-  QUIZ_QUESTION: 'question/:questionId',
+  QUIZ_PROBLEM: 'problem/:problemId',
 };
 
 
@@ -56,7 +55,7 @@ export const getRoutes = getState => {
         },
         childRoutes: [
           {
-            path: paths.QUIZ_QUESTION,
+            path: paths.QUIZ_PROBLEM,
             component: Quiz,
             onEnter: requireAuth(getState),
             indexRoute: {

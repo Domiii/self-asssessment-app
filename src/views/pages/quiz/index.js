@@ -77,51 +77,59 @@ class QuizResponseMenu extends React.Component {
 }
 
 
+@firebase( [
+  'todos'
+])
+@connect(
+  ({firebase}) => ({
+    todos: dataToJS(firebase, 'todos'),
+  })
+)
 export class Quiz extends Component {
   static propTypes = {
     loadCategories: PropTypes.func.isRequired,
-    loadQuestions: PropTypes.func.isRequired,
-    unloadQuestions: PropTypes.func.isRequired,
+    loadProblems: PropTypes.func.isRequired,
+    unloadProblems: PropTypes.func.isRequired,
     unloadCategories: PropTypes.func.isRequired,
 
     location: PropTypes.object.isRequired,
     userPrefs: PropTypes.object.isRequired,
     categories: PropTypes.instanceOf(List).isRequired,
-    questions: PropTypes.instanceOf(List).isRequired
+    problems: PropTypes.instanceOf(List).isRequired
   };
 
   componentDidMount() {
-    // init questions + categories (if not previously inited)
+    // init problems + categories (if not previously inited)
     this.props.loadCategories();
-    this.props.loadQuestions();
+    this.props.loadProblems();
   }
 
   componentWillReceiveProps(nextProps) {
   }
 
   componentWillUnmount() {
-    this.props.unloadQuestions();
+    this.props.unloadProblems();
   }
   
   render() {
     // TODO: Actions!
-    const gotoNextQuestion = ...;
-    const gotoPreviousQuestion = ...;
     const getQuizById = ...;
-    const getQuestionById = ...;
+    const getProblemById = ...;
+    const gotoNextProblem = ...;
+    const gotoPreviousProblem = ...;
 
 
     const quizId = this.props.params.quizId;
-    const questionId = this.props.params.questionId;
+    const problemId = this.props.params.problemId;
 
     // TODO: State!
-    const quiz = getQuiz(quizId);
+    const quiz = getQuizById(quizId);
     if (!quiz) {
       // TODO!
     }
 
-    const question = getQuestionById(questionId);
-    if (!question) {
+    const problem = getProblemById(problemId);
+    if (!problem) {
       // TODO!
     }
 
@@ -138,12 +146,12 @@ export class Quiz extends Component {
 
 
 
-    const questionDOM = renderData(question,
+    const problemDOM = renderData(problem,
       () => (<FAIcon name="cog" spinning={true} />),
-      () => (<Well>no questions added</Well>),
+      () => (<Well>no problems added</Well>),
       () => (
           <div className="quiz-main" style={mainStyle}>
-            <QuizQuestion question={question} />
+            <QuizProblem problem={problem} />
           </div>
           <QuizResponseMenu className="quiz-response-menu"
             {...QuizResponseMenuArgs}>
@@ -152,16 +160,16 @@ export class Quiz extends Component {
     );
     
     return (<div className="quiz-wrapper flex-row-multi">
-        {questionDOM}
+        {problemDOM}
         <footer className="footer" style={{position: 'relative'}}>
           <div className="some-margin2" />
           <div>
             <Button style={navBtnStyle}
               bsStyle="primary" bsSize="large"
-              onClick={gotoPreviousQuestion}>&lt;&lt;&lt;</Button>
+              onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
             <Button  style={navBtnStyle}
               bsStyle="primary" bsSize="large"
-              onClick={gotoNextQuestion}>>>></Button>
+              onClick={gotoNextProblem}>>>></Button>
           </div>
         </footer>
       </div>
