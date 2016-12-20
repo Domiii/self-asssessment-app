@@ -3,7 +3,8 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
-* Implement generalized Firebase interface
+* Get data in RefWrapper (currently passed into component as prop from @firebase decorator from store.firebase.data)
+* Implement generalized Firebase interface (RefWrapper)
 * Re-implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
 * Convert question data to new format (and keep as separate file)
 * Store responses in FB

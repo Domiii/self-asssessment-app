@@ -77,7 +77,7 @@ class QuizResponseMenu extends React.Component {
 }
 
 
-@firebase( [
+@firebase([
   'todos'
 ])
 @connect(
