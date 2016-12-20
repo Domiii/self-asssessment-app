@@ -1,5 +1,12 @@
+export paths = {
+  QuizProblems: '/quizProblems',
+  ProblemResponses: '/quizProblemResponses',
+  QuizProgress: '/quizProgress'
+};
+
 export const getPath = {
-  userProgress(quizId, uid) { return `/quizProgress/${uid}/${quizId}`; },
-  problems(quizId) { return `/quizProblems/${quizId}`; },
-  problem(quizId, problemId) { return `/quizProblems/${quizId}/${problemId}`; }
+  response(uid, problemId) { return `${paths.ProblemResponse}/${uid}/${problemId}`; },
+  problems(quizId) { return `${paths.QuizProblem}/${quizId}`; },
+  
+  progress(uid, quizId) { return `${paths.QuizProgress}/${uid}/${quizId}`; },
 };

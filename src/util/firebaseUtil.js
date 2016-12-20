@@ -7,14 +7,22 @@ import { createSelector } from 'reselect';
 // * Create selectors for getting records/children
 // * actions + reducers have already been taken care of
 
-export class FirebaseRefWrapper {
-  constructor(ref) {
-    this._ref = ref;
-    this._path = ref.toString();
+export class RefWrapper {
+  constructor(db, path) {
+    this._db = db || Firebase.database();
+    this._ref = this._db.ref(path);
+    this._path = path;
+  }
+
+  get() {
+    return this._val;
   }
 
   getChild(id) {
     return ;
+  }
+
+  set(val) {
   }
 
   setChild(id, newChild) {
@@ -27,12 +35,5 @@ export class FirebaseRefWrapper {
 
   pushChild(newChild) {
     
-  }
-
-  get() {
-    return this._val;
-  }
-
-  set(val) {
   }
 }

@@ -144,8 +144,6 @@ export class Quiz extends Component {
       minHeight: '400px'
     };
 
-
-
     const problemDOM = renderData(problem,
       () => (<FAIcon name="cog" spinning={true} />),
       () => (<Well>no problems added</Well>),
