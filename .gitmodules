@@ -1,0 +1,3 @@
+[submodule "src/third-party/redux-react-firebase"]
+	path = src/third-party/redux-react-firebase
+	url = git@github.com:Domiii/redux-react-firebase.git
