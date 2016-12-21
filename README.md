@@ -1,6 +1,12 @@
 # Simple Self-Assessment App
 Built with React, Redux, Firebase and based on [todo-react-redux](https://github.com/r-park/todo-react-redux).
 
+# Install instructions
+## `npm install`
+## `cd third_party/redux-react-firebase`
+## `npm install --prefix ../..`
+## `cd ../..`
+
 
 ### TODO
 * Get data in RefWrapper (currently passed into component as prop from @firebase decorator from store.firebase.data)
