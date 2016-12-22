@@ -7,6 +7,7 @@ import auth from './auth/reducer';
 
 export default combineReducers({
   routing,
-  auth,
-  firebase
+  firebase,
+
+  auth
 });

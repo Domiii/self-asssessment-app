@@ -10,8 +10,9 @@ export default class QuizProblems extends RefWrapper {
   // Read
   // ######################################################
 
-  getProblem(quizId, problemId) {
+  getProblem(data, quizId, problemId) {
     const childPath = `${quizId}/${problemId}`;
+    
   }
 
   getQuizProblems(quizId) {

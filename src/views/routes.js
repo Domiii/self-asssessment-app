@@ -1,4 +1,5 @@
-import { isAuthenticated } from 'src/core/auth';
+import React from 'react';
+import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/sign-in';
 import Quizzes from './pages/quizzes';
@@ -12,10 +13,17 @@ export const paths = {
   QUIZ_PROBLEM: 'problem/:problemId',
 };
 
+// TODO: cope with firebase not being ready yet?
+
+const requireLoading = getState => {
+  return (nextState, replace) => {
+    return !isInitialized(getState().firebase);
+  }
+};
 
 const requireAuth = getState => {
   return (nextState, replace) => {
-    if (!isAuthenticated(getState())) {
+    if (!isAuthenticated(getState().firebase)) {
       replace(paths.SIGN_IN);
     }
   };
@@ -23,12 +31,11 @@ const requireAuth = getState => {
 
 const requireUnauth = getState => {
   return (nextState, replace) => {
-    if (isAuthenticated(getState())) {
+    if (isAuthenticated(getState().firebase)) {
       replace(paths.QUIZ);
     }
   };
 };
-
 
 export const getRoutes = getState => {
   return {
