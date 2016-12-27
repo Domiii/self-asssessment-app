@@ -1,8 +1,8 @@
 import { ScratchVM } from 'src/core/scratch/ScratchVM';
-import { React } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 // simple stand-alone Workspace to just render a bunch of code
-export class InlineScratchWorkspace extends React.Component {
+export class InlineScratchWorkspace extends Component {
   static propTypes = {
     workspaceConfig: PropTypes.object,
     xml: PropTypes.string,

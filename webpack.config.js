@@ -23,7 +23,7 @@ const PORT = 3000;
 //  LOADERS
 //---------------------------------------------------------
 const loaders = {
-  js: {test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
+  js: {test: /\.js[x]?$/, exclude: /node_modules/, loader: 'babel'},
   scss: {test: /\.scss$/, loader: 'style!css!postcss!sass'}
 };
 
@@ -36,7 +36,7 @@ module.exports = config;
 
 
 config.resolve = {
-  extensions: ['', '.js'],
+  extensions: ['', '.js', '.jsx'],
   modulesDirectories: ['node_modules'],
   root: path.resolve('.')
 };

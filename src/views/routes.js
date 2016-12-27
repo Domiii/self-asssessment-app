@@ -2,15 +2,15 @@ import React from 'react';
 import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/sign-in';
-import Quizzes from './pages/quizzes';
-import Quiz from './pages/quiz';
+import QuizzesPage from './pages/quizzes';
+import QuizPage from './pages/quiz';
 
 
 export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
   QUIZ: 'quiz/:quizId',
-  QUIZ_PROBLEM: 'problem/:problemId',
+  QUIZ_PROBLEM: 'problem/:problemId'
 };
 
 // TODO: cope with firebase not being ready yet?
@@ -50,23 +50,23 @@ export const getRoutes = getState => {
       {
         path: paths.QUIZZES,
         indexRoute: {
-          component: Quizzes,
+          component: QuizzesPage,
           onEnter: requireAuth(getState)
         }
       },
       {
         path: paths.QUIZ,
         indexRoute: {
-          component: Quizzes,
+          component: QuizzesPage,
           onEnter: requireAuth(getState)
         },
         childRoutes: [
           {
             path: paths.QUIZ_PROBLEM,
-            component: Quiz,
+            component: QuizPage,
             onEnter: requireAuth(getState),
             indexRoute: {
-              component: Quiz,
+              component: QuizPage,
               onEnter: requireAuth(getState)
             }
           }

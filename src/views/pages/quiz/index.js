@@ -1,23 +1,34 @@
-import { List } from 'immutable';
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Alert, Button, Jumbotron, Well } from 'react-bootstrap';
 import { firebase, helpers } from 'redux-react-firebase'
-import _ from 'lodash';
+//import _ from 'lodash';
 
-import { ProblemResponses } from 'src/core/quizzes';
+import { makeGetDataDefault } from 'src/util/firebaseUtil';
+import { 
+  Quizzes, 
+  QuizProblems,
+  QuizProgress,
+  ProblemResponses
+} from 'src/core/quizzes/';
 
 import { FAIcon } from 'src/views/components/util';
-import { ScratchMarkdown } from 'src/views/components/scratch/ScratchMarkdown';
+import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
 
 
-const { dataToJS } = helpers;
+const { isLoading, isEmpty } = helpers;
 
 
 class QuizProblem extends React.Component {
   render () {
     const problem = this.props.problem;
     const text = problem.q || problem.q_zh || "";
-    const contStyle = {
+    const QuizResponseMenuArgs = {};
+    
+    const mainStyle = {
+      minHeight: '400px'
+    };
+    const jumboStyle = {
       fontSize: '2em',
       
       height: '100%', 
@@ -25,39 +36,26 @@ class QuizProblem extends React.Component {
       flex: '1 100%', 
       flexFlow: 'column'
     };
-    const childStyle = {
-      flex: '1 auto'
-    };
-
-
-
-    const QuizResponseMenuArgs = {};
     
-    const navBtnStyle = {
-      width: '50%'
-    };
-    const mainStyle = {
-      minHeight: '400px'
-    };
-    <div className="quiz-main" style={mainStyle}>
-            <QuizProblem problem={problem} />
-          </div>
-          <QuizResponseMenu className="quiz-response-menu"
-            {...QuizResponseMenuArgs}>
-          </QuizResponseMenu>
-    
-    return (<Jumbotron className="no-margin"style={contStyle}>
-        <div style={{flex: '8 auto'}}>
-          <ScratchMarkdown text={text} />
-        </div>
-        <div style={{flex: '1 auto', position: 'relative'}}>
-          <textarea placeholder="小筆記" 
-            disabled
-            rows="2"
-            style={{width: '100%', 
-              display:'block'}}></textarea>
-        </div>
-    </Jumbotron>);
+    return (<div>
+      <div className="quiz-main" style={mainStyle}>
+        <Jumbotron className="no-margin"style={jumboStyle}>
+            <div style={{flex: '8 auto'}}>
+              <ScratchMarkdown text={text} />
+            </div>
+            <div style={{flex: '1 auto', position: 'relative'}}>
+              <textarea placeholder="小筆記" 
+                disabled
+                rows="2"
+                style={{width: '100%', 
+                  display:'block'}}></textarea>
+            </div>
+        </Jumbotron>
+      </div>
+      <QuizResponseMenu className="quiz-response-menu"
+        {...QuizResponseMenuArgs}>
+      </QuizResponseMenu>
+    </div>);
   }
 }
 
@@ -93,34 +91,37 @@ class QuizResponseMenu extends React.Component {
   }
 }
 
-// TODO: Finalize component structure with correct data dependencies?
-//    data counts + statistics in Quiz component?
-// TODO: Create new wrappers in mapStateToProps?
-
-// NOTE: Re-mapping (and thus re-rendering) everything for single questions is not a good idea
-//    -> see: https://github.com/JAndritsch/redux/blob/optimization-recipe/docs/recipes/Optimization.md
 
 @firebase(({ params }, firebase) => ([
-  getPath.problems(params.quizId),
-  ProblemResponses.getDefaultPath(firebase._.authUid, params.quizId),
-  getPath.progress(firebase._.authUid, params.quizId)
+  Quizzes.PATH_ROOT,
+  QuizProblems.PATH_ROOT,
+  ProblemResponses.PATH_ROOT,
+  QuizProgress.PATH_ROOT
 ]))
 @connect(
-  ({ firebase }, { params }) => ({
-    uid: firebase._.authUid,
-    problem: dataToJS(firebase, QuizProblems.getProblemPath(params.quizId, params.problemId)),
-    response: dataToJS(firebase, ProblemResponses.ROOT_PATH),
-    progress: dataToJS(firebase, getPath.progress(firebase._.authUid, params.quizId))
-  })
+  ({ firebase }, { params }) => {
+    const getData = makeGetDataDefault(firebase);
+    return {
+      uid: firebase._.authUid,
+      problems: new QuizProblems(getData),
+      responses: new ProblemResponses(getData),
+      progress: new QuizProgress(getData)
+    };
+  }
 )
-export class Quiz extends Component {
+export default class QuizPage extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
+
   static propTypes = {
     firebase: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
 
-    uid: PropTypes.number.isRequired,
-    problems: PropTypes.instanceOf(List).isRequired,
-    responses: PropTypes.instanceOf(List).isRequired,
-    progress: PropTypes.instanceOf(List).isRequired
+    uid: PropTypes.string.isRequired,
+    problems: PropTypes.instanceOf(QuizProblems).isRequired,
+    responses: PropTypes.instanceOf(ProblemResponses).isRequired,
+    progress: PropTypes.instanceOf(QuizProgress).isRequired
   };
 
   componentDidMount() {
@@ -136,38 +137,54 @@ export class Quiz extends Component {
   }
   
   render() {
-    // TODO: selectors + actions!
-    const isBusy = ...;
-    const hasProblems = ...;
-    const getQuizById = ...;
-    const getProblems = ...;
-    const getProblemById = ...;
-    const gotoNextProblem = ...;
-    const gotoPreviousProblem = ...;
+    // get data + wrappers
+    const { router } = this.context;
+    const { uid, quizzes, problems, responses, progress } = this.props;
+    const { quizId, problemId } = this.props.params;
+    const quizProblems = problems.getProblems(quizId);
+    const isBusy = isLoading(quizProblems);
+    const hasProblems = !isEmpty(quizProblems);
 
-    if (isBusy()) {
+    // prepare all actions used by render()
+    const getQuizById = quizzes::getQuiz;
+    const getFirstProblemId = problems::getFirstProblemId;
+    const getProblemById = problems.getProblem.bind(problems, quizId);
+    const gotoFirstProblem = () => {
+      const newProblemId = getFirstProblemId(quizId);
+      router.replace(`quiz/${quizId}/problem/${newProblemId}`);
+    };
+
+    const gotoNextProblem = undefined;
+    const gotoPreviousProblem = undefined;
+    const gotoRoot = router.replace.bind(router, '/');
+
+    // go!
+    if (isBusy) {
+      // still loading
       return (<FAIcon name="cog" spinning={true} />);
     }
-    if (!hasProblems()) {
+
+    if (!hasProblems) {
       // quiz has no problems at all
       return (<Alert bsStyle="info">quiz is empty</Alert>);
     }
 
-    const quizId = this.props.params.quizId;
-    const problemId = this.props.params.problemId;
-
     const quiz = getQuizById(quizId);
     if (!quiz) {
       // invalid quiz id -> TODO: redirect to overview page
-      return (<Alert bsStyle="danger">invalid quizId</Alert>);
+      return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
     const problem = getProblemById(problemId);
     if (!problem) {
-      // invalid problem id -> TODO: redirect to first problem
+      // invalid problem id -> redirect to first problem
+      gotoFirstProblem();
       return (<Alert bsStyle="danger">invalid problemId</Alert>);
     }
     else {
+      const navBtnStyle = {
+        width: '50%'
+      };
       return (
         <div className="quiz-wrapper flex-row-multi">
           <QuizProblem problem={problem} />

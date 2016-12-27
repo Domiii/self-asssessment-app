@@ -25,7 +25,7 @@ export class App extends Component {
       router.replace(paths.SIGN_IN);
     }
     else if (!auth.authenticated && nextProps.auth.authenticated) {
-      router.replace(paths.TASKS);
+      router.replace(paths.QUIZ);
     }
   }
 
@@ -35,7 +35,7 @@ export class App extends Component {
         <Header
           currentUser={this.props.auth}
           signOut={this.props.signOut}
-          openURL={::window.open}
+          openURL={window::open}
         />
 
         <main className="main">{this.props.children}</main>
@@ -54,7 +54,9 @@ const mapStateToProps = createSelector(
   auth => ({auth})
 );
 
+const mapDispatchToProps = authActions;
+
 export default connect(
   mapStateToProps,
-  authActions
+  mapDispatchToProps
 )(App);

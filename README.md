@@ -9,8 +9,7 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
-* Get data in RefWrapper (get from store on every call)
-* Implement generalized Firebase interface (RefWrapper)
+* CRUD quizzes + quiz questions
 * Re-implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
 * Convert question data to new format (and keep as separate file)
 * Store responses in FB
@@ -37,5 +36,10 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### Done
+* Implement generalized Firebase interface and corresponding utilities (see `src/util/firebaseUtil`)
 * Add bootstrap + react-bootstrap
 * Implement redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
+
+
+# More References
+* https://github.com/vacuumlabs/firebase-transactions/blob/master/wiki/tutorial.md

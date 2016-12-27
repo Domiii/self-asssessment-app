@@ -1,9 +1,9 @@
-import { InlineScratchWorkspace } from 'InlineScratchWorkspace';
+import { InlineScratchWorkspace } from './InlineScratchWorkspace';
 
-import { React } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 // accept text with inline Scratch markup language for displaying Scratch components
-export class ScratchMarkdown extends React.Component {
+export default class ScratchMarkdown extends Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
   }

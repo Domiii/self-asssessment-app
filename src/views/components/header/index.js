@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
-import { Navbar, Nav, NavItem,
-  NavDropdown, MenuItem
-  } from 'react-bootstrap';
-
+import { Link } from 'react-router';
+import {
+  Navbar, Nav, NavItem, NavDropdown, MenuItem
+} from 'react-bootstrap';
 
 const Header = ({currentUser, signOut, openURL}) => {
   return (
@@ -10,7 +10,7 @@ const Header = ({currentUser, signOut, openURL}) => {
       <Navbar inverse collapseOnSelect>
         <Navbar.Header>
           <Navbar.Brand>
-            <NavLink to="/" onlyActiveOnIndex={true}>Home</NavLink>
+            <Link to="/" onlyActiveOnIndex={true}>Home</Link>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
