@@ -3,7 +3,7 @@ import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/sign-in';
 import QuizzesPage from './pages/quizzes';
-import QuizPage from './pages/quiz';
+import { QuizPage, QuizProblem } from './pages/quiz';
 
 
 export const paths = {
@@ -32,7 +32,7 @@ const requireAuth = getState => {
 const requireUnauth = getState => {
   return (nextState, replace) => {
     if (isAuthenticated(getState().firebase)) {
-      replace(paths.QUIZ);
+      replace(paths.QUIZZES);
     }
   };
 };
@@ -56,19 +56,12 @@ export const getRoutes = getState => {
       },
       {
         path: paths.QUIZ,
-        indexRoute: {
-          component: QuizzesPage,
-          onEnter: requireAuth(getState)
-        },
+        component: QuizPage,
+        onEnter: requireAuth(getState),
         childRoutes: [
           {
             path: paths.QUIZ_PROBLEM,
-            component: QuizPage,
-            onEnter: requireAuth(getState),
-            indexRoute: {
-              component: QuizPage,
-              onEnter: requireAuth(getState)
-            }
+            component: QuizProblem
           }
         ]
       }

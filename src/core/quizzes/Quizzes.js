@@ -21,4 +21,8 @@ export default class Quizzes extends RefWrapper {
   getQuizzes() {
     return this.rootData;
   }
+
+  addQuiz(quiz) {
+    this.pushChild(quiz);
+  }
 }

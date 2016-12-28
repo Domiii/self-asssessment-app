@@ -21,4 +21,4 @@ usersRef.on('child_added', (snapshot) => {
 
 console.log("Initialized.");
 
-// uid jGkqPSeuujXazrDLYtAK1DZG1IF2
+// jGkqPSeuujXazrDLYtAK1DZG1IF2

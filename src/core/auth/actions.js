@@ -14,7 +14,7 @@ export const signOutSuccess = createAction('signOutSuccess');
 
 function authenticate(provider) {
   return dispatch => {
-    firebaseAuth.signInWithPopup(provider)
+    firebaseAuth.signInWithRedirect(provider)
       .then(result => dispatch(signInSuccess(result)))
       .catch(error => dispatch(signInError(error)));
   };

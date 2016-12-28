@@ -16,10 +16,10 @@ import { FAIcon } from 'src/views/components/util';
 import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
 
 
-const { isLoading, isEmpty } = helpers;
+const { isLoaded, isEmpty } = helpers;
 
 
-class QuizProblem extends React.Component {
+export class QuizProblem extends React.Component {
   render () {
     const problem = this.props.problem;
     const text = problem.q || problem.q_zh || "";
@@ -102,14 +102,14 @@ class QuizResponseMenu extends React.Component {
   ({ firebase }, { params }) => {
     const getData = makeGetDataDefault(firebase);
     return {
-      uid: firebase._.authUid,
+      quizzes: new Quizzes(getData),
       problems: new QuizProblems(getData),
       responses: new ProblemResponses(getData),
       progress: new QuizProgress(getData)
     };
   }
 )
-export default class QuizPage extends Component {
+export class QuizPage extends Component {
   static contextTypes = {
     router: React.PropTypes.object.isRequired
   };
@@ -117,8 +117,9 @@ export default class QuizPage extends Component {
   static propTypes = {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
+    auth: PropTypes.object.isRequired,
 
-    uid: PropTypes.string.isRequired,
+    quizzes: PropTypes.instanceOf(Quizzes).isRequired,
     problems: PropTypes.instanceOf(QuizProblems).isRequired,
     responses: PropTypes.instanceOf(ProblemResponses).isRequired,
     progress: PropTypes.instanceOf(QuizProgress).isRequired
@@ -130,7 +131,8 @@ export default class QuizPage extends Component {
   componentWillReceiveProps(nextProps) {
   }
 
-  componentShouldUpdate(nextProps) {
+  shouldComponentUpdate(nextProps) {
+    return true;
   }
 
   componentWillUnmount() {
@@ -139,15 +141,17 @@ export default class QuizPage extends Component {
   render() {
     // get data + wrappers
     const { router } = this.context;
-    const { uid, quizzes, problems, responses, progress } = this.props;
+    const { auth, quizzes, problems, responses, progress, children } = this.props;
     const { quizId, problemId } = this.props.params;
+    const { uid } = auth;
+
     const quizProblems = problems.getProblems(quizId);
-    const isBusy = isLoading(quizProblems);
+    const isBusy = !isLoaded(quizzes.rootData);
     const hasProblems = !isEmpty(quizProblems);
 
-    // prepare all actions used by render()
-    const getQuizById = quizzes::getQuiz;
-    const getFirstProblemId = problems::getFirstProblemId;
+    // prepare all actions
+    const getQuizById = quizzes.getQuiz.bind(this);
+    const getFirstProblemId = problems.getFirstProblemId.bind(this);
     const getProblemById = problems.getProblem.bind(problems, quizId);
     const gotoFirstProblem = () => {
       const newProblemId = getFirstProblemId(quizId);
@@ -185,9 +189,10 @@ export default class QuizPage extends Component {
       const navBtnStyle = {
         width: '50%'
       };
+
       return (
         <div className="quiz-wrapper flex-row-multi">
-          <QuizProblem problem={problem} />
+          { children }
           <footer className="footer" style={{position: 'relative'}}>
             <div className="some-margin2" />
             <div>

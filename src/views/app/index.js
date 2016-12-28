@@ -8,7 +8,7 @@ import Header from '../components/header';
 
 export class App extends Component {
   static contextTypes = {
-    router: React.PropTypes.object.isRequired
+    router: PropTypes.object.isRequired
   };
 
   static propTypes = {
@@ -30,15 +30,19 @@ export class App extends Component {
   }
 
   render() {
+    const { auth, signOut, children } = this.props;
+
     return (
-      <div className="container">
+      <div className="app container">
         <Header
-          currentUser={this.props.auth}
+          auth={this.props.auth}
           signOut={this.props.signOut}
           openURL={window::open}
         />
 
-        <main className="main">{this.props.children}</main>
+        <main className="app-main">
+          { React.cloneElement(children, { auth } ) }
+        </main>
       </div>
     );
   }

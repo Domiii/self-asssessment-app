@@ -1,6 +1,6 @@
 import { createReducer } from 'redux-act';
 import * as actions from './actions';
-import User from './User';
+import CurrentUser from './CurrentUser';
 
 
 /**
@@ -19,5 +19,5 @@ export default createReducer({
   [actions.initAuth]: doMerge,
   [actions.signInSuccess]: doMerge,
 
-  [actions.signOutSuccess]: () => new User()
-}, new User());
+  [actions.signOutSuccess]: () => new CurrentUser()
+}, new CurrentUser());
