@@ -1,6 +1,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { authActions } from 'src/core/auth';
+import {
+  signInWithGithub,
+  signInWithGoogle,
+  signInWithTwitter
+} from 'src/util/firebaseUtil';
 
 
 export function SignIn({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
@@ -27,4 +31,8 @@ SignIn.propTypes = {
 //  CONNECT
 //-------------------------------------
 
-export default connect(null, authActions)(SignIn);
+export default connect(state => ({
+  signInWithGithub,
+  signInWithGoogle,
+  signInWithTwitter
+}))(SignIn);

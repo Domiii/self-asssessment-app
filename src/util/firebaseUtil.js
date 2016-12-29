@@ -1,8 +1,27 @@
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
 import { helpers } from 'redux-react-firebase';
-
 const { pathToJS, isLoaded, dataToJS } = helpers;
+
+
+export function authenticate(provider) {
+  return Firebase.auth().signInWithRedirect(provider);
+}
+
+export function signInWithGithub() {
+  return authenticate(new Firebase.auth.GithubAuthProvider());
+}
+
+
+export function signInWithGoogle() {
+  return authenticate(new Firebase.auth.GoogleAuthProvider());
+}
+
+
+export function signInWithTwitter() {
+  return authenticate(new Firebase.auth.TwitterAuthProvider());
+}
+
 
 export function isInitialized(firebaseApp) {
   return isLoaded(pathToJS(firebaseApp, 'auth'));
@@ -15,10 +34,6 @@ export function isAuthenticated(firebaseApp) {
 // get data at given path from current state in store
 export function makeGetDataDefault(firebaseWrapper) {
   return path => dataToJS(firebaseWrapper, path);
-}
-
-export function makeGetDataImmutable(immutableObj) {
-  return immutableObj.getIn();
 }
 
 export function wrapPath(firebaseWrapper, path, RefClass) {

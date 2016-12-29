@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Alert, Button, Jumbotron, Well } from 'react-bootstrap';
-import { firebase, helpers } from 'redux-react-firebase'
+import { firebase, helpers } from 'redux-react-firebase';
 //import _ from 'lodash';
 
 import { makeGetDataDefault } from 'src/util/firebaseUtil';

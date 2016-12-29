@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { Link } from 'react-router';
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Button
 } from 'react-bootstrap';
 import {
   LinkContainer
@@ -16,7 +16,7 @@ export default class Header extends Component {
   };
 
   static propTypes = {
-    auth: PropTypes.object.isRequired,
+    auth: PropTypes.object,
     openURL: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired
   };
@@ -52,7 +52,7 @@ export default class Header extends Component {
                   <MenuItem divider />
                   <MenuItem eventKey="user-drop-logout" onClick={signOut}>Sign Out</MenuItem>
                 </NavDropdown>
-               : <LinkContainer to={{ pathname: '/sign-in' }} onlyActiveOnIndex={true}><span>Login</span></LinkContainer>
+               : undefined
               }
             </Nav>
           </Navbar.Collapse>

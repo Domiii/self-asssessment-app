@@ -13,7 +13,7 @@ export const paths = {
   QUIZ_PROBLEM: 'problem/:problemId'
 };
 
-// TODO: cope with firebase not being ready yet?
+// TODO: auth checks not working yet
 
 const requireLoading = getState => {
   return (nextState, replace) => {
