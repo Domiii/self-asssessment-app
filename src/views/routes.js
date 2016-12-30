@@ -9,15 +9,17 @@ import { QuizPage, QuizProblem } from './pages/quiz';
 export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
+  QUIZZES: '',
   QUIZ: 'quiz/:quizId',
   QUIZ_PROBLEM: 'problem/:problemId'
 };
 
-// TODO: auth checks not working yet
 
 const requireLoading = getState => {
   return (nextState, replace) => {
-    return !isInitialized(getState().firebase);
+    if (!isInitialized(getState().firebase)) {
+      replace
+    }
   }
 };
 
@@ -41,13 +43,19 @@ export const getRoutes = getState => {
   return {
     path: paths.ROOT,
     component: App,
+    // redirect: {
+    //   from: '*',
+    //   to: paths.QUIZZES
+    // },
     childRoutes: [
       {
+        name: 'sign-in',
         path: paths.SIGN_IN,
         component: SignIn,
         onEnter: requireUnauth(getState)
       },
       {
+        name: 'quizzes',
         path: paths.QUIZZES,
         indexRoute: {
           component: QuizzesPage,
@@ -55,6 +63,7 @@ export const getRoutes = getState => {
         }
       },
       {
+        name: 'quiz',
         path: paths.QUIZ,
         component: QuizPage,
         onEnter: requireAuth(getState),

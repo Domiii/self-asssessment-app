@@ -8,6 +8,7 @@ import configureStore from './core/store';
 import Root from './views/root';
 import './views/styles/styles.scss';
 
+import firebase from 'firebase';
 import firebaseConfig from './config/firebase.cfg';
 
 const store = configureStore(firebaseConfig);
@@ -36,4 +37,7 @@ if (module.hot) {
   });
 }
 
-render(Root);
+// Wait until after authentication has finished before rendering anything
+firebase.auth().onAuthStateChanged(function (authData) {
+  render(Root);
+});

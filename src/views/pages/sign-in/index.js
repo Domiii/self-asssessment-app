@@ -6,6 +6,8 @@ import {
   signInWithTwitter
 } from 'src/util/firebaseUtil';
 
+import { firebase, helpers } from 'redux-react-firebase'
+const { pathToJS } = helpers;
 
 export function SignIn({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
   return (

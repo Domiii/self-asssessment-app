@@ -11,11 +11,13 @@ import { paths } from '../routes';
 
 import Header from '../components/header';
 import { FAIcon } from 'src/views/components/util';
+import { isInitialized } from 'src/util/firebaseUtil';
+
 
 @firebase()
 @connect(
   ({firebase}) => ({
-    auth: Firebase.auth().currentUser
+    auth: pathToJS(firebase, 'auth')
   })
 )
 export class App extends Component {
@@ -25,9 +27,14 @@ export class App extends Component {
 
   static propTypes = {
     auth: PropTypes.object,
-    children: PropTypes.object.isRequired,
+    children: PropTypes.object,
     firebase: PropTypes.object.isRequired
   };
+
+  constructor(...args) {
+    super(...args);
+    this.state = {wasBusy: false};
+  }
 
   componentWillReceiveProps(nextProps) {
     const { router } = this.context;
@@ -36,10 +43,21 @@ export class App extends Component {
 
   render() {
     const { auth, firebase, children } = this.props;
+    const { router } = this.context;
     const isBusy = auth === undefined;
+
+    if (!children) {
+      router.replace('/');
+      return;
+    }
 
     const signOut = firebase.logout.bind(firebase);
 
+    if (isBusy) {
+      // still loading
+      return (<FAIcon name="cog" spinning={true} />);
+    }
+    
     const mainEl = isBusy ? 
       <FAIcon name="cog" spinning={true} /> : (
       <main className="app-main">

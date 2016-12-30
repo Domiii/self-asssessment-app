@@ -2,8 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Alert, Button, Jumbotron, Well, FormGroup } from 'react-bootstrap';
 import { firebase, helpers } from 'redux-react-firebase';
-
 import { Field, reduxForm } from 'redux-form';
+import _ from 'lodash';
+import {
+  LinkContainer
+} from 'react-router-bootstrap';
 
 import { UserInfo } from 'src/core/user-info';
 
@@ -16,24 +19,29 @@ import {
 } from 'src/core/quizzes/';
 
 import { FAIcon } from 'src/views/components/util';
+const { isLoaded } = helpers;
+
 
 export class QuizListItem extends Component {
   static propTypes = {
-    quiz: PropTypes.object.isRequired
+    quiz: PropTypes.object.isRequired,
+    quizId: PropTypes.string.isRequired
   };
 
   render() {
-    const { quiz } = this.props;
+    const { quiz, quizId } = this.props;
 
     return (
-      <Well>{quiz.title}</Well>
+      <LinkContainer to={{ pathname: '/quiz/' + quizId }}>
+        <Button>{quiz.title}</Button>
+      </LinkContainer>
     );
   }
 }
 
 export class QuizList extends Component {
   static propTypes = {
-    quizzes: PropTypes.array.isRequired
+    quizzes: PropTypes.object.isRequired
   };
 
   render() {
@@ -41,7 +49,7 @@ export class QuizList extends Component {
 
     return (
       <div>
-        {quizzes.map(quiz => <QuizListItem quiz={quiz} />)}
+        {_.map(quizzes, (quiz, id) => (<QuizListItem key={id} quizId={id} quiz={quiz} />))}
       </div>
     );
   }
@@ -163,18 +171,28 @@ export default class QuizzesPage extends Component {
     const { router } = this.context;  
     const { userInfo, quizzes } = this.props;
     const isAdmin = userInfo.isCurrentAdmin();
+    const isBusy = !isLoaded(quizzes.rootData);
 
     // prepare actions
-    const addQuiz = quizzes.addQuiz.bind(quizzes);
+    //const addQuiz = quizzes.addQuiz.bind(quizzes);
+    const addQuiz = (q) => {
+      quizzes.addQuiz(q);
+    };
 
-    // prepare elements
+
+    // go render!
+    if (isBusy) {
+      // still loading
+      return (<FAIcon name="cog" spinning={true} />);
+    }
+
     const adminTools = isAdmin ? (<div>
       <hr />
       <QuizAddRegion addQuiz={addQuiz} />
     </div>) : undefined;
 
     return (<div>
-      <QuizList quizzes={quizzes.rootData || []} />
+      <QuizList quizzes={quizzes.rootData || {}} />
       {adminTools}
     </div>);
   }

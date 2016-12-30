@@ -6,6 +6,7 @@ import {
 import {
   LinkContainer
 } from 'react-router-bootstrap';
+import Breadcrumbs from 'react-breadcrumbs';
 
 import { FAIcon } from 'src/views/components/util';
 
@@ -38,14 +39,6 @@ export default class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
-              <NavDropdown eventKey="more-drop" id="user-dropdown" title="more">
-                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('https://github.com/Domiii/self-asssessment-app')}>
-                  View Source Code <i className="fa fa-github" aria-hidden="true"></i>
-                </MenuItem>
-                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('http://codepen.io/Domiii/pen/JbvLbe')}>
-                  Scratch 3.0 Sandbox
-                </MenuItem>
-              </NavDropdown>
               {!!auth ?
                 <NavDropdown eventKey="user-drop" id="user-dropdown"
                   title={<span><FAIcon name="user" /> {auth.displayName || auth.email}</span>}>
@@ -54,6 +47,14 @@ export default class Header extends Component {
                 </NavDropdown>
                : undefined
               }
+              <NavDropdown eventKey="more-drop" id="user-dropdown" title="more">
+                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('https://github.com/Domiii/self-asssessment-app')}>
+                  View Source Code <i className="fa fa-github" aria-hidden="true"></i>
+                </MenuItem>
+                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('http://codepen.io/Domiii/pen/JbvLbe')}>
+                  Scratch 3.0 Sandbox
+                </MenuItem>
+              </NavDropdown>
             </Nav>
           </Navbar.Collapse>
         </Navbar>

@@ -28,6 +28,7 @@ export function isInitialized(firebaseApp) {
 }
 
 export function isAuthenticated(firebaseApp) {
+  //return !!Firebase.auth().currentUser;
   return !!pathToJS(firebaseApp, 'auth');
 }
 
@@ -49,7 +50,7 @@ export class RefWrapper {
   constructor(path, getData, db) {
     this._db = db || Firebase.database();
     this._ref = this._db.ref(path);
-    this._path = path.endsWith('/') ? path : (path + '/');
+    this._path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
 
     // getData(path) function returns data at given database path
     this._getData = getData;
@@ -60,7 +61,13 @@ export class RefWrapper {
   }
 
   getData(path) {
-    return this._getData(this._path + (path || ''));
+    if (!path) {
+      path = '';
+    }
+    else if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    return this._getData(this._path + path);
   }
 
 

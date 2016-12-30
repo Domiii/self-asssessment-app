@@ -1,8 +1,12 @@
 {
   "rules": {
+    "quizzes": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+    },
     "users": {
       ".read": "auth !== null",
-      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true || !data.exists())"
+      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     }
   }
 }
