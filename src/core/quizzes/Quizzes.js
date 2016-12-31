@@ -14,8 +14,7 @@ export default class Quizzes extends RefWrapper {
   // ######################################################
 
   getQuiz(quizId) {
-    const path = `${quizId}`;
-    return this.getData(path);
+    return this.getData(quizId);
   }
 
   getQuizzes() {
@@ -23,6 +22,6 @@ export default class Quizzes extends RefWrapper {
   }
 
   addQuiz(quiz) {
-    this.pushChild(quiz);
+    this.push(quiz);
   }
 }

@@ -1,15 +1,4 @@
-import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { Alert, Button, Jumbotron, Well, FormGroup } from 'react-bootstrap';
-import { firebase, helpers } from 'redux-react-firebase';
-import { Field, reduxForm } from 'redux-form';
-import _ from 'lodash';
-import {
-  LinkContainer
-} from 'react-router-bootstrap';
-
 import { UserInfo } from 'src/core/user-info';
-
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
   Quizzes, 
@@ -18,23 +7,63 @@ import {
   ProblemResponses
 } from 'src/core/quizzes/';
 
-import { FAIcon } from 'src/views/components/util';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { firebase, helpers } from 'redux-react-firebase';
+import { Alert, Button, Jumbotron, Well, FormGroup } from 'react-bootstrap';
+import { Link } from 'react-router';
+import { Field, reduxForm } from 'redux-form';
+import {
+  LinkContainer
+} from 'react-router-bootstrap';
+import { SimpleGrid, FAIcon } from 'src/views/components/util';
+
+import _ from 'lodash';
+
+
 const { isLoaded } = helpers;
 
 
 export class QuizListItem extends Component {
+  static contextTypes = {
+    userInfo: PropTypes.instanceOf(UserInfo).isRequired
+  };
+
   static propTypes = {
     quiz: PropTypes.object.isRequired,
     quizId: PropTypes.string.isRequired
   };
 
   render() {
+    const { userInfo } = this.context;
     const { quiz, quizId } = this.props;
+    const quizPath = '/quiz/' + quizId;
+    const isAdmin = userInfo && userInfo.isCurrentAdmin();
+
+    const adminTools = !isAdmin ? undefined : (
+      <span>
+        <Link to={'/quiz-editor/' + quizId} onlyActiveOnIndex={true}>
+          <span>edit</span>
+        </Link>
+      </span>
+    );
 
     return (
-      <LinkContainer to={{ pathname: '/quiz/' + quizId }}>
-        <Button>{quiz.title}</Button>
-      </LinkContainer>
+      <span>
+        <Well className="no-margin">
+          <div>
+            <Link to={quizPath} onlyActiveOnIndex={true}>
+              <h3 className="no-margin">{quiz.title}</h3>
+            </Link>
+          </div>
+          <span>
+            <Link to={quizPath} onlyActiveOnIndex={true}>
+              play&nbsp;
+            </Link>
+          </span>
+          {adminTools}
+        </Well>
+      </span>
     );
   }
 }
@@ -48,14 +77,16 @@ export class QuizList extends Component {
     const { quizzes } = this.props;
 
     return (
-      <div>
-        {_.map(quizzes, (quiz, id) => (<QuizListItem key={id} quizId={id} quiz={quiz} />))}
-      </div>
+      <SimpleGrid objects={quizzes} 
+        nCols={4}
+        objectComponentCreator={(key, value) => <QuizListItem key={key} quizId={key} quiz={value} />} 
+        objectPropName="quiz"
+      >
+      </SimpleGrid>
     );
   }
 }
 
-// TODO: Use redux-form
 //  see: http://redux-form.com/6.4.1/examples/simple/
 class _QuizEditor extends Component {
   static propTypes = {
@@ -84,7 +115,12 @@ class _QuizEditor extends Component {
         </div>
 
         <div>
-          <Button type="submit" disabled={pristine || submitting}>Save</Button>
+          <Button type="submit" disabled={pristine || submitting}>
+            {(!quiz ?
+              (<span><FAIcon name="plus" className="color-green" /> add new problem</span>):
+              (<span><FAIcon name="upload" className="color-green" /> save</span>)
+            )}
+          </Button>
           <Button disabled={pristine || submitting} onClick={reset}>Clear</Button>
         </div>
       </form>
@@ -94,34 +130,31 @@ class _QuizEditor extends Component {
 
 export const QuizEditor = reduxForm({ form: 'quiz_editor' /* unique form name */})(_QuizEditor);
 
-export class QuizAddRegion extends Component {
-  constructor(...args) {
-    super(...args);
+export class AddQuiz extends Component {
+  static propTypes = {
+    addQuiz: PropTypes.func.isRequired
   }
 
   render() {
     const { addQuiz } = this.props;
 
     return (
-      //<SimpleForm 
       <QuizEditor onSubmit={addQuiz}></QuizEditor>
     );
   }
 }
 
 
-@firebase(({ params, auth }, firebase) => ([
-  UserInfo.userPath(auth.uid),
+@firebase((props, firebase) => ([
   Quizzes.PATH_ROOT,
   QuizProblems.PATH_ROOT,
   ProblemResponses.PATH_ROOT,
   QuizProgress.PATH_ROOT
 ]))
 @connect(
-  ({ firebase }, { params, auth }) => {
+  ({ firebase }) => {
     const getData = makeGetDataDefault(firebase);
     return {
-      userInfo: new UserInfo(auth, getData),
       quizzes: new Quizzes(getData),
       problems: new QuizProblems(getData),
       responses: new ProblemResponses(getData),
@@ -131,14 +164,13 @@ export class QuizAddRegion extends Component {
 )
 export default class QuizzesPage extends Component {
   static contextTypes = {
-    router: React.PropTypes.object.isRequired
+    userInfo: PropTypes.instanceOf(UserInfo).isRequired
   };
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
 
-    userInfo: PropTypes.instanceOf(UserInfo).isRequired,
     quizzes: PropTypes.instanceOf(Quizzes).isRequired,
     problems: PropTypes.instanceOf(QuizProblems).isRequired,
     responses: PropTypes.instanceOf(ProblemResponses).isRequired,
@@ -168,9 +200,9 @@ export default class QuizzesPage extends Component {
     // TODO: Import questions (if isAdmin)
 
     // prepare data + wrappers
-    const { router } = this.context;  
-    const { userInfo, quizzes } = this.props;
-    const isAdmin = userInfo.isCurrentAdmin();
+    const { userInfo } = this.context;
+    const { quizzes } = this.props;
+    const isAdmin = userInfo && userInfo.isCurrentAdmin();
     const isBusy = !isLoaded(quizzes.rootData);
 
     // prepare actions
@@ -186,10 +218,10 @@ export default class QuizzesPage extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    const adminTools = isAdmin ? (<div>
+    const adminTools = !isAdmin ? undefined : (<div>
       <hr />
-      <QuizAddRegion addQuiz={addQuiz} />
-    </div>) : undefined;
+      <AddQuiz addQuiz={addQuiz} />
+    </div>);
 
     return (<div>
       <QuizList quizzes={quizzes.rootData || {}} />

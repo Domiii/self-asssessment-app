@@ -36,9 +36,15 @@ export default class QuizProblems extends RefWrapper {
     // TODO
   }
 
-  addProblem(problemData) {
-    //this.setChild(`${quizId}`);
+  addProblem(quizId, problemData) {
+    console.assert(quizId);
+    return this.pushChild(`${quizId}`, problemData);
 
     // TODO: use transaction to get a rolling and unique id
+  }
+
+  updateProblem(quizId, problemId, problemData) {
+    console.assert(quizId && problemId);
+    return this.updateChild(`${quizId}/${problemId}`, problemData);
   }
 }

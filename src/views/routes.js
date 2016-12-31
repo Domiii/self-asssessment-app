@@ -2,6 +2,7 @@ import React from 'react';
 import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/sign-in';
+import QuizEditorPage from './pages/quiz-editor';
 import QuizzesPage from './pages/quizzes';
 import { QuizPage, QuizProblem } from './pages/quiz';
 
@@ -10,18 +11,19 @@ export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
   QUIZZES: '',
+  QUIZ_EDITOR: 'quiz-editor/:quizId',
   QUIZ: 'quiz/:quizId',
   QUIZ_PROBLEM: 'problem/:problemId'
 };
 
 
-const requireLoading = getState => {
-  return (nextState, replace) => {
-    if (!isInitialized(getState().firebase)) {
-      replace
-    }
-  }
-};
+// const requireLoading = getState => {
+//   return (nextState, replace) => {
+//     if (!isInitialized(getState().firebase)) {
+//       replace
+//     }
+//   }
+// };
 
 const requireAuth = getState => {
   return (nextState, replace) => {
@@ -61,6 +63,12 @@ export const getRoutes = getState => {
           component: QuizzesPage,
           onEnter: requireAuth(getState)
         }
+      },
+      {
+        name: 'quiz-editor',
+        path: paths.QUIZ_EDITOR,
+        component: QuizEditorPage,
+        onEnter: requireAuth(getState)
       },
       {
         name: 'quiz',

@@ -175,7 +175,7 @@ export class QuizPage extends Component {
 
     const quiz = getQuizById(quizId);
     if (!quiz) {
-      // invalid quiz id -> TODO: redirect to overview page
+      // invalid quiz id
       return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 

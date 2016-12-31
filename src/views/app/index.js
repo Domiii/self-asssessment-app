@@ -1,24 +1,43 @@
-import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
+import { UserInfo } from 'src/core/user-info';
+import { makeGetDataDefault } from 'src/util/firebaseUtil';
+import { paths } from '../routes';
+import { isInitialized } from 'src/util/firebaseUtil';
 import { createSelector } from 'reselect';
 
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Firebase from 'firebase';
-
 import { firebase, helpers } from 'redux-react-firebase'
-const { pathToJS } = helpers;
-
-import { paths } from '../routes';
-
 import Header from '../components/header';
 import { FAIcon } from 'src/views/components/util';
-import { isInitialized } from 'src/util/firebaseUtil';
 
+const { pathToJS } = helpers;
 
-@firebase()
+@firebase((props, firebase) => {
+  const uid = firebase._.authUid;
+  const paths = [];
+  if (uid) {
+    paths.push(UserInfo.userPath(uid));
+  }
+  return paths;
+})
 @connect(
-  ({firebase}) => ({
-    auth: pathToJS(firebase, 'auth')
-  })
+  ({ firebase }) => {
+    const auth = pathToJS(firebase, 'auth');
+    const props = {
+      auth
+    };
+
+    if (auth && auth.uid) {
+      const getData = makeGetDataDefault(firebase);
+      props.userInfo = new UserInfo(getData, auth);
+
+
+      //console.log(props.userInfo.rootData);
+    }
+
+    return props;
+  }
 )
 export class App extends Component {
   static contextTypes = {
@@ -26,10 +45,22 @@ export class App extends Component {
   };
 
   static propTypes = {
+    firebase: PropTypes.object.isRequired,
     auth: PropTypes.object,
-    children: PropTypes.object,
-    firebase: PropTypes.object.isRequired
+    userInfo: PropTypes.instanceOf(UserInfo),
+
+    children: PropTypes.object
   };
+
+  static childContextTypes = {
+    userInfo: PropTypes.instanceOf(UserInfo)
+  };
+
+  getChildContext() {
+    return {
+      userInfo: this.props.userInfo
+    }
+  }
 
   constructor(...args) {
     super(...args);
@@ -38,7 +69,6 @@ export class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { router } = this.context;
-    const { auth } = this.props;
   }
 
   render() {

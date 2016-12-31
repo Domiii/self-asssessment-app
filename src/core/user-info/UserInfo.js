@@ -12,13 +12,14 @@ export default class UserInfo extends RefWrapper {
     return UserInfo.PATH_ROOT + '/' + uid;
   }
 
-  constructor(auth, getData, db) {
-    super(UserInfo.PATH_ROOT, getData, db);
+  constructor(getData, auth, db) {
+    super(auth && UserInfo.userPath(auth.uid) || UserInfo.PATH_ROOT, getData, db);
     this._auth = auth;
   }
 
   getUserInfo(uid) {
-    return this.getData(uid);
+    const path = this._auth ? '' : uid;
+    return this.getData(path);
   }
 
   isAdmin(uid) {

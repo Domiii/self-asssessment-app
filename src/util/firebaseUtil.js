@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
 import { helpers } from 'redux-react-firebase';
@@ -60,14 +61,21 @@ export class RefWrapper {
     return this.getData();
   }
 
-  getData(path) {
+  getData(path, defaultValue) {
     if (!path) {
       path = '';
     }
-    else if (!path.startsWith('/')) {
-      path = '/' + path;
+    else if (path.startsWith('/')) {
+      console.warning('invalid path: should not start with slash (/)');
     }
-    return this._getData(this._path + path);
+
+    const ancestor = this._getData(this._path);
+    if (!path) {
+      return ancestor === undefined ? defaultValue : ancestor;
+    }
+
+    path = path.replace(/\./g, '/');
+    return _.get(ancestor, path, defaultValue);
   }
 
 
@@ -97,7 +105,11 @@ export class RefWrapper {
     return this._ref.child(path).transaction(cb);
   }
 
-  pushChild(newChild) {
+  push(newChild) {
     return this._ref.push(newChild);
+  }
+
+  pushChild(path, newChild) {
+    return this._ref.child(path).push(newChild);
   }
 }
