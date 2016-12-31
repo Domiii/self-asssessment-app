@@ -1,6 +1,6 @@
 import { UserInfo } from 'src/core/user-info';
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
-import { paths } from '../routes';
+import { paths } from './routes';
 import { isInitialized } from 'src/util/firebaseUtil';
 import { createSelector } from 'reselect';
 
@@ -8,7 +8,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Firebase from 'firebase';
 import { firebase, helpers } from 'redux-react-firebase'
-import Header from '../components/header';
+import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 
 const { pathToJS } = helpers;

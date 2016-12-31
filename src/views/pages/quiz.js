@@ -16,15 +16,50 @@ import { FAIcon } from 'src/views/components/util';
 import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
 
 
-const { isLoaded, isEmpty } = helpers;
+const { isEmpty } = helpers;
+
+export class QuizProgressBar extends React.Component {
+  static propTypes = {
+    quiz: PropTypes.object.isRequired,
+    problem: PropTypes.object,
+
+    quizzes: PropTypes.instanceOf(Quizzes).isRequired,
+    problemsRef: PropTypes.instanceOf(QuizProblems).isRequired,
+    responses: PropTypes.instanceOf(ProblemResponses).isRequired,
+    progress: PropTypes.instanceOf(QuizProgress).isRequired
+  };
+
+  render() {
+    const { quiz, problem, quizzes, problems, responses, progress } = this.props;
+
+    return (<div>
+      <Well className="no-margin">
+        <h3 className="no-margin inline">{quiz.title}</h3>
+
+      </Well>
+      <div className="margin2" />
+    </div>);
+  }
+}
 
 
 export class QuizProblem extends React.Component {
+  static propTypes = {
+    problem: PropTypes.object
+  };
+
   render () {
-    const problem = this.props.problem;
-    const text = problem.q || problem.q_zh || "";
-    const QuizResponseMenuArgs = {};
+    // data
+    if (!this.props.problem) {
+      throw new Error('problem prop must be supplied before rendering');
+    }
+
+    const { problem } = this.props;
+    const text = problem.description_en || problem.description_zh || "";
     
+
+    // go render!
+    const QuizResponseMenuArgs = {};
     const mainStyle = {
       minHeight: '400px'
     };
@@ -117,7 +152,6 @@ export class QuizPage extends Component {
   static propTypes = {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
-    auth: PropTypes.object.isRequired,
 
     quizzes: PropTypes.instanceOf(Quizzes).isRequired,
     problems: PropTypes.instanceOf(QuizProblems).isRequired,
@@ -141,36 +175,32 @@ export class QuizPage extends Component {
   render() {
     // get data + wrappers
     const { router } = this.context;
-    const { auth, quizzes, problems, responses, progress, children } = this.props;
+    const { quizzes, problems, responses, progress, children } = this.props;
     const { quizId, problemId } = this.props.params;
-    const { uid } = auth;
 
     const quizProblems = problems.getProblems(quizId);
-    const isBusy = !isLoaded(quizzes.rootData);
+    const isBusy = !quizzes.isLoaded;
     const hasProblems = !isEmpty(quizProblems);
 
     // prepare all actions
-    const getQuizById = quizzes.getQuiz.bind(this);
-    const getFirstProblemId = problems.getFirstProblemId.bind(this);
-    const getProblemById = problems.getProblem.bind(problems, quizId);
+    const getQuizById = quizzes.getQuiz.bind(quizzes);
+    const getFirstProblemId = problems.getFirstProblemId.bind(problems);
+    const getFirstProblem = problems.getFirstProblem.bind(problems);
+    const getProblemById = problems.getProblem.bind(problems);
     const gotoFirstProblem = () => {
       const newProblemId = getFirstProblemId(quizId);
-      router.replace(`quiz/${quizId}/problem/${newProblemId}`);
+      setTimeout(() => router.replace(`/quiz/${quizId}/problem/${newProblemId}`), 1000);
     };
 
     const gotoNextProblem = undefined;
     const gotoPreviousProblem = undefined;
     const gotoRoot = router.replace.bind(router, '/');
 
+
     // go!
     if (isBusy) {
       // still loading
       return (<FAIcon name="cog" spinning={true} />);
-    }
-
-    if (!hasProblems) {
-      // quiz has no problems at all
-      return (<Alert bsStyle="info">quiz is empty</Alert>);
     }
 
     const quiz = getQuizById(quizId);
@@ -179,33 +209,40 @@ export class QuizPage extends Component {
       return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    const problem = getProblemById(problemId);
+    let contentEl;
+    const problem = getProblemById(quizId, problemId) || getFirstProblem(quizId);
+
     if (!problem) {
-      // invalid problem id -> redirect to first problem
-      gotoFirstProblem();
-      return (<Alert bsStyle="danger">invalid problemId</Alert>);
+      // quiz has no problems at all
+      contentEl = (<Alert bsStyle="info">quiz is empty</Alert>);
     }
     else {
       const navBtnStyle = {
         width: '50%'
       };
-
-      return (
-        <div className="quiz-wrapper flex-row-multi">
-          { children }
-          <footer className="footer" style={{position: 'relative'}}>
-            <div className="some-margin2" />
-            <div>
-              <Button style={navBtnStyle}
-                bsStyle="primary" bsSize="large"
-                onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
-              <Button  style={navBtnStyle}
-                bsStyle="primary" bsSize="large"
-                onClick={gotoNextProblem}>>>></Button>
-            </div>
-          </footer>
-        </div>
-      );
+      contentEl = (<div>
+        <QuizProblem problem={problem} />
+        <footer className="footer" style={{position: 'relative'}}>
+          <div className="margin" />
+          <div>
+            <Button style={navBtnStyle}
+              bsStyle="primary" bsSize="large"
+              onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
+            <Button  style={navBtnStyle}
+              bsStyle="primary" bsSize="large"
+              onClick={gotoNextProblem}>>>></Button>
+          </div>
+        </footer>
+      </div>);
     }
+
+    return (
+      <div className="quiz-wrapper flex-row-multi">
+        <QuizProgressBar quiz={quiz} problem={problem} 
+          quizzes={quizzes} problems={problems}
+          progress={progress} responses={responses} />
+        { contentEl }
+      </div>
+    );
   }
 }

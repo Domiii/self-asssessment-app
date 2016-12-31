@@ -1,12 +1,18 @@
 import { RefWrapper } from 'src/util/firebaseUtil';
+import { makeGetDataDefault } from 'src/util/firebaseUtil';
 
 
-export default class ProblemResponses extends RefWrapper {
+export default class ProblemResponsesRef extends RefWrapper {
   // the root of all objects of this type
   static get PATH_ROOT() { return '/quizProblemResponses'; }
 
+  static getDefault(state) { 
+    const getData = makeGetDataDefault(state);
+    return new QuizzesRef(getData);
+  }
+
   constructor(getData, db) {
-    super(ProblemResponses.PATH_ROOT, getData, db);
+    super(ProblemResponsesRef.PATH_ROOT, getData, db);
   }
 
   // ######################################################

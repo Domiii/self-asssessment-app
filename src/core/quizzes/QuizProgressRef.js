@@ -1,12 +1,13 @@
 import { RefWrapper } from 'src/util/firebaseUtil';
+import { makeGetDataDefault } from 'src/util/firebaseUtil';
 
 
-export default class QuizProgress extends RefWrapper {
+export default class QuizProgressRef extends RefWrapper {
   // the root of all objects of this type
   static get PATH_ROOT() { return '/quizProgress'; }
 
   constructor(getData, db) {
-    super(QuizProgress.PATH_ROOT, getData, db);
+    super(QuizProgressRef.PATH_ROOT, getData, db);
   }
 
   // ######################################################

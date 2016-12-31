@@ -1,6 +1,6 @@
 
-export Quizzes from './Quizzes';
-export QuizProblems from './QuizProblems';
-export ProblemResponses from './ProblemResponses';
-export QuizProgress from './QuizProgress';
-export ResponseFeedback from './ResponseFeedback';
+export QuizzesRef from './QuizzesRef';
+export QuizProblemsRef from './QuizProblemsRef';
+export ProblemResponsesRef from './ProblemResponsesRef';
+export QuizProgressRef from './QuizProgressRef';
+export ResponseFeedbackRef from './ResponseFeedbackRef';

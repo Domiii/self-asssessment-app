@@ -2,6 +2,7 @@ import React from 'react';
 import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/sign-in';
+import UserProfilePage from './pages/user-profile';
 import QuizEditorPage from './pages/quiz-editor';
 import QuizzesPage from './pages/quizzes';
 import { QuizPage, QuizProblem } from './pages/quiz';
@@ -10,6 +11,7 @@ import { QuizPage, QuizProblem } from './pages/quiz';
 export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
+  USER_PROFILE: 'user',
   QUIZZES: '',
   QUIZ_EDITOR: 'quiz-editor/:quizId',
   QUIZ: 'quiz/:quizId',
@@ -57,6 +59,12 @@ export const getRoutes = getState => {
         onEnter: requireUnauth(getState)
       },
       {
+        name: 'user',
+        path: paths.USER_PROFILE,
+        component: UserProfilePage,
+        onEnter: requireAuth(getState)
+      },
+      {
         name: 'quizzes',
         path: paths.QUIZZES,
         indexRoute: {
@@ -78,7 +86,7 @@ export const getRoutes = getState => {
         childRoutes: [
           {
             path: paths.QUIZ_PROBLEM,
-            component: QuizProblem
+            component: QuizPage
           }
         ]
       }

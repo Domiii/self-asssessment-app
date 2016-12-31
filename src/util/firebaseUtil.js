@@ -44,6 +44,17 @@ export function wrapPath(firebaseWrapper, path, RefClass) {
 }
 
 
+export const defaultRefFactory(RefClass) {
+  return function getDefault(state) { 
+    const getData = makeGetDataDefault(state);
+    return new RefClass(getData);
+  };
+}
+
+// TODO: Change RefWrapper to class factory and make access to getData, getDefault + PATH_ROOT easier
+// TODO: use reselect for improved performance
+//    see: http://codepen.io/Domiii/pen/apomGQ?editors=0010
+
 // Provides some convinience operations for working with a specific path of Firebase.
 // NOTE that the `redux-react-firebase` module internally already takes care of
 //    dispatching actions for firebase operations and reducing firebase data.
@@ -59,6 +70,10 @@ export class RefWrapper {
 
   get rootData() {
     return this.getData();
+  }
+
+  get isLoaded() {
+    return isLoaded(this.rootData);
   }
 
   getData(path, defaultValue) {
@@ -78,13 +93,16 @@ export class RefWrapper {
     return _.get(ancestor, path, defaultValue);
   }
 
+  getRef(path) {
+    return path && this._ref.child(path) || this._ref;
+  }
 
   set(val) {
     return this._ref.set(val);
   }
 
   setChild(path, newChild) {
-    return this._ref.child(path).set(newChild);
+    return this.getRef(path).set(newChild);
   }
 
   update(values) {
@@ -92,7 +110,7 @@ export class RefWrapper {
   }
 
   updateChild(path, childValues) {
-    return this._ref.child(path).update(childValues);
+    return this.getRef(path).update(childValues);
   }
 
 
@@ -102,7 +120,7 @@ export class RefWrapper {
   }
 
   transactionChild(path, cb) {
-    return this._ref.child(path).transaction(cb);
+    return this.getRef(path).transaction(cb);
   }
 
   push(newChild) {
@@ -110,6 +128,6 @@ export class RefWrapper {
   }
 
   pushChild(path, newChild) {
-    return this._ref.child(path).push(newChild);
+    return this.getRef(path).push(newChild);
   }
 }

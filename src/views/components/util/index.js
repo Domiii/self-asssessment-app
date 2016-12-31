@@ -100,7 +100,9 @@ export class FormInputField extends Component {
         </Col>
         <Col {...(inputColProps || {})}>
           <Field className="form-control" id={name} name={name} {...(inputProps || {})}
-            placeholder={placeholder} />
+            placeholder={placeholder}>
+            {this.props.children}
+          </Field>
         </Col>
       </FormGroup>
     );

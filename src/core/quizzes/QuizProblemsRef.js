@@ -1,12 +1,14 @@
 import { RefWrapper } from 'src/util/firebaseUtil';
+import { makeGetDataDefault } from 'src/util/firebaseUtil';
+import _ from 'lodash';
 
 
-export default class QuizProblems extends RefWrapper {
+export default class QuizProblemsRef extends RefWrapper {
   // the root of all objects of this type
   static get PATH_ROOT() { return '/quizProblems'; }
 
   constructor(getData, db) {
-    super(QuizProblems.PATH_ROOT, getData, db);
+    super(QuizProblemsRef.PATH_ROOT, getData, db);
   }
 
   // ######################################################
@@ -23,8 +25,26 @@ export default class QuizProblems extends RefWrapper {
     return this.getData(path);
   }
 
+  getFirstProblem(quizId) {
+    const firstId = this.getFirstProblemId(quizId);
+    return firstId && this.getProblems(quizId)[firstId];
+  }
+
   getFirstProblemId(quizId) {
-    // TODO
+    const problems = this.getProblems(quizId);
+    if (!problems) {
+      return null;
+    }
+    let firstNum = 99999999999;
+    let firstKey = null;
+    for (let key in problems) {
+      const prob = problems[key];
+      if (prob.num < firstNum) {
+        firstNum = prob.num;
+        firstKey = key;
+      }
+    }
+    return firstKey;
   }
 
   getPreviousProblemId(quizId, currentProblemId) {

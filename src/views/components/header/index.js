@@ -23,11 +23,14 @@ export default class Header extends Component {
   };
 
   render() {
+    const { router } = this.context;
     const { auth, openURL, signOut } = this.props;
+
+    const gotoProfile = () => router.replace('/user');
 
     return (
       <header className="header">
-        <Navbar inverse collapseOnSelect>
+        <Navbar inverse collapseOnSelect className="no-margin">
           <Navbar.Header>
             <Navbar.Brand>
               <Link to='/' onlyActiveOnIndex={true}><span>Home</span></Link>
@@ -42,6 +45,7 @@ export default class Header extends Component {
               {!!auth ?
                 <NavDropdown eventKey="user-drop" id="user-dropdown"
                   title={<span><FAIcon name="user" /> {auth.displayName || auth.email}</span>}>
+                  <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>Profile</MenuItem>
                   <MenuItem divider />
                   <MenuItem eventKey="user-drop-logout" onClick={signOut}>Sign Out</MenuItem>
                 </NavDropdown>

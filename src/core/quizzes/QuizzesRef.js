@@ -1,12 +1,14 @@
-import { RefWrapper } from 'src/util/firebaseUtil';
+import { RefWrapper, defaultRefFactory } from 'src/util/firebaseUtil';
 
 
-export default class Quizzes extends RefWrapper {
+export default class QuizzesRef extends RefWrapper {
   // the root of all objects of this type
   static get PATH_ROOT() { return '/quizzes'; }
 
+  static getDefault = defaultRefFactory(QuizzesRef);
+
   constructor(getData, db) {
-    super(Quizzes.PATH_ROOT, getData, db);
+    super(QuizzesRef.PATH_ROOT, getData, db);
   }
 
   // ######################################################

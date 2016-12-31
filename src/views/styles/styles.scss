@@ -80,11 +80,25 @@ a {
   border: 0 !important;
 }
 
-.some-margin1 {
+.margin-half {
   margin: 0.5em;
+}
+.margin {
+  margin: 1em;
+}
+.margin2 {
+  margin: 2em;
 }
 
 
 .color-green {
   color: green;
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
 }

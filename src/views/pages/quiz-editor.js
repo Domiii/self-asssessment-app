@@ -1,10 +1,10 @@
 import { UserInfo } from 'src/core/user-info';
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
-  Quizzes, 
-  QuizProblems,
-  QuizProgress,
-  ProblemResponses
+  QuizzesRef, 
+  QuizProblemsRef,
+  QuizProgressRef,
+  ProblemResponsesRef
 } from 'src/core/quizzes/';
 
 import React, { Component, PropTypes } from 'react';
@@ -22,8 +22,6 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
-
-const { isLoaded } = helpers;
 
 class ProblemPreview extends Component {
   static propTypes = {
@@ -80,7 +78,7 @@ class _ProblemEditor extends Component {
               (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
           </Button>
-          <Button disabled={pristine || submitting || busy} onClick={reset}>Clear</Button>
+          <Button disabled={pristine || submitting || busy} onClick={reset}>reset</Button>
         </div>
       </form>
     );
@@ -117,15 +115,15 @@ export class AddProblem extends Component {
 
 
 @firebase((props, firebase) => ([
-  Quizzes.PATH_ROOT,
-  QuizProblems.PATH_ROOT
+  QuizzesRef.PATH_ROOT,
+  QuizProblemsRef.PATH_ROOT
 ]))
 @connect(
   ({ firebase }) => {
     const getData = makeGetDataDefault(firebase);
     return {
-      quizDb: new Quizzes(getData),
-      problemDb: new QuizProblems(getData)
+      quizDb: QuizzesRef.getDefault(firebase),
+      problemDb: new QuizProblemsRef(getData)
     };
   }
 )
@@ -165,7 +163,7 @@ export default class QuizEditorPage extends Component {
     const { userInfo, router } = this.context;  
     const { quizDb, problemDb, params } = this.props;
     const isAdmin = userInfo && userInfo.isCurrentAdmin();
-    const isBusy = !isLoaded(quizDb.rootData);
+    const isBusy = !quizDb.isLoaded;
     const { quizId } = params;
     const quiz = quizDb.getQuiz(quizId);
     const problems = problemDb.getProblems(quizId);

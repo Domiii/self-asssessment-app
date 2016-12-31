@@ -9,7 +9,8 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
-* CRUD quizzes + quiz questions
+* fix RefWrapper to work as a factory with easier access to all data
+* finalize quiz + question editor GUI
 * Convert question data to new format
 * Store question data in DB
 * Store responses in DB
@@ -37,6 +38,7 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### Done
+* CRUD quizzes + quiz questions
 * Implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
 * Implement generalized Firebase interface and corresponding utilities (see `src/util/firebaseUtil`)
 * Add bootstrap + react-bootstrap

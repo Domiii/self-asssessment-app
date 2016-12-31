@@ -9,7 +9,7 @@ import {
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { firebase, helpers } from 'redux-react-firebase';
+import { firebase } from 'redux-react-firebase';
 import { Alert, Button, Jumbotron, Well, FormGroup } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { Field, reduxForm } from 'redux-form';
@@ -19,9 +19,6 @@ import {
 import { SimpleGrid, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
-
-
-const { isLoaded } = helpers;
 
 
 export class QuizListItem extends Component {
@@ -121,7 +118,7 @@ class _QuizEditor extends Component {
               (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
           </Button>
-          <Button disabled={pristine || submitting} onClick={reset}>Clear</Button>
+          <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
         </div>
       </form>
     );
@@ -156,9 +153,7 @@ export class AddQuiz extends Component {
     const getData = makeGetDataDefault(firebase);
     return {
       quizzes: new Quizzes(getData),
-      problems: new QuizProblems(getData),
-      responses: new ProblemResponses(getData),
-      progress: new QuizProgress(getData)
+      problems: new QuizProblems(getData)
     };
   }
 )
@@ -168,13 +163,8 @@ export default class QuizzesPage extends Component {
   };
 
   static propTypes = {
-    firebase: PropTypes.object.isRequired,
-    params: PropTypes.object.isRequired,
-
     quizzes: PropTypes.instanceOf(Quizzes).isRequired,
-    problems: PropTypes.instanceOf(QuizProblems).isRequired,
-    responses: PropTypes.instanceOf(ProblemResponses).isRequired,
-    progress: PropTypes.instanceOf(QuizProgress).isRequired
+    problems: PropTypes.instanceOf(QuizProblems).isRequired
   };
 
   componentDidMount() {
@@ -203,7 +193,7 @@ export default class QuizzesPage extends Component {
     const { userInfo } = this.context;
     const { quizzes } = this.props;
     const isAdmin = userInfo && userInfo.isCurrentAdmin();
-    const isBusy = !isLoaded(quizzes.rootData);
+    const isBusy = !quizzes.isLoaded;
 
     // prepare actions
     //const addQuiz = quizzes.addQuiz.bind(quizzes);
