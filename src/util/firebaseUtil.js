@@ -122,30 +122,59 @@ function createChildDataAccessors(prototype, children, parentPath) {
 
   for (let wrapperName in cfg.children) {
     const childCfg = cfg.children[wrapperName];
+
+    // the path is the relative path between the node we are accessing and the current child
+    // NOTE: The path is NOT the full path.
     const path = (parentPath || '') + childCfg.path;
     const getPath = createPathGetterFromTemplateArray(path);
 
     // get
-    prototype[wrapperName] = createChildDataGetter(getPath);
+    prototype[wrapperName] = createChildDataGet(getPath);
 
     // set
-    prototype['set_' + wrapperName] = createChildDataGetter(getPath);
+    prototype['set_' + wrapperName] = createChildDataSet(getPath);
 
     // update
-    prototype['update_' + wrapperName] = createChildDataGetter(getPath);
+    prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
 
     // keep going
     createChildDataAccessors(prototype, childCfg.children);
   }
 }
 
-// the path is the relative path between the node we are accessing and the current child
-// NOTE: The path is NOT the full path.
-function createchildDataGetter(getPath) {
-  return function _getter(args) {
+function createChildDataGet(getPath) {
+  return function _get(args) {
     const path = getPath(args);
     return this.getData(path);
   };
+}
+function createChildDataSet(getPath) {
+  if (getPath.hasVariables) {
+    return function _set(args, data) {
+      const path = getPath(args);
+      return this.setChild(path, args);
+    };
+  }
+  else {
+    const path = getPath();
+    return function _set(data) {
+      return this.setChild(path, args);
+    };
+  }
+}
+function createChildDataUpdate(getPath) {
+  if (getPath.hasVariables) {
+    return function _update(args, data) {
+      const path = getPath(args);
+      return this.updateChild(path, args);
+    };
+  }
+  else {
+    const path = getPath();
+    return function _update(data) {
+      return this.updateChild(path, args);
+    };
+  }
 }
 
 // function getVariablesFromPath(path) {
@@ -213,17 +242,11 @@ function createPathGetterFromTemplateProps(path) {
     }
     return props[varName];
   }
-  const pathInfo = parseTemplateString(path, varLookup);
-  if (pathInfo.nVars > 0) {
-    // replace template variables with props
-    return function getPath(props) {
-      return pathInfo.nodes.map(node => node(props)).join('');
-    };
-  }
-  else {
-    // no variable substitution necessary
-    return () => path;
-  }
+  const substituter = function getPath(props) {
+    return pathInfo.nodes.map(node => node(props)).join('');
+  };
+
+  return createPathGetterFromTemplate(path, varLookup, substituter);
 }
 
 // 
@@ -234,17 +257,26 @@ function createPathGetterFromTemplateArray(path) {
     }
     return args[iArg];
   };
+  const substituter = function getPath(...args) {
+    return pathInfo.nodes.map(node => node(args)).join('');
+  };
+  return createPathGetterFromTemplate(path, varLookup, substituter);
+}
+
+function createPathGetterFromTemplate(path, varLookup, substituter) {
   const pathInfo = parseTemplateString(path, varLookup);
+  let getPath;
   if (pathInfo.nVars > 0) {
     // template substitution from array
-    return function getPath(...args) {
-      return pathInfo.nodes.map(node => node(args)).join('');
-    };
+    getPath = substituter;
+    getPath.hasVariables = true;
   }
   else {
     // no variable substitution necessary
-    return () => path;
+    getPath = function getPath() { return path; };
+    getPath.hasVariables = false;
   }
+  return getPath;
 }
 
 function createWrapperFunc(parent, RefClass) {
