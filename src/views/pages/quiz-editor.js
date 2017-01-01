@@ -1,5 +1,4 @@
-import { UserInfo } from 'src/core/user-info';
-import { makeGetDataDefault } from 'src/util/firebaseUtil';
+import { UserInfoRef } from 'src/core/users';
 import { 
   QuizzesRef, 
   QuizProblemsRef,
@@ -120,24 +119,23 @@ export class AddProblem extends Component {
 ]))
 @connect(
   ({ firebase }) => {
-    const getData = makeGetDataDefault(firebase);
     return {
-      quizDb: QuizzesRef.getDefault(firebase),
-      problemDb: new QuizProblemsRef(getData)
+      quizzesRef: QuizzesRef(firebase),
+      problemsRef: QuizProblemsRef(firebase)
     };
   }
 )
 export default class QuizEditorPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfo: PropTypes.instanceOf(UserInfo).isRequired
+    userInfo: PropTypes.object.isRequired
   };
 
   static propTypes = {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
-    quizDb: PropTypes.instanceOf(Quizzes).isRequired,
-    problemDb: PropTypes.instanceOf(QuizProblems).isRequired
+    quizzesRef: PropTypes.object.isRequired,
+    problemsRef: PropTypes.object.isRequired
   }
 
   constructor(...args) {
@@ -161,23 +159,23 @@ export default class QuizEditorPage extends Component {
   render() {
     // prepare data
     const { userInfo, router } = this.context;  
-    const { quizDb, problemDb, params } = this.props;
-    const isAdmin = userInfo && userInfo.isCurrentAdmin();
-    const isBusy = !quizDb.isLoaded;
+    const { quizzesRef, problemsRef, params } = this.props;
+    const isAdmin = userInfo && userInfo.isAdmin();
+    const isBusy = !quizzesRef.isLoaded;
     const { quizId } = params;
-    const quiz = quizDb.getQuiz(quizId);
-    const problems = problemDb.getProblems(quizId);
+    const quiz = quizzesRef.getQuiz(quizId);
+    const problems = problemsRef.getProblems(quizId);
 
     // prepare actions
     const addProblem = (editorData) => {
       // TODO: Use transaction to avoid race condition
       const { problem } = editorData;
       problem.num = _.size(problems)+1;
-      return this.wrapPromise(problemDb.addProblem(quizId, problem));
+      return this.wrapPromise(problemsRef.addProblem(quizId, problem));
     };
     const updateProblem = (editorData) => {
       const { problemId, problem } = editorData;
-      return this.wrapPromise(problemDb.updateProblem(quizId, problemId, problem));
+      return this.wrapPromise(problemsRef.updateProblem(quizId, problemId, problem));
     };
 
     // go render!

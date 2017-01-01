@@ -1,5 +1,4 @@
-import { UserInfo } from 'src/core/user-info';
-import { makeGetDataDefault } from 'src/util/firebaseUtil';
+import { UserInfoRef } from 'src/core/users';
 import { paths } from './routes';
 import { isInitialized } from 'src/util/firebaseUtil';
 import { createSelector } from 'reselect';
@@ -17,7 +16,8 @@ const { pathToJS } = helpers;
   const uid = firebase._.authUid;
   const paths = [];
   if (uid) {
-    paths.push(UserInfo.userPath(uid));
+    console.log(UserInfoRef.user.getPath({uid}));
+    paths.push(UserInfoRef.user.getPath({uid}));
   }
   return paths;
 })
@@ -29,8 +29,7 @@ const { pathToJS } = helpers;
     };
 
     if (auth && auth.uid) {
-      const getData = makeGetDataDefault(firebase);
-      props.userInfo = new UserInfo(getData, auth);
+      props.userInfo = UserInfoRef.user(firebase, {auth, uid: auth.uid});
 
 
       //console.log(props.userInfo.val);
@@ -47,13 +46,13 @@ export class App extends Component {
   static propTypes = {
     firebase: PropTypes.object.isRequired,
     auth: PropTypes.object,
-    userInfo: PropTypes.instanceOf(UserInfo),
+    userInfo: PropTypes.object,
 
     children: PropTypes.object
   };
 
   static childContextTypes = {
-    userInfo: PropTypes.instanceOf(UserInfo)
+    userInfo: PropTypes.object
   };
 
   getChildContext() {

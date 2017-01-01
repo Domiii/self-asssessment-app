@@ -54,10 +54,11 @@ export function makeGetDataDefault(firebaseDataRoot, path) {
  * @param {object|string} cfgOrPath.path|cfgOrPath The path of the given ref wrapper.
  * @param {object} [cfgOrPath.children] Children wrappers within the same rootPath.
  * @param {object} [cfgOrPath.methods] Custom set of methods (selectors/actions) for this specific data set.
- * @param {object} [cfgOrPath.inheritedMethods] These methods will be inherited by all children.
+ * @param {object} [cfgOrPath.inheritedMethods] These methods will be assigned to self and all children.
+ * @param {object} [cfgOrPath.cascadingMethods] These methods will be assigned to self and all parents, but parameters will be filled from props, according to all variables in full path.
  * 
- * returns a new function wrapper(firebaseDataRoot, props) with the following properties:
- *  Parent, pathName, getPath, and all corresponding child wrapper functions
+ * returns a new ref wrapper function (firebaseDataRoot, props) with the following properties:
+ *  parent, getPath, and all corresponding child wrapper functions
  *
  * TODO: Use reselect + internal caching so we can reduce re-creation of wrappers
  */
@@ -76,43 +77,70 @@ function _refWrapper(parent, cfgOrPath) {
   console.assert(!!cfg, 'config was not provided under: ' + (parent && parent.path));
 
   const { path, children } = cfg;
-  const fullPath = parent.path && pathJoin(parent.path, path) || path;
+  const fullPath = parent && pathJoin(parent.path, path) || path;
   const getPath = createPathGetterFromTemplateProps(fullPath);
   
   const WrapperClass = createRefWrapperBase();
-  const inheritedMethods = cfg.inheritedMethods || {};
 
-  if (parent && parent.inheritedMethods) {
-    Object.assign(inheritedMethods, parent.inheritedMethods);
-  }
-  Object.assign(WrapperClass.prototype, inheritedMethods);
-
-  if (cfg.methods) {
-    Object.assign(WrapperClass.prototype, cfg.methods);
-  }
-
-  createChildDataAccessors(WrapperClass.prototype, cfg.children);
-
-  const func = createWrapperFunc(parent, WrapperClass);
+  // create the factory function
+  const func = createWrapperFunc(parent, WrapperClass, getPath);
   if (cfg.static) {
     Object.assign(func, cfg.static);
   }
   func.parent = parent;
-  func.pathName = pathName;
   func.getPath = getPath;
+  func.path = fullPath;
   func.inheritedMethods = inheritedMethods;
 
-  // recurse and repeat for all children
+  // recurse and add all children
+  cfg.cascadingMethods = cfg.cascadingMethods || [];
   if (cfg.children) {
     WrapperClass._ChildWrappers = {};
     for (let wrapperName in cfg.children) {
       const childCfg = cfg.children[wrapperName];
 
       WrapperClass._ChildWrappers = func[wrapperName] = _refWrapper(func, childCfg);
+
+      if (childCfg.cascadingMethods) {
+        // add all descendant cascading methods as well
+        Object.assign(cfg.cascadingMethods, childCfg.cascadingMethods);
+      }
     }
   }
 
+  // add data accessors
+  createDataAccessors(WrapperClass.prototype, cfg.children);
+
+  // add inheritedMethods
+  const inheritedMethods = cfg.inheritedMethods || {};
+  if (parent && parent.inheritedMethods) {
+    Object.assign(inheritedMethods, parent.inheritedMethods);
+  }
+  Object.assign(WrapperClass.prototype, inheritedMethods);
+
+  // add cascadingMethods
+  const varNames = parseTemplateString(fullPath).varNames;
+  const cascadingMethods = _.map(cfg.cascadingMethods, function(method, name) {
+    // replace path variables with props
+    return function (...args2) {
+      const props = this.props;
+      const args1 = varNames.map(varName => props[varName]);
+      return method(...args1.concat(args2));
+    };
+  });
+  Object.assign(WrapperClass.prototype, cascadingMethods);
+
+  // add methods
+  if (cfg.methods) {
+    Object.assign(WrapperClass.prototype, cfg.methods);
+  }
+
   return func;
+}
+
+function createDataAccessors(prototype, children) {
+  // add all children
+  createChildDataAccessors(prototype, children, '');
 }
 
 function createChildDataAccessors(prototype, children, parentPath) {
@@ -120,16 +148,20 @@ function createChildDataAccessors(prototype, children, parentPath) {
     return;
   }
 
-  for (let wrapperName in cfg.children) {
-    const childCfg = cfg.children[wrapperName];
+  for (let wrapperName in children) {
+    const childCfgOrPath = children[wrapperName];
+    const childPath = _.isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.path || '');
 
-    // the path is the relative path between the node we are accessing and the current child
+    // the path is the relative path between from the node of given prototype to current child
     // NOTE: The path is NOT the full path.
-    const path = (parentPath || '') + childCfg.path;
+    const path = pathJoin(parentPath, childPath);
     const getPath = createPathGetterFromTemplateArray(path);
 
     // get
     prototype[wrapperName] = createChildDataGet(getPath);
+
+    // push
+    prototype['push_' + wrapperName] = createChildDataPush(getPath);
 
     // set
     prototype['set_' + wrapperName] = createChildDataSet(getPath);
@@ -138,7 +170,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
     prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
 
     // keep going
-    createChildDataAccessors(prototype, childCfg.children);
+    createChildDataAccessors(prototype, childCfgOrPath.children);
   }
 }
 
@@ -147,6 +179,20 @@ function createChildDataGet(getPath) {
     const path = getPath(args);
     return this.getData(path);
   };
+}
+function createChildDataPush(getPath) {
+  if (getPath.hasVariables) {
+    return function _push(args, data) {
+      const path = getPath(args);
+      return this.pushChild(path, args);
+    };
+  }
+  else {
+    const path = getPath();
+    return function _push(data) {
+      return this.pushChild(path, args);
+    };
+  }
 }
 function createChildDataSet(getPath) {
   if (getPath.hasVariables) {
@@ -208,12 +254,14 @@ function parseTemplateString(text, varLookup) {
   }
 
   const nodes = [];
+  const varNames = [];
   let lastIndex = 0;
   let match;
   while ((match = varRe.exec(text)) != null) {
     const matchStart = match.index, matchEnd = varRe.lastIndex;
     let prevText = text.substring(lastIndex, matchStart);
     let varName = match[1];
+    varNames.push(varName);
 
     if (prevText.length > 0) {
       nodes.push(textNode(prevText));
@@ -231,6 +279,7 @@ function parseTemplateString(text, varLookup) {
   return {
     nVars,
     nTexts,
+    varNames,
     nodes
   };
 }
@@ -243,7 +292,7 @@ function createPathGetterFromTemplateProps(path) {
     return props[varName];
   }
   const substituter = function getPath(props) {
-    return pathInfo.nodes.map(node => node(props)).join('');
+    return substituter.pathInfo.nodes.map(node => node(props)).join('');
   };
 
   return createPathGetterFromTemplate(path, varLookup, substituter);
@@ -258,7 +307,7 @@ function createPathGetterFromTemplateArray(path) {
     return args[iArg];
   };
   const substituter = function getPath(...args) {
-    return pathInfo.nodes.map(node => node(args)).join('');
+    return substituter.pathInfo.nodes.map(node => node(args)).join('');
   };
   return createPathGetterFromTemplate(path, varLookup, substituter);
 }
@@ -270,6 +319,7 @@ function createPathGetterFromTemplate(path, varLookup, substituter) {
     // template substitution from array
     getPath = substituter;
     getPath.hasVariables = true;
+    getPath.pathInfo = pathInfo;
   }
   else {
     // no variable substitution necessary
@@ -279,18 +329,21 @@ function createPathGetterFromTemplate(path, varLookup, substituter) {
   return getPath;
 }
 
-function createWrapperFunc(parent, RefClass) {
+function createWrapperFunc(parent, RefClass, getPath) {
   return function wrapper(firebaseDataRoot, props) {
     props = props || {};
-    let path = RefClass.getPath(props);
+    let path = getPath(props);
     path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
+
+    console.log('creating wrapper at: ' + path);
+
     const getData = makeGetDataDefault(firebaseDataRoot, path);
 
     const db = props && props.db || Firebase.database();
     const ref = db.ref(path);
     const refWrapper = new RefClass();
-    refWrapper.Parent = parent;
-    refWrapper.__init(path, getData, ref, props);
+    refWrapper.parent = parent;
+    refWrapper.__init(getData, ref, props);
     return refWrapper;
   };
 }

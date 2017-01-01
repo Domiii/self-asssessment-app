@@ -1,4 +1,4 @@
-import { UserInfo } from 'src/core/user-info';
+import { UserInfo } from 'src/core/users';
 
 import React, { Component, PropTypes } from 'react';
 //import { connect } from 'react-redux';
@@ -50,18 +50,18 @@ export const UserForm = reduxForm({ form: 'user_info', enableReinitialize: true 
 
 export default class UserProfilePage extends Component {
   static contextTypes = {
-    userInfo: PropTypes.instanceOf(UserInfo).isRequired
+    userInfo: PropTypes.object.isRequired
   };
 
   render() {
     // data
     const { userInfo } = this.context;
-    const isAdmin = userInfo && userInfo.isCurrentAdmin();
+    const isAdmin = userInfo && userInfo.isAdmin();
     const isBusy = !userInfo.isLoaded;
 
 
     // actions
-    const updateUser = userInfo.updateCurrentUserInfo.bind(userInfo);
+    const updateUser = userInfo.update.bind(userInfo);
 
 
     // go render!

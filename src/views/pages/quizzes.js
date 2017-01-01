@@ -1,10 +1,10 @@
-import { UserInfo } from 'src/core/user-info';
+import { UserInfoRef } from 'src/core/users';
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
-  Quizzes, 
-  QuizProblems,
-  QuizProgress,
-  ProblemResponses
+  QuizzesRef,
+  QuizProblemsRef,
+  QuizProgressRef,
+  ProblemResponsesRef
 } from 'src/core/quizzes/';
 
 import React, { Component, PropTypes } from 'react';
@@ -23,7 +23,7 @@ import _ from 'lodash';
 
 export class QuizListItem extends Component {
   static contextTypes = {
-    userInfo: PropTypes.instanceOf(UserInfo).isRequired
+    userInfo: PropTypes.object.isRequired
   };
 
   static propTypes = {
@@ -35,7 +35,7 @@ export class QuizListItem extends Component {
     const { userInfo } = this.context;
     const { quiz, quizId } = this.props;
     const quizPath = '/quiz/' + quizId;
-    const isAdmin = userInfo && userInfo.isCurrentAdmin();
+    const isAdmin = userInfo && userInfo.isAdmin();
 
     const adminTools = !isAdmin ? undefined : (
       <span>
@@ -143,28 +143,27 @@ export class AddQuiz extends Component {
 
 
 @firebase((props, firebase) => ([
-  Quizzes.PATH_ROOT,
-  QuizProblems.PATH_ROOT,
-  ProblemResponses.PATH_ROOT,
-  QuizProgress.PATH_ROOT
+  QuizzesRef.PATH_ROOT,
+  QuizProblemsRef.PATH_ROOT,
+  ProblemResponsesRef.PATH_ROOT,
+  QuizProgressRef.PATH_ROOT
 ]))
 @connect(
   ({ firebase }) => {
-    const getData = makeGetDataDefault(firebase);
     return {
-      quizzes: new Quizzes(getData),
-      problems: new QuizProblems(getData)
+      quizzesRef: QuizzesRef(firebase),
+      problemsRef: QuizProblemsRef(firebase)
     };
   }
 )
 export default class QuizzesPage extends Component {
   static contextTypes = {
-    userInfo: PropTypes.instanceOf(UserInfo).isRequired
+    userInfo: PropTypes.object.isRequired
   };
 
   static propTypes = {
-    quizzes: PropTypes.instanceOf(Quizzes).isRequired,
-    problems: PropTypes.instanceOf(QuizProblems).isRequired
+    quizzesRef: PropTypes.object.isRequired,
+    problemsRef: PropTypes.object.isRequired
   };
 
   componentDidMount() {
@@ -191,14 +190,14 @@ export default class QuizzesPage extends Component {
 
     // prepare data + wrappers
     const { userInfo } = this.context;
-    const { quizzes } = this.props;
-    const isAdmin = userInfo && userInfo.isCurrentAdmin();
-    const isBusy = !quizzes.isLoaded;
+    const { quizzesRef } = this.props;
+    const isAdmin = userInfo && userInfo.isAdmin();
+    const isBusy = !quizzesRef.isLoaded;
 
     // prepare actions
-    //const addQuiz = quizzes.addQuiz.bind(quizzes);
+    //const addQuiz = quizzesRef.add_quiz.bind(quizzesRef);
     const addQuiz = (q) => {
-      quizzes.addQuiz(q);
+      quizzesRef.addQuiz(q);
     };
 
 
@@ -214,7 +213,7 @@ export default class QuizzesPage extends Component {
     </div>);
 
     return (<div>
-      <QuizList quizzes={quizzes.val || {}} />
+      <QuizList quizzes={quizzesRef.val || {}} />
       {adminTools}
     </div>);
   }

@@ -1,2 +1,0 @@
-
-export UserInfo from './UserInfo';

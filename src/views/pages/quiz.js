@@ -4,12 +4,11 @@ import { Alert, Button, Jumbotron, Well } from 'react-bootstrap';
 import { firebase, helpers } from 'redux-react-firebase';
 //import _ from 'lodash';
 
-import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
-  Quizzes, 
-  QuizProblems,
-  QuizProgress,
-  ProblemResponses
+  QuizzesRef,
+  QuizProblemsRef,
+  QuizProgressRef,
+  ProblemResponsesRef
 } from 'src/core/quizzes/';
 
 import { FAIcon } from 'src/views/components/util';
@@ -23,10 +22,10 @@ export class QuizProgressBar extends React.Component {
     quiz: PropTypes.object.isRequired,
     problem: PropTypes.object,
 
-    quizzes: PropTypes.instanceOf(Quizzes).isRequired,
-    problemsRef: PropTypes.instanceOf(QuizProblems).isRequired,
-    responses: PropTypes.instanceOf(ProblemResponses).isRequired,
-    progress: PropTypes.instanceOf(QuizProgress).isRequired
+    quizzes: PropTypes.object.isRequired,
+    problemsRef: PropTypes.object.isRequired,
+    responses: PropTypes.object.isRequired,
+    progress: PropTypes.object.isRequired
   };
 
   render() {
@@ -128,19 +127,18 @@ class QuizResponseMenu extends React.Component {
 
 
 @firebase(({ params }, firebase) => ([
-  Quizzes.PATH_ROOT,
-  QuizProblems.PATH_ROOT,
-  ProblemResponses.PATH_ROOT,
-  QuizProgress.PATH_ROOT
+  QuizzesRef.PATH_ROOT,
+  QuizProblemsRef.PATH_ROOT,
+  ProblemResponsesRef.PATH_ROOT,
+  QuizProgressRef.PATH_ROOT
 ]))
 @connect(
   ({ firebase }, { params }) => {
-    const getData = makeGetDataDefault(firebase);
     return {
-      quizzes: new Quizzes(getData),
-      problems: new QuizProblems(getData),
-      responses: new ProblemResponses(getData),
-      progress: new QuizProgress(getData)
+      quizzes: QuizzesRef(firebase),
+      problems: QuizProblemsRef(firebase),
+      responses: ProblemResponsesRef(firebase),
+      progress: QuizProgressRef(firebase)
     };
   }
 )
@@ -153,10 +151,10 @@ export class QuizPage extends Component {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
 
-    quizzes: PropTypes.instanceOf(Quizzes).isRequired,
-    problems: PropTypes.instanceOf(QuizProblems).isRequired,
-    responses: PropTypes.instanceOf(ProblemResponses).isRequired,
-    progress: PropTypes.instanceOf(QuizProgress).isRequired
+    quizzes: PropTypes.object.isRequired,
+    problems: PropTypes.object.isRequired,
+    responses: PropTypes.object.isRequired,
+    progress: PropTypes.object.isRequired
   };
 
   componentDidMount() {
@@ -183,10 +181,10 @@ export class QuizPage extends Component {
     const hasProblems = !isEmpty(quizProblems);
 
     // prepare all actions
-    const getQuizById = quizzes.getQuiz.bind(quizzes);
+    const getQuizById = quizzes.quiz.bind(quizzes);
+    const getProblemById = problems.ofQuiz.bind(problems);
     const getFirstProblemId = problems.getFirstProblemId.bind(problems);
     const getFirstProblem = problems.getFirstProblem.bind(problems);
-    const getProblemById = problems.getProblem.bind(problems);
     const gotoFirstProblem = () => {
       const newProblemId = getFirstProblemId(quizId);
       setTimeout(() => router.replace(`/quiz/${quizId}/problem/${newProblemId}`), 1000);
