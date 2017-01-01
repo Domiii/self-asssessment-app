@@ -20,7 +20,7 @@ export default class QuizzesRef extends RefWrapper {
   }
 
   getQuizzes() {
-    return this.rootData;
+    return this.val;
   }
 
   addQuiz(quiz) {

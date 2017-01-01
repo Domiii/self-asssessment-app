@@ -33,14 +33,18 @@ export default class ScratchMarkdown extends Component {
         let prevText = text.substring(lastIndex, matchStart);
         let matchText = match[1];
 
-        comps.push(textNode(prevText));
+        if (prevText.length > 0) {
+          comps.push(textNode(prevText));
+        }
         comps.push(codeNode(matchText));
 
         lastIndex = matchEnd;
       }
 
       let prevText = text.substring(lastIndex, text.length);
-      comps.push(textNode(prevText));
+      if (prevText.length > 0) {
+        comps.push(textNode(prevText));
+      }
     }
     catch (err) {
       console.error('Invalid string: ' + text);

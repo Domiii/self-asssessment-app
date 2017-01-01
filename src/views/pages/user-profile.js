@@ -19,15 +19,15 @@ class _UserForm extends Component {
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
-        <FormInputField name="userName" label="user name"
+        <FormInputField name="data.userName" label="user name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="email" label="email"
+        <FormInputField name="data.email" label="email"
           inputProps={{type: 'email', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="locale" label="language"
+        <FormInputField name="data.locale" label="language"
           inputProps={{component:'select'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         >
@@ -71,7 +71,7 @@ export default class UserProfilePage extends Component {
     }
 
     return (
-      <UserForm onSubmit={updateUser} initialValues={userInfo.rootData} />
+      <UserForm onSubmit={updateUser} initialValues={userInfo.val} />
     );
   }
 }

@@ -33,7 +33,7 @@ const { pathToJS } = helpers;
       props.userInfo = new UserInfo(getData, auth);
 
 
-      //console.log(props.userInfo.rootData);
+      //console.log(props.userInfo.val);
     }
 
     return props;

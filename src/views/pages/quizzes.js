@@ -214,7 +214,7 @@ export default class QuizzesPage extends Component {
     </div>);
 
     return (<div>
-      <QuizList quizzes={quizzes.rootData || {}} />
+      <QuizList quizzes={quizzes.val || {}} />
       {adminTools}
     </div>);
   }
