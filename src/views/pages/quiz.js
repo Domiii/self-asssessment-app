@@ -176,7 +176,7 @@ export class QuizPage extends Component {
     const { quizzes, problems, responses, progress, children } = this.props;
     const { quizId, problemId } = this.props.params;
 
-    const quizProblems = problems.getProblems(quizId);
+    const quizProblems = problems.ofQuiz(quizId);
     const isBusy = !quizzes.isLoaded;
     const hasProblems = !isEmpty(quizProblems);
 

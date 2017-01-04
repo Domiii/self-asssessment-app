@@ -93,7 +93,7 @@ function _refWrapper(parent, cfgOrPath) {
   func.inheritedMethods = inheritedMethods;
 
   // recurse and add all children
-  cfg.cascadingMethods = cfg.cascadingMethods || [];
+  cfg.cascadingMethods = cfg.cascadingMethods || {};
   if (cfg.children) {
     WrapperClass._ChildWrappers = {};
     for (let wrapperName in cfg.children) {
@@ -120,7 +120,7 @@ function _refWrapper(parent, cfgOrPath) {
 
   // add cascadingMethods
   const varNames = parseTemplateString(fullPath).varNames;
-  const cascadingMethods = _.map(cfg.cascadingMethods, function(method, name) {
+  const cascadingMethods = _.mapValues(cfg.cascadingMethods, function(method, name) {
     // replace path variables with props
     return function (...args2) {
       const props = this.props;
@@ -128,6 +128,9 @@ function _refWrapper(parent, cfgOrPath) {
       return method(...args1.concat(args2));
     };
   });
+  if (cascadingMethods) {
+    console.log([fullPath].concat(Object.keys(cascadingMethods)));
+  }
   Object.assign(WrapperClass.prototype, cascadingMethods);
 
   // add methods
