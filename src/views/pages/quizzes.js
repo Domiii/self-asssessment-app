@@ -77,8 +77,7 @@ export class QuizList extends Component {
     return (
       <SimpleGrid objects={quizzes} 
         nCols={4}
-        objectComponentCreator={(key, value) => <QuizListItem key={key} quizId={key} quiz={value} />} 
-        objectPropName="quiz"
+        objectComponentCreator={(key, value) => <QuizListItem key={key} quizId={key} quiz={value} />}
       >
       </SimpleGrid>
     );

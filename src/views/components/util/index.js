@@ -30,13 +30,12 @@ export class SimpleGrid extends Component {
     objects: PropTypes.object.isRequired,   // an object containing a bunch of objects to display
     nCols: PropTypes.number.isRequired,
     objectComponentCreator: PropTypes.func.isRequired,
-    objectPropName: PropTypes.string.isRequired,
     rowProps: PropTypes.object,
     keyCompareFunction: PropTypes.func     // optional function for sorting objects before rendering
   };
 
   render() {
-    const { nCols, objects, objectComponentCreator, objectPropName, rowProps, keyCompareFunction } = this.props;
+    const { nCols, objects, objectComponentCreator, rowProps, keyCompareFunction } = this.props;
     const keys = Object.keys(objects);
     const nChildren = keys.length;
     console.assert(nCols > 0, 'nCols passed to SimpleGrid is invalid: ' + nCols);

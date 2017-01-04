@@ -129,14 +129,18 @@ export class ProblemRow extends Component {
 
     // render
     return (
-      <Row>
-        <Col xs={11}>
-          { content }
-        </Col>
-        <Col xs={1} className="inline-vcentered">
-          { adminTools }
-        </Col>
-      </Row>
+      <Grid fluid>
+        <Row>
+          <Col xs={12}>
+            { content }
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12} className="inline-vcentered">
+            { adminTools }
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
@@ -259,6 +263,39 @@ export default class QuizEditorPage extends Component {
     });
   }
 
+  ProblemGrid(problems) {
+    // actions
+    const updateProblem = (editorData) => {
+      const { problemId, problem } = editorData;
+      debugger;
+      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
+    };
+    const deleteProblemId = (problemId) => {
+      return this.wrapPromise(problemsRef.delete_problem(quizId, problemId));
+    };
+
+    // prepare props
+    const problemProps = _.mapValues(problems, 
+      (problem, problemId) => ({
+        problemId,
+        problem,
+        updateProblem,
+        deleteProblemId
+      })
+    );
+
+    // return final element
+    return (<SimpleGrid objects={problems} 
+      nCols={3}
+      objectComponentCreator={(key, value) => {
+        return (
+          <ProblemRow key={key} busy={this.state.busy} {...problemProps[key]}/>
+        );
+      }}
+    >
+    </SimpleGrid>);
+  }
+
   render() {
     // prepare data
     const { userInfo, router } = this.context;  
@@ -275,14 +312,6 @@ export default class QuizEditorPage extends Component {
       const { problem } = editorData;
       problem.num = _.size(problems)+1;
       return this.wrapPromise(problemsRef.add_problem(quizId, problem));
-    };
-    const updateProblem = (editorData) => {
-      const { problemId, problem } = editorData;
-      debugger;
-      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
-    };
-    const deleteProblemId = (problemId) => {
-      return this.wrapPromise(problemsRef.delete_problem(quizId, problemId));
     };
 
     // go render!
@@ -301,21 +330,12 @@ export default class QuizEditorPage extends Component {
       return (<Alert bsStyle="danger">invalid quizId: {quizId}</Alert>);
     }
 
-    const problemList = !problems ? (
+    const problemsEl = !problems ? (
       // no problems
       <Alert bsStyle="info">quiz is empty</Alert>
     ) : (
-      // list problem editors
-      _.map(problems, (problem, problemId) => (
-        <ProblemRow key={problemId} 
-          busy={this.state.busy}
-          {...{
-            problemId, 
-            problem,
-            updateProblem,
-            deleteProblemId
-          }}/>
-      ))
+      // display problems
+      <div>{ this.ProblemGrid(problems) }</div>
     );
 
     //console.log(problems && _.map(problems, p => p.description_en).join(', '));
@@ -328,9 +348,7 @@ export default class QuizEditorPage extends Component {
       <div>
         <h3>{quiz.title}</h3>
         { errEl }
-        <Grid>
-          { problemList }
-        </Grid>
+        { problemsEl }
         <hr />
         <AddProblem busy={this.state.busy} quiz={quiz} addProblem={addProblem} />
       </div>
