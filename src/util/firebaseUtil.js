@@ -108,7 +108,7 @@ function _refWrapper(parent, cfgOrPath) {
     }
   }
 
-  // add data accessors
+  // add get,set,update,add,delete accessors
   createDataAccessors(WrapperClass.prototype, cfg.children);
 
   // add inheritedMethods
@@ -157,6 +157,11 @@ function createChildDataAccessors(prototype, children, parentPath) {
     const path = pathJoin(parentPath, childPath);
     const getPath = createPathGetterFromTemplateArray(path);
 
+    if (prototype[wrapperName]) {
+      console.error(`invalid: duplicate path name '${wrapperName}' under '${parentPath}'`);
+      return;
+    }
+
     // get
     prototype[wrapperName] = createChildDataGet(getPath);
 
@@ -170,6 +175,9 @@ function createChildDataAccessors(prototype, children, parentPath) {
     // update
     prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
 
+    // delete
+    prototype['delete_' + wrapperName] = createChildDataDelete(getPath);
+
     // keep going
     createChildDataAccessors(prototype, childCfgOrPath.children, path);
   }
@@ -177,7 +185,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
 
 function createChildDataGet(getPath) {
   return function _get(...args) {
-    const path = getPath(args);
+    const path = getPath(...args);
     return this.getData(path);
   };
 }
@@ -186,7 +194,7 @@ function createChildDataPush(getPath) {
     return function _push(...args) {
       const pathArgs = _.initial(args);
       const data = _.last(args);
-      const path = getPath(pathArgs);
+      const path = getPath(...pathArgs);
       return this.pushChild(path, data);
     };
   }
@@ -202,7 +210,7 @@ function createChildDataSet(getPath) {
     return function _set(...args) {
       const pathArgs = _.initial(args);
       const data = _.last(args);
-      const path = getPath(pathArgs);
+      const path = getPath(...pathArgs);
       return this.setChild(path, data);
     };
   }
@@ -218,7 +226,7 @@ function createChildDataUpdate(getPath) {
     return function _update(...args) {
       const pathArgs = _.initial(args);
       const data = _.last(args);
-      const path = getPath(pathArgs);
+      const path = getPath(...pathArgs);
       return this.updateChild(path, data);
     };
   }
@@ -229,6 +237,21 @@ function createChildDataUpdate(getPath) {
     };
   }
 }
+function createChildDataDelete(getPath) {
+  if (getPath.hasVariables) {
+    return function _delete(...args) {
+      const path = getPath(...args);
+      return this.setChild(path, null);
+    };
+  }
+  else {
+    const path = getPath();
+    return function _delete() {
+      return this.setChild(path, null);
+    };
+  }
+}
+
 
 // function getVariablesFromPath(path) {
 //   const vars = [];
@@ -294,7 +317,7 @@ function parseTemplateString(text, varLookup) {
 function createPathGetterFromTemplateProps(path) {
   const varLookup = (props, varName, iArg) => {
     if (!props || props[varName] === undefined) {
-      throw new Exception(`invalid arguments: ${varName} was not provided for path ${path}`);
+      throw new Error(`invalid arguments: ${varName} was not provided for path ${path}`);
     }
     return props[varName];
   }
@@ -309,7 +332,7 @@ function createPathGetterFromTemplateProps(path) {
 function createPathGetterFromTemplateArray(path) {
   const varLookup = (args, varName, iArg) => {
     if (!args || args[iArg] === undefined) {
-      throw new Exception(`invalid arguments: ${varName} was not provided for path ${path}`);
+      throw new Error(`invalid arguments: ${varName} was not provided for path ${path}`);
     }
     return args[iArg];
   };

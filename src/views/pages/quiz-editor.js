@@ -10,7 +10,9 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { firebase, helpers } from 'redux-react-firebase';
 import { 
-  Alert, Button, Jumbotron, Well
+  Alert, Button, Jumbotron, Well,
+  Grid, Row, Col,
+  Popover, Tooltip, Modal
 } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { Field, reduxForm } from 'redux-form';
@@ -21,19 +23,120 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
-
-class ProblemPreview extends Component {
+export class ProblemDeleteModal extends Component {
   static propTypes = {
     problemId: PropTypes.string.isRequired,
-    problem: PropTypes.object.isRequired
+    problem: PropTypes.object.isRequired,
+    deleteProblemId: PropTypes.func.isRequired
   };
 
+  constructor(...args) { super(...args); this.state = { showModal: false }; }
+  close() { this.setState({ showModal: false }); }
+  open() { this.setState({ showModal: true }); }
+
   render() {
-    const { problemId, problem } = this.props;
+
+    // data
+    const { problemId, problem, deleteProblemId } = this.props;
     const description = problem.description_en || problem.description_zh;
 
+    // actions
+    const deleteProblem = () => {
+      deleteProblemId(problemId);
+      this.close();
+    };
+
+    // modal setup
+    const open = this.open.bind(this);
+    const close = this.close.bind(this);
+
     return (
-      <Well className="no-padding">{description}</Well>
+      <span>
+        <Button onClick={open} className="color-red" bsSize="small">
+          <FAIcon name="remove" />
+        </Button>
+
+        <Modal show={this.state.showModal} onHide={close}>
+          <Modal.Header closeButton>
+            <Modal.Title>Do you really want to delete the problem?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {description}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={ deleteProblem }
+              bsStyle="danger">
+              Yes
+            </Button>
+            <Button onClick={close}
+              bsStyle="primary"
+              bsSize="large">
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </span>
+    );
+  }
+};
+
+export class ProblemRow extends Component {
+  static contextTypes = {
+    userInfo: PropTypes.object.isRequired
+  };
+
+  static propTypes = {
+    busy: PropTypes.bool.isRequired,
+    problemId: PropTypes.string.isRequired,
+    problem: PropTypes.object.isRequired,
+    updateProblem: PropTypes.func.isRequired,
+    deleteProblemId: PropTypes.func.isRequired
+  };
+
+  constructor(...args) {
+    super(...args);
+    this.state = { editing: false };
+  }
+  startEdit() { this.setState({ editing: false }); }
+  stopEdit() { this.setState({ editing: true }); }
+  toggleEdit() { this.setState({ editing: !this.state.editing }); }
+
+  get EditButton() {
+    return (<Button onClick={() => this.toggleEdit()} className="color-green" bsSize="small">
+      <FAIcon name="edit" />
+    </Button>);
+  }
+
+  render() {
+    // data
+    const { userInfo } = this.context;
+    const { busy, problemId, problem, updateProblem, deleteProblemId } = this.props;
+    const description = problem.description_en || problem.description_zh;
+    const isAdmin = userInfo && userInfo.isAdmin();
+    const content = !this.state.editing ?
+      (<Well className="no-padding no-margin" style={{fontSize: '2em'}}>
+        {description}
+      </Well>) :
+
+      (<ProblemEditor busy={busy} onSubmit={updateProblem} {...{ problemId, problem }}></ProblemEditor>)
+    ;
+
+    // elements
+    const adminTools = !isAdmin ? undefined : (<span>
+      { this.EditButton }
+      <ProblemDeleteModal {...{ problemId, problem, deleteProblemId }} />
+    </span>);
+
+    // render
+    return (
+      <Row>
+        <Col xs={11}>
+          { content }
+        </Col>
+        <Col xs={1} className="inline-vcentered">
+          { adminTools }
+        </Col>
+      </Row>
     );
   }
 }
@@ -163,19 +266,23 @@ export default class QuizEditorPage extends Component {
     const isAdmin = userInfo && userInfo.isAdmin();
     const isBusy = !quizzesRef.isLoaded;
     const { quizId } = params;
-    const quiz = quizzesRef.getQuiz(quizId);
-    const problems = problemsRef.getProblems(quizId);
+    const quiz = quizzesRef.quiz(quizId);
+    const problems = problemsRef.ofQuiz(quizId);
 
     // prepare actions
     const addProblem = (editorData) => {
       // TODO: Use transaction to avoid race condition
       const { problem } = editorData;
       problem.num = _.size(problems)+1;
-      return this.wrapPromise(problemsRef.addProblem(quizId, problem));
+      return this.wrapPromise(problemsRef.add_problem(quizId, problem));
     };
     const updateProblem = (editorData) => {
       const { problemId, problem } = editorData;
-      return this.wrapPromise(problemsRef.updateProblem(quizId, problemId, problem));
+      debugger;
+      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
+    };
+    const deleteProblemId = (problemId) => {
+      return this.wrapPromise(problemsRef.delete_problem(quizId, problemId));
     };
 
     // go render!
@@ -200,13 +307,18 @@ export default class QuizEditorPage extends Component {
     ) : (
       // list problem editors
       _.map(problems, (problem, problemId) => (
-        <ProblemPreview key={problemId} 
-          problemId={problemId} problem={problem}/>
+        <ProblemRow key={problemId} 
+          busy={this.state.busy}
+          {...{
+            problemId, 
+            problem,
+            updateProblem,
+            deleteProblemId
+          }}/>
       ))
     );
 
-
-    console.log(problems && _.map(problems, p => p.description_en).join(', '));
+    //console.log(problems && _.map(problems, p => p.description_en).join(', '));
 
     const errEl = !this.state.error ? undefined : (
       <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
@@ -216,7 +328,9 @@ export default class QuizEditorPage extends Component {
       <div>
         <h3>{quiz.title}</h3>
         { errEl }
-        { problemList }
+        <Grid>
+          { problemList }
+        </Grid>
         <hr />
         <AddProblem busy={this.state.busy} quiz={quiz} addProblem={addProblem} />
       </div>

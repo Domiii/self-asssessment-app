@@ -95,10 +95,22 @@ a {
   color: green;
 }
 
+.color-red {
+  color: red;
+}
+
 .inline {
   display: inline;
 }
 
 .inline-block {
   display: inline-block;
+}
+
+.inline-hcentered {
+  text-align: center;
+}
+
+.inline-vcentered {
+  vertical-align: middle;
 }
