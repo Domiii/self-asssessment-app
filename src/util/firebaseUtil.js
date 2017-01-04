@@ -125,12 +125,9 @@ function _refWrapper(parent, cfgOrPath) {
     return function (...args2) {
       const props = this.props;
       const args1 = varNames.map(varName => props[varName]);
-      return method(...args1.concat(args2));
+      return method.call(this, ...args1.concat(args2));
     };
   });
-  if (cascadingMethods) {
-    console.log([fullPath].concat(Object.keys(cascadingMethods)));
-  }
   Object.assign(WrapperClass.prototype, cascadingMethods);
 
   // add methods
@@ -345,7 +342,7 @@ function createWrapperFunc(parent, RefClass, getPath) {
     let path = getPath(props);
     path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
 
-    console.log('creating wrapper at: ' + path);
+    //console.log('creating wrapper at: ' + path);
 
     const getData = makeGetDataDefault(firebaseDataRoot, path);
 

@@ -39,6 +39,7 @@ export class QuizListItem extends Component {
 
     const adminTools = !isAdmin ? undefined : (
       <span>
+        &nbsp;
         <Link to={'/quiz-editor/' + quizId} onlyActiveOnIndex={true}>
           <span>edit</span>
         </Link>
@@ -55,7 +56,7 @@ export class QuizListItem extends Component {
           </div>
           <span>
             <Link to={quizPath} onlyActiveOnIndex={true}>
-              play&nbsp;
+              play
             </Link>
           </span>
           {adminTools}

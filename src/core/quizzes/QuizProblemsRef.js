@@ -15,13 +15,13 @@ const QuizProblemsRef = refWrapper({
       path: '$(quizId)',
 
       cascadingMethods: {
-        getFirstProblem: function(quizId) {
+        getFirstProblem(quizId) {
           const firstId = this.getFirstProblemId(quizId);
-          return firstId && this.getProblems(quizId)[firstId];
+          return firstId && this.ofQuiz(quizId)[firstId];
         },
 
-        getFirstProblemId: function(quizId) {
-          const problems = this.getProblems(quizId);
+        getFirstProblemId(quizId) {
+          const problems = this.ofQuiz(quizId);
           if (!problems) {
             return null;
           }
@@ -37,8 +37,8 @@ const QuizProblemsRef = refWrapper({
           return firstKey;
         },
 
-        getPreviousProblemId: function(quizId, currentProblemId) {
-          const problems = this.getProblems(quizId);
+        getPreviousProblemId(quizId, currentProblemId) {
+          const problems = this.ofQuiz(quizId);
           // TODO
         },
 

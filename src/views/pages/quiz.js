@@ -22,14 +22,14 @@ export class QuizProgressBar extends React.Component {
     quiz: PropTypes.object.isRequired,
     problem: PropTypes.object,
 
-    quizzes: PropTypes.object.isRequired,
+    quizzesRef: PropTypes.object.isRequired,
     problemsRef: PropTypes.object.isRequired,
-    responses: PropTypes.object.isRequired,
-    progress: PropTypes.object.isRequired
+    responsesRef: PropTypes.object.isRequired,
+    progressRef: PropTypes.object.isRequired
   };
 
   render() {
-    const { quiz, problem, quizzes, problems, responses, progress } = this.props;
+    const { quiz, problem, quizzesRef, problemsRef, responsesRef, progressRef } = this.props;
 
     return (<div>
       <Well className="no-margin">
@@ -135,10 +135,10 @@ class QuizResponseMenu extends React.Component {
 @connect(
   ({ firebase }, { params }) => {
     return {
-      quizzes: QuizzesRef(firebase),
-      problems: QuizProblemsRef(firebase),
-      responses: ProblemResponsesRef(firebase),
-      progress: QuizProgressRef(firebase)
+      quizzesRef: QuizzesRef(firebase),
+      problemsRef: QuizProblemsRef(firebase),
+      responsesRef: ProblemResponsesRef(firebase),
+      progressRef: QuizProgressRef(firebase)
     };
   }
 )
@@ -151,10 +151,10 @@ export class QuizPage extends Component {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
 
-    quizzes: PropTypes.object.isRequired,
-    problems: PropTypes.object.isRequired,
-    responses: PropTypes.object.isRequired,
-    progress: PropTypes.object.isRequired
+    quizzesRef: PropTypes.object.isRequired,
+    problemsRef: PropTypes.object.isRequired,
+    responsesRef: PropTypes.object.isRequired,
+    progressRef: PropTypes.object.isRequired
   };
 
   componentDidMount() {
@@ -173,18 +173,18 @@ export class QuizPage extends Component {
   render() {
     // get data + wrappers
     const { router } = this.context;
-    const { quizzes, problems, responses, progress, children } = this.props;
+    const { quizzesRef, problemsRef, responsesRef, progressRef, children } = this.props;
     const { quizId, problemId } = this.props.params;
 
-    const quizProblems = problems.ofQuiz(quizId);
-    const isBusy = !quizzes.isLoaded;
+    const quizProblems = problemsRef.ofQuiz(quizId);
+    const isBusy = !quizzesRef.isLoaded;
     const hasProblems = !isEmpty(quizProblems);
 
     // prepare all actions
-    const getQuizById = quizzes.quiz.bind(quizzes);
-    const getProblemById = problems.ofQuiz.bind(problems);
-    const getFirstProblemId = problems.getFirstProblemId.bind(problems);
-    const getFirstProblem = problems.getFirstProblem.bind(problems);
+    const getQuizById = quizzesRef.quiz.bind(quizzesRef);
+    const getProblemById = problemsRef.ofQuiz.bind(problemsRef);
+    const getFirstProblemId = problemsRef.getFirstProblemId.bind(problemsRef);
+    const getFirstProblem = problemsRef.getFirstProblem.bind(problemsRef);
     const gotoFirstProblem = () => {
       const newProblemId = getFirstProblemId(quizId);
       setTimeout(() => router.replace(`/quiz/${quizId}/problem/${newProblemId}`), 1000);
@@ -237,8 +237,8 @@ export class QuizPage extends Component {
     return (
       <div className="quiz-wrapper flex-row-multi">
         <QuizProgressBar quiz={quiz} problem={problem} 
-          quizzes={quizzes} problems={problems}
-          progress={progress} responses={responses} />
+          quizzesRef={quizzesRef} problemsRef={problemsRef}
+          progressRef={progressRef} responsesRef={responsesRef} />
         { contentEl }
       </div>
     );
