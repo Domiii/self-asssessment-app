@@ -13,18 +13,21 @@ import { FAIcon } from 'src/views/components/util';
 
 export default class Header extends Component {
   static contextTypes = {
-    router: PropTypes.object.isRequired
+    router: PropTypes.object.isRequired,
+    userInfo: PropTypes.object
   };
 
   static propTypes = {
-    auth: PropTypes.object,
     openURL: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired
   };
 
   render() {
-    const { router } = this.context;
-    const { auth, openURL, signOut } = this.props;
+    const { router, userInfo } = this.context;
+    const { openURL, signOut } = this.props;
+
+    const busy = !userInfo || !userInfo.isLoaded;
+    const user = userInfo && userInfo.props.auth;
 
     const gotoProfile = () => router.replace('/user');
 
@@ -42,9 +45,9 @@ export default class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
-              {!!auth ?
+              { !busy ?
                 <NavDropdown eventKey="user-drop" id="user-dropdown"
-                  title={<span><FAIcon name="user" /> {auth.displayName || auth.email}</span>}>
+                  title={<span><FAIcon name="user" /> {user.displayName || user.email}</span>}>
                   <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>Profile</MenuItem>
                   <MenuItem divider />
                   <MenuItem eventKey="user-drop-logout" onClick={signOut}>Sign Out</MenuItem>

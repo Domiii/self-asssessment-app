@@ -143,10 +143,10 @@ export class AddQuiz extends Component {
 
 
 @firebase((props, firebase) => ([
-  QuizzesRef.PATH_ROOT,
-  QuizProblemsRef.PATH_ROOT,
-  ProblemResponsesRef.PATH_ROOT,
-  QuizProgressRef.PATH_ROOT
+  QuizzesRef.path,
+  QuizProblemsRef.path,
+  ProblemResponsesRef.path,
+  QuizProgressRef.path
 ]))
 @connect(
   ({ firebase }) => {
@@ -197,7 +197,7 @@ export default class QuizzesPage extends Component {
     // prepare actions
     //const addQuiz = quizzesRef.add_quiz.bind(quizzesRef);
     const addQuiz = (q) => {
-      quizzesRef.addQuiz(q);
+      quizzesRef.add_quiz(q);
     };
 
 

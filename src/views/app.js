@@ -16,7 +16,6 @@ const { pathToJS } = helpers;
   const uid = firebase._.authUid;
   const paths = [];
   if (uid) {
-    console.log(UserInfoRef.user.getPath({uid}));
     paths.push(UserInfoRef.user.getPath({uid}));
   }
   return paths;
@@ -24,9 +23,7 @@ const { pathToJS } = helpers;
 @connect(
   ({ firebase }) => {
     const auth = pathToJS(firebase, 'auth');
-    const props = {
-      auth
-    };
+    const props = {};
 
     if (auth && auth.uid) {
       props.userInfo = UserInfoRef.user(firebase, {auth, uid: auth.uid});
@@ -45,7 +42,6 @@ export class App extends Component {
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
-    auth: PropTypes.object,
     userInfo: PropTypes.object,
 
     children: PropTypes.object
@@ -71,9 +67,9 @@ export class App extends Component {
   }
 
   render() {
-    const { auth, firebase, children } = this.props;
+    const { userInfo, firebase, children } = this.props;
     const { router } = this.context;
-    const isBusy = auth === undefined;
+    const isBusy = !userInfo.isLoaded;
 
     if (!children) {
       router.replace('/');
@@ -90,14 +86,13 @@ export class App extends Component {
     const mainEl = isBusy ? 
       <FAIcon name="cog" spinning={true} /> : (
       <main className="app-main">
-        { React.cloneElement(children, { auth } ) }
+        { children }
       </main>
     );
 
     return (
       <div className="app container">
         <Header
-          auth={this.props.auth}
           signOut={signOut}
           openURL={window::open}
         />

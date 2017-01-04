@@ -114,8 +114,8 @@ export class AddProblem extends Component {
 
 
 @firebase((props, firebase) => ([
-  QuizzesRef.PATH_ROOT,
-  QuizProblemsRef.PATH_ROOT
+  QuizzesRef.path,
+  QuizProblemsRef.path
 ]))
 @connect(
   ({ firebase }) => {

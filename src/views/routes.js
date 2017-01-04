@@ -38,7 +38,7 @@ const requireAuth = getState => {
 const requireUnauth = getState => {
   return (nextState, replace) => {
     if (isAuthenticated(getState().firebase)) {
-      replace(paths.QUIZZES);
+      replace('/');
     }
   };
 };
@@ -50,7 +50,11 @@ export const getRoutes = getState => {
     // redirect: {
     //   from: '*',
     //   to: paths.QUIZZES
-    // },
+    // },,
+    indexRoute: {
+      component: QuizzesPage,
+      onEnter: requireAuth(getState)
+    },
     childRoutes: [
       {
         name: 'sign-in',
@@ -59,18 +63,18 @@ export const getRoutes = getState => {
         onEnter: requireUnauth(getState)
       },
       {
-        name: 'user',
-        path: paths.USER_PROFILE,
-        component: UserProfilePage,
-        onEnter: requireAuth(getState)
-      },
-      {
         name: 'quizzes',
         path: paths.QUIZZES,
         indexRoute: {
           component: QuizzesPage,
           onEnter: requireAuth(getState)
         }
+      },
+      {
+        name: 'user',
+        path: paths.USER_PROFILE,
+        component: UserProfilePage,
+        onEnter: requireAuth(getState)
       },
       {
         name: 'quiz-editor',

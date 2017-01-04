@@ -160,8 +160,9 @@ function createChildDataAccessors(prototype, children, parentPath) {
     // get
     prototype[wrapperName] = createChildDataGet(getPath);
 
-    // push
-    prototype['push_' + wrapperName] = createChildDataPush(getPath);
+    // add
+    const addGetPath = createPathGetterFromTemplateArray(parentPath);
+    prototype['add_' + wrapperName] = createChildDataPush(addGetPath);
 
     // set
     prototype['set_' + wrapperName] = createChildDataSet(getPath);
@@ -170,55 +171,61 @@ function createChildDataAccessors(prototype, children, parentPath) {
     prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
 
     // keep going
-    createChildDataAccessors(prototype, childCfgOrPath.children);
+    createChildDataAccessors(prototype, childCfgOrPath.children, path);
   }
 }
 
 function createChildDataGet(getPath) {
-  return function _get(args) {
+  return function _get(...args) {
     const path = getPath(args);
     return this.getData(path);
   };
 }
 function createChildDataPush(getPath) {
   if (getPath.hasVariables) {
-    return function _push(args, data) {
-      const path = getPath(args);
-      return this.pushChild(path, args);
+    return function _push(...args) {
+      const pathArgs = _.initial(args);
+      const data = _.last(args);
+      const path = getPath(pathArgs);
+      return this.pushChild(path, data);
     };
   }
   else {
     const path = getPath();
     return function _push(data) {
-      return this.pushChild(path, args);
+      return this.pushChild(path, data);
     };
   }
 }
 function createChildDataSet(getPath) {
   if (getPath.hasVariables) {
-    return function _set(args, data) {
-      const path = getPath(args);
-      return this.setChild(path, args);
+    return function _set(...args) {
+      const pathArgs = _.initial(args);
+      const data = _.last(args);
+      const path = getPath(pathArgs);
+      return this.setChild(path, data);
     };
   }
   else {
     const path = getPath();
     return function _set(data) {
-      return this.setChild(path, args);
+      return this.setChild(path, data);
     };
   }
 }
 function createChildDataUpdate(getPath) {
   if (getPath.hasVariables) {
-    return function _update(args, data) {
-      const path = getPath(args);
-      return this.updateChild(path, args);
+    return function _update(...args) {
+      const pathArgs = _.initial(args);
+      const data = _.last(args);
+      const path = getPath(pathArgs);
+      return this.updateChild(path, data);
     };
   }
   else {
     const path = getPath();
     return function _update(data) {
-      return this.updateChild(path, args);
+      return this.updateChild(path, data);
     };
   }
 }

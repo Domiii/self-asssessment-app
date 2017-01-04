@@ -127,10 +127,10 @@ class QuizResponseMenu extends React.Component {
 
 
 @firebase(({ params }, firebase) => ([
-  QuizzesRef.PATH_ROOT,
-  QuizProblemsRef.PATH_ROOT,
-  ProblemResponsesRef.PATH_ROOT,
-  QuizProgressRef.PATH_ROOT
+  QuizzesRef.path,
+  QuizProblemsRef.path,
+  ProblemResponsesRef.path,
+  QuizProgressRef.path
 ]))
 @connect(
   ({ firebase }, { params }) => {
