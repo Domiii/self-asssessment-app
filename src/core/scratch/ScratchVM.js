@@ -1,4 +1,4 @@
-
+//import VirtualMachine from 'scratch-vm';
 // TODO!
 // http://llk.github.io/scratch-vm/vendor.js
 // http://llk.github.io/scratch-vm/vm.js
@@ -10,7 +10,7 @@ import _ from 'lodash';
 // wraps the Scratch VM
 export class ScratchVM {
   constructor(workspaceCfg, renderCfg) {
-    this.vm = new window.VirtualMachine();
+    this.vm = new VirtualMachine();
     
     if (workspaceCfg) {
       this.setupWorkspace(workspaceCfg);

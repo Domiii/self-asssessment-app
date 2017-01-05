@@ -1,5 +1,6 @@
-import { ScratchVM } from 'src/core/scratch/ScratchVM';
 import React, { Component, PropTypes } from 'react';
+import { ScratchVM } from 'src/core/scratch/ScratchVM';
+import $ from 'jquery';
 
 // simple stand-alone Workspace to just render a bunch of code
 export class InlineScratchWorkspace extends Component {

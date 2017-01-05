@@ -32,6 +32,7 @@
     "babel-polyfill": "~6.13.0",
     "classnames": "~2.2.5",
     "immutable": "~3.8.1",
+    "jquery": "^3.1.1",
     "react": "^15.3.2",
     "react-bootstrap": "^0.30.7",
     "react-breadcrumbs": "^1.5.1",
@@ -45,7 +46,8 @@
     "redux-form": "^6.4.1",
     "redux-react-firebase": "^2.3.3",
     "redux-thunk": "^2.1.0",
-    "reselect": "^2.5.4"
+    "reselect": "^2.5.4",
+    "scratch-vm": "git+https://github.com/LLK/scratch-vm.git"
   },
   "devDependencies": {
     "autoprefixer": "~6.4.1",

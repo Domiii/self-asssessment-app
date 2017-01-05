@@ -1,5 +1,5 @@
 # Simple Self-Assessment App
-Built with React, Redux, Firebase and based on [todo-react-redux](https://github.com/r-park/todo-react-redux).
+Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
 # Install instructions
 ## `npm install`
@@ -9,11 +9,15 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 
 
 ### TODO
-* fix RefWrapper to work as a factory with easier access to all data
+* Finalize Editor
+* Tags
+* Question Hierarchy
 * finalize quiz + question editor GUI
-* Convert question data to new format
-* Store question data in DB
-* Store responses in DB
+* Add questions
+** Convert existing question data to new format
+** Fix format
+** Add remaining questions - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
+** Add more questions
 * Visualize responses of each individual Question
 * ResponseSummary
 * Teacher view: Pick a user from list of all users and check their responses with options: [OverEstimated, UnderEstimated, JustRight]
@@ -23,7 +27,6 @@ Built with React, Redux, Firebase and based on [todo-react-redux](https://github
 ** Render per-question code beneath text
 ** Add markdown support to question text
 ** (Render symbol images in questions)
-* Add all questions - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
 * Display statistics
 * Make sure, 小筆記 feature works
 * Activity logging

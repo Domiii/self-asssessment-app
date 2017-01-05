@@ -54,7 +54,7 @@ export class QuizProblem extends React.Component {
     }
 
     const { problem } = this.props;
-    const text = problem.description_en || problem.description_zh || "";
+    const description = problem.description_en || problem.description_zh || "";
     
 
     // go render!
@@ -75,7 +75,7 @@ export class QuizProblem extends React.Component {
       <div className="quiz-main" style={mainStyle}>
         <Jumbotron className="no-margin"style={jumboStyle}>
             <div style={{flex: '8 auto'}}>
-              <ScratchMarkdown text={text} />
+              <ScratchMarkdown text={description} />
             </div>
             <div style={{flex: '1 auto', position: 'relative'}}>
               <textarea placeholder="小筆記" 
