@@ -3,10 +3,11 @@ import { connect } from 'react-redux';
 import { 
   Alert, Button, Jumbotron, Well,
   Grid, Row, Col,
-  Popover, Tooltip, Modal
+  Popover, Tooltip, Modal,
+  FormGroup, FormControl, ControlLabel
 } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
-import { FormInputField, FAIcon } from 'src/views/components/util';
+import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
@@ -19,16 +20,78 @@ class _ProblemEditor extends Component {
     problem: PropTypes.object
   };
 
+  constructor(...args) {
+    super(...args);
+    this.state = {};
+  }
+
+  TagElements(tags) {
+    // data
+
+    // actions
+    const onEnterAdd = evt => {
+      const val = evt.target.value;
+      if (evt.key === 'Enter') {
+        // add tag
+        tags[val] = val;
+
+        // reset new tag input field
+        evt.preventDefault();
+        evt.target.value = "";
+
+        this.setState({dirty: (this.state.dirty || 0) + 1});
+      }
+    };
+    const deleteEmpty = (tagId) => (evt) => {
+      const val = evt.target.value;
+      if (!_.isString(val) || val.length === 0) {
+        // delete tag
+        delete tags[tagId];
+      }
+    };
+
+    const tagEls = _.map(tags, (tag, tagId) => {
+      const name = 'problem.tags.' + tagId;
+      return (<Field className="form-control" 
+        key={name} id={name} name={name}
+        onChange={ deleteEmpty(tagId) } />
+      );
+    });
+
+    // create elements
+    return (<FormGroup controlId="newTag">
+      <Col componentClass={ControlLabel} xs={2}>
+        Tags
+      </Col>
+      <Col xs={10}>
+        <input className="form-control" 
+          placeholder="enter new tag"
+          type="text"
+          name="newTag" onKeyPress={onEnterAdd} />
+        { tagEls }
+      </Col>
+    </FormGroup>);
+  }
+
   render() {
+    // data
     const { busy, problemId, problem } = this.props;
-    const { handleSubmit, pristine, reset, submitting, values } = this.props;
+    const { 
+      handleSubmit, pristine, reset, submitting, values
+    } = this.props;
     const num = problem && problem.num || 0;
 
+    // actions
     function onSubmit(...args) {
       reset();
       handleSubmit(...args);
     };
 
+    // elements
+    //problem.tags = problem && problem.tags || [];
+    const tagsEl = this.TagElements(problem.tags);
+
+    // render go!
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="problemId" value={problemId} component="input" type="hidden" />
@@ -41,6 +104,8 @@ class _ProblemEditor extends Component {
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
+
+        { tagsEl }
 
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>

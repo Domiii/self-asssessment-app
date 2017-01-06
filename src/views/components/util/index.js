@@ -27,8 +27,65 @@ export class FAIcon extends Component {
 
 export SimpleGrid from './SimpleGrid';
 
+// <FieldArray name="members" component={members =>
 
-export class FormInputField extends Component {
+
+export class FormInputFieldBase extends Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
+    labelProps: PropTypes.object,
+    inputColProps: PropTypes.object,
+    inputProps: PropTypes.object
+  };
+
+  constructor(...args) {
+    super(...args);
+  }
+
+  createField(component) {
+    let { 
+      name, label, placeholder, labelProps, inputColProps, inputProps
+    } = this.props;
+
+    return (<FormGroup controlId={name}>
+      <Col componentClass={ControlLabel} {...(labelProps || {})} >
+        {label}
+      </Col>
+      <Col {...(inputColProps || {})}>
+        { component }
+      </Col>
+    </FormGroup>);
+  }
+}
+
+export class FormInputFieldArray extends FormInputFieldBase {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    labelProps: PropTypes.object,
+    inputColProps: PropTypes.object,
+    inputProps: PropTypes.object,
+    component: PropTypes.any
+  };
+
+  render() {
+    let { 
+      name, placeholder, inputProps, component
+    } = this.props;
+
+    return this.createField(<FieldArray className="form-control" 
+      key={name} id={name} name={name}
+      component={component}
+      {...(inputProps || {})}>
+      {this.props.children}
+    </FieldArray>);
+  }
+}
+
+
+export class FormInputField extends FormInputFieldBase {
   static propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
@@ -39,21 +96,16 @@ export class FormInputField extends Component {
   };
 
   render() {
-    let { name, label, placeholder, labelProps, inputColProps, inputProps } = this.props;
+    let { 
+      name, label, placeholder, inputProps
+    } = this.props;
     placeholder = placeholder || label;
 
-    return (
-      <FormGroup controlId={name}>
-        <Col componentClass={ControlLabel} {...(labelProps || {})} >
-          {label}
-        </Col>
-        <Col {...(inputColProps || {})}>
-          <Field className="form-control" id={name} name={name} {...(inputProps || {})}
-            placeholder={placeholder}>
-            {this.props.children}
-          </Field>
-        </Col>
-      </FormGroup>
-    );
+    return this.createField(<Field className="form-control" 
+      key={name} id={name} name={name} 
+      placeholder={placeholder}
+      {...(inputProps || {})}>
+      {this.props.children}
+    </Field>);
   }
 }

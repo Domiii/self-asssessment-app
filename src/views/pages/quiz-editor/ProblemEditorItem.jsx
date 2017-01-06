@@ -14,6 +14,25 @@ import ProblemEditor from './ProblemEditor';
 
 import ProblemPreview from 'src/views/components/quiz/ProblemPreview';
 
+
+
+export class ProblemTags extends Component {
+  static propTypes = {
+    problemId: PropTypes.string.isRequired,
+    problem: PropTypes.object.isRequired
+  };
+
+  ProblemTag(tagText) {
+    return (<span className="alert alert-danger no-padding no-margin">tagText</span>);
+  }
+
+  render() {
+    const tags = this.problem && this.problem.tags || [];
+    const tagEls = tags.map(tag => this.ProblemTag(tag));
+    return tagEls && (<div>{tagEls}</div>) || null;
+  }
+}
+
 export default class ProblemEditorItem extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired
@@ -79,6 +98,11 @@ export default class ProblemEditorItem extends Component {
         <Row>
           <Col xs={12}>
             { content }
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <ProblemTags {...problemArgs} />
           </Col>
         </Row>
       </Grid>

@@ -13,6 +13,11 @@ export default class ProblemPreview extends Component {
     const { problemId, problem } = this.props;
     const description = problem.description_en || problem.description_zh;
 
+    // tags
+    // hierarchy
+
+    // actions
+
     // render!
     return (
       <ScratchMarkdown text={description} />
