@@ -17,44 +17,61 @@ class _ProblemEditor extends Component {
     //quiz: PropTypes.object.isRequired,
     busy: PropTypes.bool,
     problemId: PropTypes.string,
-    problem: PropTypes.object
+    problem: PropTypes.object,
+    notifyChange: PropTypes.func
   };
 
-  constructor(...args) {
-    super(...args);
-    this.state = {};
-  }
-
-  TagElements(tags) {
+  TagElements(problem) {
     // data
+    let tags = problem.tags;
+
+    // TODO: MUST redo this with FieldArray: http://redux-form.com/6.4.3/examples/fieldArrays/
 
     // actions
+    const updateTags = (tags) => {
+      problem.tags = tags;
+      this.props.notifyChange(problem);
+    };
     const onEnterAdd = evt => {
       const val = evt.target.value;
       if (evt.key === 'Enter') {
         // add tag
+        tags = Object.assign({}, tags);
         tags[val] = val;
+        if (!problem.tags) {
+          problem.tags = tags;
+        }
 
-        // reset new tag input field
+        // reset "new tag" input field
         evt.preventDefault();
         evt.target.value = "";
 
-        this.setState({dirty: (this.state.dirty || 0) + 1});
+        updateTags(tags);
       }
     };
-    const deleteEmpty = (tagId) => (evt) => {
+    const updateTag = (tagId) => (evt) => {
       const val = evt.target.value;
+      tags = Object.assign({}, tags);
       if (!_.isString(val) || val.length === 0) {
-        // delete tag
+        // delete empty tag
         delete tags[tagId];
       }
+      else {
+        // update!
+        delete tags[tagId];
+        tags[val] = val;
+      }
+      updateTags(tags);
     };
 
+    let key = 0;
     const tagEls = _.map(tags, (tag, tagId) => {
       const name = 'problem.tags.' + tagId;
       return (<Field className="form-control" 
-        key={name} id={name} name={name}
-        onChange={ deleteEmpty(tagId) } />
+        key={++key} id={name} name={name}
+        type="text"
+        component="input"
+        onChange={ updateTag(tagId) } />
       );
     });
 
@@ -88,8 +105,7 @@ class _ProblemEditor extends Component {
     };
 
     // elements
-    //problem.tags = problem && problem.tags || [];
-    const tagsEl = this.TagElements(problem.tags);
+    const tagsEl = this.TagElements(problem);
 
     // render go!
     return (
@@ -122,14 +138,39 @@ class _ProblemEditor extends Component {
 }
 
 _ProblemEditor = reduxForm({ enableReinitialize: true })(_ProblemEditor);
-export default connect(
+
+const ProblemEditorFormBase = connect(
   (state, { problemId, problem }) => {
     return ({
       form: 'problem_editor_' + problemId,
       initialValues: {
         problemId,
-        problem
-      }
+        problem: problem || {}
+      },
     });
   }
 )(_ProblemEditor);
+
+export default class ProblemEditorForm extends Component {
+
+  constructor(...args) {
+    super(...args);
+    this.state = {};
+  }
+
+  notifyChange(problem) {
+    this.setState({ problem });
+  }
+
+  render() {
+    // data
+    const props = Object.assign({}, this.props);
+    props.problem = this.state.problem || props.problem;
+    console.log(props.pristine);
+
+    // actions
+    props.notifyChange = this.notifyChange.bind(this);
+
+    return (<ProblemEditorFormBase {...props} />);
+  }
+}
