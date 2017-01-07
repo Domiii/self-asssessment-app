@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { 
   Grid, Row, Col,
-  Form, FormGroup, FormControl, ControlLabel
+  Form, FormGroup, FormControl, ControlLabel, FieldArray
 } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
@@ -60,6 +60,7 @@ export class FormInputFieldBase extends Component {
   }
 }
 
+// see: http://redux-form.com/6.4.3/examples/fieldArrays/
 export class FormInputFieldArray extends FormInputFieldBase {
   static propTypes = {
     name: PropTypes.string.isRequired,
@@ -72,7 +73,7 @@ export class FormInputFieldArray extends FormInputFieldBase {
 
   render() {
     let { 
-      name, placeholder, inputProps, component
+      name, inputProps, component
     } = this.props;
 
     return this.createField(<FieldArray className="form-control" 
@@ -92,7 +93,8 @@ export class FormInputField extends FormInputFieldBase {
     placeholder: PropTypes.string,
     labelProps: PropTypes.object,
     inputColProps: PropTypes.object,
-    inputProps: PropTypes.object
+    inputProps: PropTypes.object,
+    component: PropTypes.any
   };
 
   render() {
@@ -103,6 +105,7 @@ export class FormInputField extends FormInputFieldBase {
 
     return this.createField(<Field className="form-control" 
       key={name} id={name} name={name} 
+      component={component}
       placeholder={placeholder}
       {...(inputProps || {})}>
       {this.props.children}

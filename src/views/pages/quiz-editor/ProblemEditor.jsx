@@ -11,23 +11,22 @@ import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/component
 
 import _ from 'lodash';
 
-//  see: http://redux-form.com/6.4.1/examples/simple/
-class _ProblemEditor extends Component {
+class ProblemTagEditor extends Component {
   static propTypes = {
-    //quiz: PropTypes.object.isRequired,
-    busy: PropTypes.bool,
-    problemId: PropTypes.string,
-    problem: PropTypes.object,
-    notifyChange: PropTypes.func
+    problem: PropTypes.object.isRequired
   };
 
-  TagElements(problem) {
+  renderTags({ fields, meta: { touched, error } }) {
+    
+  }
+
+  render() {
     // data
+    const { problem } = this.props;
     let tags = problem.tags;
 
-    // TODO: MUST redo this with FieldArray: http://redux-form.com/6.4.3/examples/fieldArrays/
-
     // actions
+    const renderTags = this.renderTags.bind(this);
     const updateTags = (tags) => {
       problem.tags = tags;
       this.props.notifyChange(problem);
@@ -76,7 +75,13 @@ class _ProblemEditor extends Component {
     });
 
     // create elements
-    return (<FormGroup controlId="newTag">
+    return (<FormInputFieldArray name="problem.description_en" label="Description (English)"
+      component={renderTags}
+      inputProps={{type: 'text'}}
+      labelProps={{xs: 2}} inputColProps={{xs: 10}}
+    />);
+
+      <FormGroup controlId="newTag">
       <Col componentClass={ControlLabel} xs={2}>
         Tags
       </Col>
@@ -89,6 +94,16 @@ class _ProblemEditor extends Component {
       </Col>
     </FormGroup>);
   }
+}
+
+//  see: http://redux-form.com/6.4.1/examples/simple/
+class _ProblemEditor extends Component {
+  static propTypes = {
+    //quiz: PropTypes.object.isRequired,
+    busy: PropTypes.bool,
+    problemId: PropTypes.string,
+    problem: PropTypes.object.isRequired
+  };
 
   render() {
     // data
@@ -113,11 +128,13 @@ class _ProblemEditor extends Component {
         <Field name="problemId" value={problemId} component="input" type="hidden" />
         <Field name="problem.num" value={num} component="input" type="hidden" />
         <FormInputField name="problem.description_en" label="Description (English)"
-          inputProps={{type: 'text', component:'input'}}
+          component="input"
+          inputProps={{type: 'text'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
         <FormInputField name="problem.description_zh" label="Description (中文)"
-          inputProps={{type: 'text', component:'input'}}
+          component="input"
+          inputProps={{type: 'text'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
 
@@ -139,7 +156,7 @@ class _ProblemEditor extends Component {
 
 _ProblemEditor = reduxForm({ enableReinitialize: true })(_ProblemEditor);
 
-const ProblemEditorFormBase = connect(
+const ProblemEditor = connect(
   (state, { problemId, problem }) => {
     return ({
       form: 'problem_editor_' + problemId,
@@ -151,26 +168,4 @@ const ProblemEditorFormBase = connect(
   }
 )(_ProblemEditor);
 
-export default class ProblemEditorForm extends Component {
-
-  constructor(...args) {
-    super(...args);
-    this.state = {};
-  }
-
-  notifyChange(problem) {
-    this.setState({ problem });
-  }
-
-  render() {
-    // data
-    const props = Object.assign({}, this.props);
-    props.problem = this.state.problem || props.problem;
-    console.log(props.pristine);
-
-    // actions
-    props.notifyChange = this.notifyChange.bind(this);
-
-    return (<ProblemEditorFormBase {...props} />);
-  }
-}
+export default ProblemEditor;
