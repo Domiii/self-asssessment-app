@@ -112,13 +112,19 @@ export class ScratchVM {
     const x = offset, y = offset;
     
     // simple code only contains one script
-    const script = JSON.parse(simpleCodeText);
+    let script = JSON.parse(simpleCodeText);
+    if (!_.isArray(script)) {
+      script = [script];
+    }
+    if (!_.isArray(script[0])) {
+      script = [script];
+    }
     this.loadJSon(JSON.stringify({
       objName: "Stage",
       children: [{
         "objName": "DummySprite",
         "variables": [],
-        "scripts": [[x,y,[script]]]
+        "scripts": [[x,y,script]]
       }]
     }));
     

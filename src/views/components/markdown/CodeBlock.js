@@ -24,20 +24,43 @@ export default class CodeBlock extends PureComponent {
   }
 
   highlightCode() {
-    if (!init) {
-      hljs.initHighlightingOnLoad();
-      init = true;
+    // if (!init) {
+    //   hljs.initHighlightingOnLoad();
+    //   init = true;
+    // }
+    if (this.refs.code) {
+      hljs.highlightBlock(this.refs.code);
     }
-    hljs.highlightBlock(this.refs.code);
+  }
+
+  renderScratch() {
+    const style = {
+      display: 'flex',
+      margin: '0.25em 0'
+    };
+    return (<pre style={style} className="hljs">
+      <InlineScratchWorkspace simpleCode={this.props.literal} />
+    </pre>);
+  }
+
+  renderOther() {
+    const style = {
+      margin: '0.25em 0'
+    };
+    return <div style={style}>
+      <pre className="hljs no-margin no-padding">
+        <code ref="code"
+          className={this.props.language}>
+          {this.props.literal}
+        </code>
+      </pre>
+    </div>;
   }
 
   render() {
-    return (
-      <div style={{margin: '0.5em 0'}}>
-        <code ref="code" className={this.props.language}>
-          {this.props.literal}
-        </code>
-      </div>
+    return (this.props.language === 'scratch' && !!this.props.literal ?
+      this.renderScratch() :
+      this.renderOther()
     );
   }
 }

@@ -3,7 +3,7 @@ import { ScratchVM } from 'src/core/scratch/ScratchVM';
 import $ from 'jquery';
 
 // simple stand-alone Workspace to just render a bunch of code
-export class InlineScratchWorkspace extends Component {
+export default class InlineScratchWorkspace extends Component {
   static propTypes = {
     workspaceConfig: PropTypes.object,
     xml: PropTypes.string,
@@ -61,15 +61,15 @@ export class InlineScratchWorkspace extends Component {
   
   render() {
     const style = {
-      'marginLeft': '0.5em',
-      'marginRight': '0.5em',
       width: '480px', 
       height: '360px', 
-      display: 'inline-block'
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      margin: '0.5em 0'
     };
     return (
-      <div ref={this.onWorkspaceRef.bind(this)}
+      <span ref={this.onWorkspaceRef.bind(this)}
         style={style}>
-      </div>);
+      </span>);
   }
 }

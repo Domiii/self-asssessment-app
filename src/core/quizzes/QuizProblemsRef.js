@@ -52,11 +52,12 @@ const QuizProblemsRef = refWrapper({
         },
 
         getFirstProblem(quizId) {
-          const firstId = this.getFirstProblemId(quizId);
-          return firstId && this.ofQuiz(quizId)[firstId];
+          const firstProblemId = this.getFirstProblemId(quizId);
+          return firstProblemId && this.problem(quizId, firstProblemId);
         },
 
         getFirstProblemId(quizId) {
+          // TODO: Make this more efficient
           const problems = this.ofQuiz(quizId);
           if (!problems) {
             return null;

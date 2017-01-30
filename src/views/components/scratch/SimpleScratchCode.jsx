@@ -1,11 +1,11 @@
-import { InlineScratchWorkspace } from './InlineScratchWorkspace';
+import InlineScratchWorkspace from './InlineScratchWorkspace';
 
 import React, { PureComponent, PropTypes } from 'react';
 
 // accept text with inline Scratch markup language for displaying Scratch components
 export default class SimpleScratchCode extends PureComponent {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string,
     literal: PropTypes.string
   }
 
@@ -55,12 +55,9 @@ export default class SimpleScratchCode extends PureComponent {
   }
   
   render() {
-    const style = {
-      'verticalAlign': 'middle'
-    };
     const text = this.props.text || this.props.literal;
     const comps = [];
     this.textToComponents(text, comps);
-    return <span style={style}>{comps}</span>;
+    return <span>{comps}</span>;
   }
 }

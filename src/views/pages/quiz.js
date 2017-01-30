@@ -133,7 +133,7 @@ class QuizResponseMenu extends React.Component {
   QuizProgressRef.path
 ]))
 @connect(
-  ({ firebase }, { params }) => {
+  ({ firebase }) => {
     return {
       quizzesRef: QuizzesRef(firebase),
       problemsRef: QuizProblemsRef(firebase),
@@ -182,7 +182,7 @@ export class QuizPage extends Component {
 
     // prepare all actions
     const getQuizById = quizzesRef.quiz.bind(quizzesRef);
-    const getProblemById = problemsRef.ofQuiz.bind(problemsRef);
+    const getProblemById = problemsRef.problem.bind(problemsRef);
     const getFirstProblemId = problemsRef.getFirstProblemId.bind(problemsRef);
     const getFirstProblem = problemsRef.getFirstProblem.bind(problemsRef);
     const gotoFirstProblem = () => {
@@ -208,7 +208,7 @@ export class QuizPage extends Component {
     }
 
     let contentEl;
-    const problem = getProblemById(quizId, problemId) || getFirstProblem(quizId);
+    const problem = problemId && getProblemById(quizId, problemId) || getFirstProblem(quizId);
 
     if (!problem) {
       // quiz has no problems at all
