@@ -18,7 +18,6 @@ import {
 import ProblemEditorItem from './ProblemEditorItem';
 import ProblemEditor from './ProblemEditor';
 
-import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
@@ -113,15 +112,19 @@ export default class QuizEditorPage extends Component {
     // return final element
     return (<SimpleGrid objects={problems} 
       keyOrder={keyOrder}
-      rowProps={{className:'show-grid', style: {
-        display: 'flex',
-        flexWrap: 'wrap'
+      rowProps={{
+        className:'show-grid', 
+        style: {
+          display: 'flex',
+          flexWrap: 'wrap'
       }}}
-      colProps={{style: {
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        border: '1px black solid'
+      colProps={{
+        className: 'no-padding',
+        style: {
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          border: '1px black solid'
       }}}
       nCols={3}
       objectComponentCreator={(key, value) => {

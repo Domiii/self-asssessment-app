@@ -11,90 +11,90 @@ import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/component
 
 import _ from 'lodash';
 
-class ProblemTagEditor extends Component {
-  static propTypes = {
-    problem: PropTypes.object.isRequired
-  };
+// class ProblemTagEditor extends Component {
+//   static propTypes = {
+//     problem: PropTypes.object.isRequired
+//   };
 
-  renderTags({ fields, meta: { touched, error } }) {
+//   renderTags({ fields, meta: { touched, error } }) {
     
-  }
+//   }
 
-  render() {
-    // data
-    const { problem } = this.props;
-    let tags = problem.tags;
+//   render() {
+//     // data
+//     const { problem } = this.props;
+//     let tags = problem.tags;
 
-    // actions
-    const renderTags = this.renderTags.bind(this);
-    const updateTags = (tags) => {
-      problem.tags = tags;
-      this.props.notifyChange(problem);
-    };
-    const onEnterAdd = evt => {
-      const val = evt.target.value;
-      if (evt.key === 'Enter') {
-        // add tag
-        tags = Object.assign({}, tags);
-        tags[val] = val;
-        if (!problem.tags) {
-          problem.tags = tags;
-        }
+//     // actions
+//     const renderTags = this.rendeTrags.bind(this);
+//     const updateTags = (tags) => {
+//       problem.tags = tags;
+//       this.props.notifyChange(problem);
+//     };
+//     const onEnterAdd = evt => {
+//       const val = evt.target.value;
+//       if (evt.key === 'Enter') {
+//         // add tag
+//         tags = Object.assign({}, tags);
+//         tags[val] = val;
+//         if (!problem.tags) {
+//           problem.tags = tags;
+//         }
 
-        // reset "new tag" input field
-        evt.preventDefault();
-        evt.target.value = "";
+//         // reset "new tag" input field
+//         evt.preventDefault();
+//         evt.target.value = "";
 
-        updateTags(tags);
-      }
-    };
-    const updateTag = (tagId) => (evt) => {
-      const val = evt.target.value;
-      tags = Object.assign({}, tags);
-      if (!_.isString(val) || val.length === 0) {
-        // delete empty tag
-        delete tags[tagId];
-      }
-      else {
-        // update!
-        delete tags[tagId];
-        tags[val] = val;
-      }
-      updateTags(tags);
-    };
+//         updateTags(tags);
+//       }
+//     };
+//     const updateTag = (tagId) => (evt) => {
+//       const val = evt.target.value;
+//       tags = Object.assign({}, tags);
+//       if (!_.isString(val) || val.length === 0) {
+//         // delete empty tag
+//         delete tags[tagId];
+//       }
+//       else {
+//         // update!
+//         delete tags[tagId];
+//         tags[val] = val;
+//       }
+//       updateTags(tags);
+//     };
 
-    let key = 0;
-    const tagEls = _.map(tags, (tag, tagId) => {
-      const name = 'problem.tags.' + tagId;
-      return (<Field className="form-control" 
-        key={++key} id={name} name={name}
-        type="text"
-        component="input"
-        onChange={ updateTag(tagId) } />
-      );
-    });
+//     let key = 0;
+//     const tagEls = _.map(tags, (tag, tagId) => {
+//       const name = 'problem.tags.' + tagId;
+//       return (<Field className="form-control" 
+//         key={++key} id={name} name={name}
+//         type="text"
+//         component="input"
+//         onChange={ updateTag(tagId) } />
+//       );
+//     });
 
-    // create elements
-    return (<FormInputFieldArray name="problem.description_en" label="Description (English)"
-      component={renderTags}
-      inputProps={{type: 'text'}}
-      labelProps={{xs: 2}} inputColProps={{xs: 10}}
-    />);
+//     // create elements
+//     return (<FormInputFieldArray name="problem.description_en" label="Description (English)"
+//       component={renderTags}
+//       inputProps={{type: 'text'}}
+//       labelProps={{xs: 2}} inputColProps={{xs: 10}}
+//     />);
 
-      <FormGroup controlId="newTag">
-      <Col componentClass={ControlLabel} xs={2}>
-        Tags
-      </Col>
-      <Col xs={10}>
-        <input className="form-control" 
-          placeholder="enter new tag"
-          type="text"
-          name="newTag" onKeyPress={onEnterAdd} />
-        { tagEls }
-      </Col>
-    </FormGroup>);
-  }
-}
+//       <FormGroup controlId="newTag">
+//       <Col componentClass={ControlLabel} xs={2}>
+//         Tags
+//       </Col>
+//       <Col xs={10}>
+//         <input className="form-control" 
+//           placeholder="enter new tag"
+//           type="text"
+//           name="newTag" onKeyPress={onEnterAdd} />
+//         { tagEls }
+//       </Col>
+//     </FormGroup>);
+//   }
+// }
 
 //  see: http://redux-form.com/6.4.1/examples/simple/
 class _ProblemEditor extends Component {
@@ -120,7 +120,7 @@ class _ProblemEditor extends Component {
     };
 
     // elements
-    const tagsEl = this.TagElements(problem);
+    //const tagsEl = this.TagElements(problem);
 
     // render go!
     return (
@@ -128,17 +128,17 @@ class _ProblemEditor extends Component {
         <Field name="problemId" value={problemId} component="input" type="hidden" />
         <Field name="problem.num" value={num} component="input" type="hidden" />
         <FormInputField name="problem.description_en" label="Description (English)"
-          component="input"
-          inputProps={{type: 'text'}}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
+          component="textarea"
+          inputProps={{rows: '5'}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
         />
         <FormInputField name="problem.description_zh" label="Description (中文)"
-          component="input"
-          inputProps={{type: 'text'}}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
+          component="textarea"
+          inputProps={{rows: '5'}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
         />
-
-        { tagsEl }
 
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>

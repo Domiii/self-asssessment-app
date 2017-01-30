@@ -1,11 +1,12 @@
 import { InlineScratchWorkspace } from './InlineScratchWorkspace';
 
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 
 // accept text with inline Scratch markup language for displaying Scratch components
-export default class ScratchMarkdown extends Component {
+export default class SimpleScratchCode extends PureComponent {
   static propTypes = {
     text: PropTypes.string.isRequired,
+    literal: PropTypes.string
   }
 
   textToComponents(text, comps) {
@@ -17,7 +18,7 @@ export default class ScratchMarkdown extends Component {
       const style = {
         //display: 'inline-block'
       };
-      return (<span key={makeKey(text)} style={style}>{text}</span>);
+      return (<code key={makeKey(text)} style={style}>{text}</code>);
     }
 
     function codeNode(text) {
@@ -57,9 +58,9 @@ export default class ScratchMarkdown extends Component {
     const style = {
       'verticalAlign': 'middle'
     };
-    const text = this.props.text;
+    const text = this.props.text || this.props.literal;
     const comps = [];
     this.textToComponents(text, comps);
-    return <div style={style}>{comps}</div>;
+    return <span style={style}>{comps}</span>;
   }
 }

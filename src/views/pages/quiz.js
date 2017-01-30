@@ -12,7 +12,7 @@ import {
 } from 'src/core/quizzes/';
 
 import { FAIcon } from 'src/views/components/util';
-import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
+import Markdown from 'src/views/components/markdown';
 
 
 const { isEmpty } = helpers;
@@ -75,7 +75,7 @@ export class QuizProblem extends React.Component {
       <div className="quiz-main" style={mainStyle}>
         <Jumbotron className="no-margin"style={jumboStyle}>
             <div style={{flex: '8 auto'}}>
-              <ScratchMarkdown text={description} />
+              <Markdown source={description} />
             </div>
             <div style={{flex: '1 auto', position: 'relative'}}>
               <textarea placeholder="小筆記" 

@@ -1,7 +1,5 @@
 //import VirtualMachine from 'scratch-vm';
 // TODO!
-// http://llk.github.io/scratch-vm/vendor.js
-// http://llk.github.io/scratch-vm/vm.js
 
 // npm i -S https://github.com/LLK/scratch-vm.git (build failing?)
 

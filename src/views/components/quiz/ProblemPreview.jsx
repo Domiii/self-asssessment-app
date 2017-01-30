@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
-import ScratchMarkdown from 'src/views/components/scratch/ScratchMarkdown';
+import Markdown from 'src/views/components/markdown';
 
 export default class ProblemPreview extends Component {
   static propTypes = {
@@ -20,7 +20,7 @@ export default class ProblemPreview extends Component {
 
     // render!
     return (
-      <ScratchMarkdown text={description} />
+      <Markdown source={description} />
     );
   }
 }

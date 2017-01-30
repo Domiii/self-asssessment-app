@@ -23,8 +23,9 @@ const PORT = 3000;
 //  LOADERS
 //---------------------------------------------------------
 const loaders = {
-  js: {test: /\.js[x]?$/, exclude: /node_modules/, loader: 'babel'},
-  scss: {test: /\.scss$/, loader: 'style!css!postcss!sass'}
+  js:   {test: /\.js[x]?$/, exclude: /node_modules/, loader: 'babel'},
+  json: {test: /\.json$/, loader: 'json-loader' },
+  scss:  {test: /\.[s]?css$/, loader: 'style!css!postcss!sass'}
 };
 
 
@@ -36,7 +37,7 @@ module.exports = config;
 
 
 config.resolve = {
-  extensions: ['', '.js', '.jsx'],
+  extensions: ['', '.js', '.jsx', 'entities.json'],
   modulesDirectories: ['node_modules'],
   root: path.resolve('.')
 };
@@ -100,7 +101,8 @@ if (ENV_DEVELOPMENT) {
   config.module = {
     loaders: [
       loaders.js,
-      loaders.scss
+      loaders.scss,
+      loaders.json
     ]
   };
 
@@ -144,7 +146,8 @@ if (ENV_PRODUCTION) {
   config.module = {
     loaders: [
       loaders.js,
-      {test: /\.scss$/, loader: ExtractTextPlugin.extract('css?-autoprefixer!postcss!sass')}
+      loaders.json,
+      {test: /\.[s]?css$/, loader: ExtractTextPlugin.extract('css?-autoprefixer!postcss!sass')}
     ]
   };
 
@@ -178,7 +181,8 @@ if (ENV_TEST) {
   config.module = {
     loaders: [
       loaders.js,
-      loaders.scss
+      loaders.scss,
+      loaders.json
     ]
   };
 }

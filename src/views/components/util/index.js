@@ -99,7 +99,7 @@ export class FormInputField extends FormInputFieldBase {
 
   render() {
     let { 
-      name, label, placeholder, inputProps
+      name, label, placeholder, inputProps, component
     } = this.props;
     placeholder = placeholder || label;
 
