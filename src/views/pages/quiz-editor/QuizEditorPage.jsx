@@ -15,8 +15,10 @@ import {
   ProblemResponsesRef
 } from 'src/core/quizzes/';
 
-import ProblemEditorItem from './ProblemEditorItem';
-import ProblemEditor from './ProblemEditor';
+import {
+  ProblemEditor,
+  ProblemEditorItem,
+} from 'src/views/components/quiz-editor';
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 

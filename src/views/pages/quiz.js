@@ -171,28 +171,42 @@ export class QuizPage extends Component {
   }
   
   render() {
-    // get data + wrappers
+    // get basic data + wrappers
     const { router } = this.context;
     const { quizzesRef, problemsRef, responsesRef, progressRef, children } = this.props;
-    const { quizId, problemId } = this.props.params;
-
-    const quizProblems = problemsRef.ofQuiz(quizId);
-    const isBusy = !quizzesRef.isLoaded;
-    const hasProblems = !isEmpty(quizProblems);
+    let { quizId, problemId } = this.props.params;
 
     // prepare all actions
     const getQuizById = quizzesRef.quiz.bind(quizzesRef);
     const getProblemById = problemsRef.problem.bind(problemsRef);
     const getFirstProblemId = problemsRef.getFirstProblemId.bind(problemsRef);
     const getFirstProblem = problemsRef.getFirstProblem.bind(problemsRef);
+    const gotoProblem = (newProblemId) => {
+      if (newProblemId) {
+        router.replace(`/quiz/${quizId}/problem/${newProblemId}`);
+      }
+    };
     const gotoFirstProblem = () => {
       const newProblemId = getFirstProblemId(quizId);
-      setTimeout(() => router.replace(`/quiz/${quizId}/problem/${newProblemId}`), 1000);
+      setTimeout(() => gotoProblem(newProblemId), 1000);
     };
 
-    const gotoNextProblem = undefined;
-    const gotoPreviousProblem = undefined;
+    const gotoNextProblem = () => {
+      const newId = problemsRef.getNextProblemId(quizId, problemId);
+      gotoProblem(newId);
+    };
+    const gotoPreviousProblem = () => {
+      const newId = problemsRef.getPreviousProblemId(quizId, problemId);
+      gotoProblem(newId);
+    };
     const gotoRoot = router.replace.bind(router, '/');
+
+    // get derived data
+    const quizProblems = problemsRef.ofQuiz(quizId);
+    const isBusy = !quizzesRef.isLoaded;
+    const hasProblems = !isEmpty(quizProblems);
+    problemId = problemId || getFirstProblemId(quizId);
+    const problem = problemId && getProblemById(quizId, problemId);
 
 
     // go!
@@ -208,13 +222,12 @@ export class QuizPage extends Component {
     }
 
     let contentEl;
-    const problem = problemId && getProblemById(quizId, problemId) || getFirstProblem(quizId);
-
     if (!problem) {
       // quiz has no problems at all
       contentEl = (<Alert bsStyle="info">quiz is empty</Alert>);
     }
     else {
+      // render current problem
       const navBtnStyle = {
         width: '50%'
       };

@@ -74,13 +74,66 @@ const QuizProblemsRef = refWrapper({
           return firstKey;
         },
 
+        getLastProblemId(quizId) {
+          // TODO: Make this more efficient
+          const problems = this.ofQuiz(quizId);
+          if (!problems) {
+            return null;
+          }
+          let lastNum = -999999999;
+          let lastKey = null;
+          for (let key in problems) {
+            const prob = problems[key];
+            if (prob.num > lastNum) {
+              lastNum = prob.num;
+              lastKey = key;
+            }
+          }
+          return lastKey;
+        },
+
         getPreviousProblemId(quizId, currentProblemId) {
           const problems = this.ofQuiz(quizId);
-          // TODO
+          if (!problems) {
+            return null;
+          }
+          const currentProblem = this.problem(quizId, currentProblemId);
+          if (!currentProblem) {
+            return this.getFirstProblemId(quizId);
+          }
+
+          let newNum = -99999999999;
+          let newKey = null;
+          for (let key in problems) {
+            const prob = problems[key];
+            if (prob.num < currentProblem.num && prob.num > newNum) {
+              newNum = prob.num;
+              newKey = key;
+            }
+          }
+          return newKey || this.getLastProblemId(quizId);
         },
 
         getNextProblemId: function(quizId, currentProblemId) {
-          // TODO
+          const problems = this.ofQuiz(quizId);
+          if (!problems) {
+            return null;
+          }
+          const currentProblem = this.problem(quizId, currentProblemId);
+          if (!currentProblem) {
+            return this.getFirstProblemId(quizId);
+          }
+
+          let newNum = 99999999999;
+          let newKey = null;
+          for (let key in problems) {
+            const prob = problems[key];
+            if (prob.num > currentProblem.num && prob.num < newNum) {
+              newNum = prob.num;
+              newKey = key;
+            }
+          }
+          return newKey || this.getFirstProblemId(quizId);
         }
       },
 
