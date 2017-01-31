@@ -9,14 +9,23 @@ import {
 import { firebase, helpers } from 'redux-react-firebase'
 const { pathToJS } = helpers;
 
+import { FAIcon } from 'src/views/components/util';
+import { Button } from 'react-bootstrap';
+
 export function SignIn({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
   return (
     <div className="g-row sign-in">
       <div className="g-col">
         <h1 className="sign-in__heading">Sign in</h1>
-        <button className="btn sign-in__button" onClick={signInWithGithub} type="button">GitHub</button>
-        <button className="btn sign-in__button" onClick={signInWithGoogle} type="button">Google</button>
-        <button className="btn sign-in__button" onClick={signInWithTwitter} type="button">Twitter</button>
+        <Button bsStyle="primary" onClick={signInWithGithub}>
+          <FAIcon name="github" /> GitHub
+        </Button>
+        <Button bsStyle="primary" onClick={signInWithGoogle}>
+          <FAIcon name="google" /> Google
+        </Button>
+        <Button bsStyle="primary" onClick={signInWithTwitter}>
+          <FAIcon name="twitter" /> Twitter
+        </Button>
       </div>
     </div>
   );

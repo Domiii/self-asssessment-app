@@ -31,6 +31,14 @@ export default class Header extends Component {
 
     const gotoProfile = () => router.replace('/user');
 
+    const profileEl = (user && 
+      <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
+        <span>
+          <FAIcon name="user" /> {user.displayName || user.email}
+        </span>
+      </MenuItem>
+    );
+
     return (
       <header className="header">
         <Navbar inverse collapseOnSelect className="no-margin">
@@ -45,22 +53,23 @@ export default class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
-              { !busy ?
-                <NavDropdown eventKey="user-drop" id="user-dropdown"
-                  title={<span><FAIcon name="user" /> {user.displayName || user.email}</span>}>
-                  <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>Profile</MenuItem>
-                  <MenuItem divider />
-                  <MenuItem eventKey="user-drop-logout" onClick={signOut}>Sign Out</MenuItem>
-                </NavDropdown>
-               : undefined
-              }
-              <NavDropdown eventKey="more-drop" id="user-dropdown" title="more">
+              <NavDropdown eventKey="more-drop" id="user-dropdown" title={
+                   <FAIcon name="cog" />
+                }>
+                { profileEl }
+                { user && <MenuItem divider /> }
                 <MenuItem eventKey="more-drop-sand" onClick={() => openURL('https://github.com/Domiii/self-asssessment-app')}>
-                  View Source Code <i className="fa fa-github" aria-hidden="true"></i>
+                 <FAIcon name="github" /> View Source Code
                 </MenuItem>
                 <MenuItem eventKey="more-drop-sand" onClick={() => openURL('http://codepen.io/Domiii/pen/JbvLbe')}>
                   Scratch 3.0 Sandbox
-                </MenuItem>
+                </MenuItem>  
+                { user && <MenuItem divider /> }
+                { user && (
+                  <MenuItem eventKey="user-drop-logout" onClick={signOut}>
+                    <FAIcon name="close" className="color-red" /> Sign Out
+                  </MenuItem>)
+                }
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

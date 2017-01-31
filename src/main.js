@@ -11,6 +11,8 @@ import './views/styles/styles.scss';
 import firebase from 'firebase';
 import firebaseConfig from './config/firebase.cfg';
 
+import { FAIcon } from 'src/views/components/util';
+
 const store = configureStore(firebaseConfig);
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
@@ -37,7 +39,13 @@ if (module.hot) {
   });
 }
 
-// Wait until after authentication has finished before rendering anything
+// show a loading indicator
+ReactDOM.render(
+  (<FAIcon name="cog" spinning={true} className="color-red" />),
+  rootElement
+);
+
+// Wait until after authentication has finished before rendering the root
 firebase.auth().onAuthStateChanged(function (authData) {
   render(Root);
 });

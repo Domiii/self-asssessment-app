@@ -69,14 +69,26 @@ export class App extends Component {
   render() {
     const { userInfo, firebase, children } = this.props;
     const { router } = this.context;
-    const isBusy = !userInfo.isLoaded;
+    const isBusy = userInfo && !userInfo.isLoaded;
 
     if (!children) {
       router.replace('/');
-      return;
+      return (<FAIcon name="cog" spinning={true} />);
     }
 
-    const signOut = firebase.logout.bind(firebase);
+    const signOut = () => {
+      try {
+        firebase.logout();
+      }
+      catch (err) {
+        console.error(err.stack);
+      }
+    };
+
+    if (!userInfo && router.location.pathname !== '/sign-in') {
+      setTimeout(() => router.replace('/sign-in'), 50);
+      return (<FAIcon name="cog" spinning={true} />);
+    }
 
     if (isBusy) {
       // still loading
