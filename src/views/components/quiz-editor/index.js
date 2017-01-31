@@ -1,3 +1,4 @@
 export ProblemDeleteModal from './ProblemDeleteModal';
-export ProblemEditorItem from './ProblemEditorItem';
-export ProblemEditor from './ProblemEditor';
+export ProblemEditor, { AddProblemEditor } from './ProblemEditor';
+export ProblemEditTools from './ProblemEditTools';
+export QuizInfoEditor from './QuizInfoEditor';

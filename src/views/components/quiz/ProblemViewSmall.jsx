@@ -8,13 +8,11 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
+import ProblemPreview from './ProblemPreview';
 
-import ProblemDeleteModal from './ProblemDeleteModal';
-import ProblemEditor from './ProblemEditor';
-
-import ProblemPreview from 'src/views/components/quiz/ProblemPreview';
-
-
+import ProblemEditor from 'src/views/components/quiz-editor/ProblemEditor';
+import ProblemEditTools from 'src/views/components/quiz-editor/ProblemEditTools';
+console.assert(ProblemEditTools);
 
 export class ProblemTags extends Component {
   static propTypes = {
@@ -33,13 +31,14 @@ export class ProblemTags extends Component {
   }
 }
 
-export default class ProblemEditorItem extends Component {
+export default class ProblemViewSmall extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired
   };
 
   static propTypes = {
     busy: PropTypes.bool.isRequired,
+    mayEdit: PropTypes.bool.isRequired,
     problemId: PropTypes.string.isRequired,
     problem: PropTypes.object.isRequired,
     updateProblem: PropTypes.func.isRequired,
@@ -49,22 +48,13 @@ export default class ProblemEditorItem extends Component {
   constructor(...args) {
     super(...args);
     this.state = { editing: false };
-  }
-  startEdit() { this.setState({ editing: true }); }
-  stopEdit() { this.setState({ editing: false }); }
-  toggleEdit() { this.setState({ editing: !this.state.editing }); }
-
-  get EditButton() {
-    return (<Button onClick={() => this.toggleEdit()} className="color-green" bsSize="small" active={this.state.editing}>
-      <FAIcon name="edit" />
-    </Button>);
+    this.toggleEdit = (() => { this.setState({ editing: !this.state.editing }); }).bind(this);
   }
 
   render() {
     // data
     const { userInfo } = this.context;
-    const { busy, problemId, problem, updateProblem, deleteProblemId } = this.props;
-    const isAdmin = userInfo && userInfo.isAdmin();
+    const { busy, problemId, problem, updateProblem, deleteProblemId, mayEdit } = this.props;
     const problemArgs = { problemId, problem };
     const title = problem.title_en || problem.title_zh;
 
@@ -73,16 +63,22 @@ export default class ProblemEditorItem extends Component {
     //.then(() => this.stopEdit());
 
     // element: content
-    const content = !this.state.editing ?
+    const content = !mayEdit || !this.state.editing ?
       (<ProblemPreview {...problemArgs} />) :
       (<ProblemEditor busy={busy} onSubmit={onSubmit} {...problemArgs}></ProblemEditor>)
     ;
 
     // element: edit buttons
-    const buttons = (<span>
-      { this.EditButton }
-      <ProblemDeleteModal {...{ problemId, problem, deleteProblemId }} />
-    </span>);
+    const editTools = mayEdit && (
+      <Row>
+        <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
+          <ProblemEditTools {...{ 
+            problemId, problem, deleteProblemId,
+            editing: this.state.editing,
+            toggleEdit: this.toggleEdit }} />
+        </Col>
+      </Row>
+    );
 
     // render
     return (
@@ -95,11 +91,7 @@ export default class ProblemEditorItem extends Component {
             <span className='color-gray'>#{problem.num}</span>
           </Col>
         </Row>
-        <Row>
-          <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
-            { buttons }
-          </Col>
-        </Row>
+        { editTools }
         <Row>
           <Col xs={12}>
             { content }

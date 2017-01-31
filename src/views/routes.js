@@ -3,7 +3,7 @@ import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
-import QuizEditorPage from './pages/QuizEditorPage';
+import QuizViewPage from './pages/QuizViewPage';
 import QuizzesPage from './pages/QuizzesPage';
 import { QuizPage, QuizProblem } from './pages/QuizPage';
 
@@ -13,7 +13,7 @@ export const paths = {
   SIGN_IN: 'sign-in',
   USER_PROFILE: 'user',
   QUIZZES: '',
-  QUIZ_EDITOR: 'quiz-editor/:quizId',
+  QUIZ_VIEW: 'quiz-view/:quizId',
   QUIZ: 'quiz/:quizId',
   QUIZ_PROBLEM: 'problem/:problemId'
 };
@@ -77,13 +77,13 @@ export const getRoutes = getState => {
         onEnter: requireAuth(getState)
       },
       {
-        name: 'quiz-editor',
-        path: paths.QUIZ_EDITOR,
-        component: QuizEditorPage,
+        name: 'quiz-view',
+        path: paths.QUIZ_VIEW,
+        component: QuizViewPage,
         onEnter: requireAuth(getState)
       },
       {
-        name: 'quiz',
+        name: 'quiz-play',
         path: paths.QUIZ,
         component: QuizPage,
         onEnter: requireAuth(getState),

@@ -35,32 +35,24 @@ export class QuizListItem extends Component {
   render() {
     const { userInfo } = this.context;
     const { quiz, quizId } = this.props;
-    const quizPath = '/quiz/' + quizId;
-    const isAdmin = userInfo && userInfo.isAdmin();
-
-    const adminTools = !isAdmin ? undefined : (
-      <span>
-        &nbsp;
-        <Link to={'/quiz-editor/' + quizId} onlyActiveOnIndex={true}>
-          <span>edit</span>
-        </Link>
-      </span>
-    );
+    const quizViewPath = '/quiz-view/' + quizId;
+    const quizPlayPath = '/quiz/' + quizId;
 
     return (
       <span>
         <Well className="no-margin">
           <div>
-            <Link to={quizPath} onlyActiveOnIndex={true}>
+            <Link to={quizViewPath} onlyActiveOnIndex={true}>
               <h3 className="no-margin">{quiz.title}</h3>
             </Link>
           </div>
-          <span>
-            <Link to={quizPath} onlyActiveOnIndex={true}>
-              play
-            </Link>
-          </span>
-          {adminTools}
+          <Link to={quizViewPath} onlyActiveOnIndex={true}>
+            view
+          </Link>
+          <span className="margin-half" />
+          <Link to={quizPlayPath} onlyActiveOnIndex={true}>
+            play
+          </Link>
         </Well>
       </span>
     );
@@ -142,7 +134,7 @@ export default class QuizzesPage extends Component {
     // prepare data + wrappers
     const { userInfo } = this.context;
     const { quizzesRef } = this.props;
-    const isAdmin = userInfo && userInfo.isAdmin();
+    const mayEdit = userInfo && userInfo.adminDisplayMode();
     const isBusy = !quizzesRef.isLoaded;
 
     // prepare actions
@@ -158,7 +150,7 @@ export default class QuizzesPage extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    const adminTools = !isAdmin ? undefined : (<div>
+    const adminTools = mayEdit && (<div>
       <AddQuiz addQuiz={addQuiz} />
       <hr />
     </div>);

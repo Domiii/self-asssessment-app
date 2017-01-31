@@ -179,3 +179,22 @@ const ProblemEditor = connect(
 )(_ProblemEditor);
 
 export default ProblemEditor;
+
+
+
+export class AddProblemEditor extends Component {
+  static propTypes = {
+    busy: PropTypes.bool.isRequired,
+    addProblem: PropTypes.func.isRequired
+  }
+
+  render() {
+    const { busy, addProblem } = this.props;
+
+    return (<div>
+      <hr />
+      <ProblemEditor busy={busy} onSubmit={addProblem}></ProblemEditor>
+      <hr />
+    </div>);
+  }
+}

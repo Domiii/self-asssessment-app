@@ -14,6 +14,10 @@
           ".read": "auth !== null",
           ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
         },
+        "adminDisplayMode" : {
+          ".read": "auth !== null",
+          ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+        },
         "data": {
           ".read": "auth !== null",
           ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"

@@ -16,31 +16,17 @@ import {
 } from 'src/core/quizzes/';
 
 import {
+  ProblemGrid
+} from 'src/views/components/quiz';
+
+import {
   ProblemEditor,
-  ProblemEditorItem,
+  AddProblemEditor
 } from 'src/views/components/quiz-editor';
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
-
-export class AddProblemEditor extends Component {
-  static propTypes = {
-    busy: PropTypes.bool.isRequired,
-    addProblem: PropTypes.func.isRequired
-  }
-
-  render() {
-    const { busy, addProblem } = this.props;
-
-    return (<div>
-      <hr />
-      <ProblemEditor busy={busy} onSubmit={addProblem}></ProblemEditor>
-      <hr />
-    </div>);
-  }
-}
-
 
 @firebase((props, firebase) => ([
   QuizzesRef.path,
@@ -52,7 +38,7 @@ export class AddProblemEditor extends Component {
     problemsRef: QuizProblemsRef(firebase)
   })
 )
-export default class QuizEditorPage extends Component {
+export default class QuizViewPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
     userInfo: PropTypes.object.isRequired
@@ -86,64 +72,13 @@ export default class QuizEditorPage extends Component {
     });
   }
 
-  ProblemGrid(problems) {
-    const { quizzesRef, problemsRef, params } = this.props;
-    const { quizId } = params;
-
-    // actions
-    const updateProblem = (editorData) => {
-      const { problemId, problem } = editorData;
-
-      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
-    };
-    const deleteProblemId = (problemId) => {
-      return this.wrapPromise(problemsRef.deleteProblem(quizId, problemId));
-    };
-    const keyOrder = key => problems[key] && problems[key].num;
-
-    // prepare props
-    const problemProps = _.mapValues(problems, 
-      (problem, problemId) => ({
-        problemId,
-        problem,
-        updateProblem,
-        deleteProblemId
-      })
-    );
-
-    // return final element
-    return (<SimpleGrid objects={problems} 
-      keyOrder={keyOrder}
-      rowProps={{
-        className:'show-grid', 
-        style: {
-          display: 'flex',
-          flexWrap: 'wrap'
-      }}}
-      colProps={{
-        className: 'no-padding',
-        style: {
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          border: '1px black solid'
-      }}}
-      nCols={3}
-      objectComponentCreator={(key, value) => {
-        return (
-          <ProblemEditorItem key={key} busy={this.state.busy} {...problemProps[key]}/>
-        );
-      }}
-    >
-    </SimpleGrid>);
-  }
-
   render() {
     // prepare data
     const { userInfo, router } = this.context;  
     const { quizzesRef, problemsRef, params } = this.props;
-    const isAdmin = userInfo && userInfo.isAdmin();
-    const isBusy = !quizzesRef.isLoaded;
+    const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
+    const notLoadedYet = !quizzesRef.isLoaded;
+    const busy = this.state.busy;
     const { quizId } = params;
     const quiz = quizzesRef.quiz(quizId);
     const problems = problemsRef.ofQuiz(quizId);
@@ -156,16 +91,18 @@ export default class QuizEditorPage extends Component {
       problem.num = (lastProblem && lastProblem.num || 0)  + 1;
       return this.wrapPromise(problemsRef.add_problem(quizId, problem));
     };
+    const updateProblem = (editorData) => {
+      const { problemId, problem } = editorData;
+      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
+    };
+    const deleteProblemId = (problemId) => {
+      return this.wrapPromise(problemsRef.deleteProblem(quizId, problemId));
+    };
 
     // go render!
-    if (isBusy) {
+    if (notLoadedYet) {
       // still loading
       return (<FAIcon name="cog" spinning={true} />);
-    }
-
-    if (!isAdmin) {
-      setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">invalid permissions</Alert>);
     }
 
     if (!quiz) {
@@ -173,19 +110,30 @@ export default class QuizEditorPage extends Component {
       return (<Alert bsStyle="danger">invalid quizId: {quizId}</Alert>);
     }
 
-    const addButton = (
-      <Button active={this.state.adding} 
-        bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
-        <FAIcon name="plus" className="color-green" /> add new problem
-      </Button>
-    );
+    let addButton, addProblemEditor;
+    if (mayEdit) {
+      addButton = (
+        <Button active={this.state.adding} 
+          bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
+          <FAIcon name="plus" className="color-green" /> add new problem
+        </Button>
+      );
+    }
+    if (this.state.adding) {
+      addProblemEditor = (
+        <AddProblemEditor busy={busy} quiz={quiz} addProblem={addProblem}>
+        </AddProblemEditor>
+      );
+    }
 
     const problemsEl = !problems ? (
       // no problems
       <Alert bsStyle="info">quiz is empty</Alert>
     ) : (
       // display problems
-      <div>{ this.ProblemGrid(problems) }</div>
+      <div><ProblemGrid {...{
+        busy, quizId, problems, mayEdit, updateProblem, deleteProblemId
+      }} /></div>
     );
 
     //console.log(problems && _.map(problems, p => p.description_en).join(', '));
@@ -197,7 +145,7 @@ export default class QuizEditorPage extends Component {
     return (
       <div>
         <h3>{quiz.title} {addButton}</h3>
-        { this.state.adding && <AddProblemEditor busy={this.state.busy} quiz={quiz} addProblem={addProblem} /> }
+        { addProblemEditor }
         { errEl }
         { problemsEl }
       </div>

@@ -9,6 +9,7 @@ const UserInfoRef = refWrapper({
       path: '$(uid)',
       children: {
         isAdmin: 'isAdmin', 
+        adminDisplayMode: 'adminDisplayMode',
         userName: 'data/userName',
         email: 'data/email',
         locale: 'data/locale'

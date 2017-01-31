@@ -14,11 +14,25 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import _ from 'lodash';
 
 class _UserForm extends Component {
+  static contextTypes = {
+    userInfo: PropTypes.object.isRequired
+  };
+
+
   render() {
+    const { userInfo } = this.context;
     const { handleSubmit, pristine, reset, submitting } = this.props;
+    const isAdmin = userInfo && userInfo.isAdmin();
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
+        {(isAdmin && <FormInputField name="adminDisplayMode" label="admin view"
+          inputProps={{
+            type: 'checkbox',
+            component: 'input'
+          }}
+          labelProps={{xs: 2}} inputColProps={{xs: 10}}
+        />)}
         <FormInputField name="data.userName" label="user name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
@@ -56,9 +70,7 @@ export default class UserProfilePage extends Component {
   render() {
     // data
     const { userInfo } = this.context;
-    const isAdmin = userInfo && userInfo.isAdmin();
     const isBusy = !userInfo.isLoaded;
-
 
     // actions
     const updateUser = userInfo.update.bind(userInfo);
