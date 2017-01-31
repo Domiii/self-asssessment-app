@@ -6,7 +6,6 @@ import {
 import {
   LinkContainer
 } from 'react-router-bootstrap';
-import Breadcrumbs from 'react-breadcrumbs';
 
 import { FAIcon } from 'src/views/components/util';
 
@@ -28,9 +27,14 @@ export default class Header extends Component {
 
     const busy = !userInfo || !userInfo.isLoaded;
     const user = userInfo && userInfo.props.auth;
+    const lang = userInfo.locale();
 
+    // actions
     const gotoProfile = () => router.replace('/user');
+    const switchToEn = () => userInfo.set_locale('en');
+    const switchToZh = () => userInfo.set_locale('zh');
 
+    // elements
     const profileEl = (user && 
       <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
         <span>
@@ -53,6 +57,12 @@ export default class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
+              <NavItem>
+                <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
+                EN</Button>
+                <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
+                中文</Button>
+              </NavItem>
               <NavDropdown eventKey="more-drop" id="user-dropdown" title={
                    <FAIcon name="cog" />
                 }>

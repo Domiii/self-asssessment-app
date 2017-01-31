@@ -33,7 +33,8 @@ export class ProblemTags extends Component {
 
 export default class ProblemViewSmall extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired
+    userInfo: PropTypes.object.isRequired,
+    lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
@@ -53,10 +54,10 @@ export default class ProblemViewSmall extends Component {
 
   render() {
     // data
-    const { userInfo } = this.context;
+    const { userInfo, lookupLocalized } = this.context;
     const { busy, problemId, problem, updateProblem, deleteProblemId, mayEdit } = this.props;
     const problemArgs = { problemId, problem };
-    const title = problem.title_en || problem.title_zh;
+    const title = lookupLocalized(problem, 'title');
 
     // actions
     const onSubmit = (...args) => updateProblem(...args);

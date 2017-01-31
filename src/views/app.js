@@ -9,6 +9,7 @@ import Firebase from 'firebase';
 import { firebase, helpers } from 'redux-react-firebase'
 import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
+import { lookupLocalized } from 'src/util/localizeUtil';
 
 const { pathToJS } = helpers;
 
@@ -48,12 +49,15 @@ export class App extends Component {
   };
 
   static childContextTypes = {
-    userInfo: PropTypes.object
+    userInfo: PropTypes.object,
+    lookupLocalized: PropTypes.func
   };
 
   getChildContext() {
+    const lang = this.props.userInfo && this.props.userInfo.locale() || 'en';
     return {
-      userInfo: this.props.userInfo
+      userInfo: this.props.userInfo,
+      lookupLocalized: lookupLocalized.bind(null, lang)
     }
   }
 

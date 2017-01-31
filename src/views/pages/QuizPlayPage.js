@@ -42,9 +42,14 @@ export class QuizProgressBar extends React.Component {
       <Well className="no-margin">
         <h3 className="no-margin inline">{quiz.title}</h3>
 
+        <span className="margin-half" />
+
         <Button style={navBtnStyle}
           bsStyle="primary" bsSize="small" disabled={disabled}
           onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
+
+        <span className="margin-half" />
+
         <Button  style={navBtnStyle}
           bsStyle="primary" bsSize="small" disabled={disabled}
           onClick={gotoNextProblem}>>>></Button>
@@ -55,6 +60,10 @@ export class QuizProgressBar extends React.Component {
 
 
 export class QuizProblem extends React.Component {
+  static contextTypes = {
+    lookupLocalized: PropTypes.func.isRequired
+  };
+
   static propTypes = {
     problem: PropTypes.object
   };
@@ -64,9 +73,10 @@ export class QuizProblem extends React.Component {
     if (!this.props.problem) {
       throw new Error('problem prop must be supplied before rendering');
     }
-
+  
+    const { lookupLocalized } = this.context;
     const { problem } = this.props;
-    const description = problem.description_en || problem.description_zh || "";
+    const description = lookupLocalized(problem, 'description');
     
 
     // go render!
@@ -108,7 +118,6 @@ export class QuizProblem extends React.Component {
 class QuizResponseMenu extends React.Component {
   render() {
     return (<div className="quiz-response-menu">
-        <div>
       <Button
           block bsSize="large" bsStyle="warning"
           //onClick={}
@@ -132,7 +141,6 @@ class QuizResponseMenu extends React.Component {
           block bsStyle="danger" bsSize="large"
           //onClick={}
           >我覺得這題目有問題</Button>
-        </div>
     </div>);
   }
 }
@@ -154,7 +162,7 @@ class QuizResponseMenu extends React.Component {
     };
   }
 )
-export class QuizPage extends Component {
+export class QuizPlayPage extends Component {
   static contextTypes = {
     router: React.PropTypes.object.isRequired
   };
@@ -195,7 +203,7 @@ export class QuizPage extends Component {
     const getFirstProblem = problemsRef.getFirstProblem.bind(problemsRef);
     const gotoProblem = (newProblemId) => {
       if (newProblemId) {
-        router.replace(`/quiz/${quizId}/problem/${newProblemId}`);
+        router.replace(`/quiz-play/${quizId}/problem/${newProblemId}`);
       }
     };
     const gotoFirstProblem = () => {

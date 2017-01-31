@@ -36,7 +36,7 @@ export class QuizListItem extends Component {
     const { userInfo } = this.context;
     const { quiz, quizId } = this.props;
     const quizViewPath = '/quiz-view/' + quizId;
-    const quizPlayPath = '/quiz/' + quizId;
+    const quizPlayPath = '/quiz-play/' + quizId;
 
     return (
       <span>

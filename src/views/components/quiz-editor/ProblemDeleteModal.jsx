@@ -8,6 +8,10 @@ import {
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 export default class ProblemDeleteModal extends Component {
+  static contextTypes = {
+    lookupLocalized: PropTypes.func.isRequired
+  };
+
   static propTypes = {
     problemId: PropTypes.string.isRequired,
     problem: PropTypes.object.isRequired,
@@ -21,8 +25,9 @@ export default class ProblemDeleteModal extends Component {
   render() {
 
     // data
+    const { lookupLocalized } = this.context;
     const { problemId, problem, deleteProblemId } = this.props;
-    const description = problem.description_en || problem.description_zh;
+    const description = lookupLocalized(problem, 'description');
 
     // actions
     const deleteProblem = () => {

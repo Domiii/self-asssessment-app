@@ -5,7 +5,7 @@ import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import QuizViewPage from './pages/QuizViewPage';
 import QuizzesPage from './pages/QuizzesPage';
-import { QuizPage, QuizProblem } from './pages/QuizPage';
+import { QuizPlayPage, QuizProblem } from './pages/QuizPlayPage';
 
 
 export const paths = {
@@ -14,7 +14,7 @@ export const paths = {
   USER_PROFILE: 'user',
   QUIZZES: '',
   QUIZ_VIEW: 'quiz-view/:quizId',
-  QUIZ: 'quiz/:quizId',
+  QUIZ_PLAY: 'quiz-play/:quizId',
   QUIZ_PROBLEM: 'problem/:problemId'
 };
 
@@ -84,13 +84,13 @@ export const getRoutes = getState => {
       },
       {
         name: 'quiz-play',
-        path: paths.QUIZ,
-        component: QuizPage,
+        path: paths.QUIZ_PLAY,
+        component: QuizPlayPage,
         onEnter: requireAuth(getState),
         childRoutes: [
           {
             path: paths.QUIZ_PROBLEM,
-            component: QuizPage
+            component: QuizPlayPage
           }
         ]
       }
