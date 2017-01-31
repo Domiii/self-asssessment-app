@@ -3,6 +3,8 @@ import {
   Grid, Row, Col
 } from 'react-bootstrap';
 
+const EmptyObject = {};
+
 export default class SimpleGrid extends Component {
   static propTypes = {
     objects: PropTypes.object.isRequired,   // an object containing a bunch of objects to display
@@ -33,8 +35,8 @@ export default class SimpleGrid extends Component {
     // create rows
     const rows = [];
     let iItem = 0;
-    const rowPropsNotEmpty = rowProps || {};
-    const colPropsNotEmpty = colProps || {};
+    const rowPropsNotEmpty = rowProps || EmptyObject;
+    const colPropsNotEmpty = colProps || EmptyObject;
     for (let iRow = 0; iRow < nRows; ++iRow) {
       const columns = [];
       for (let iCol = 0; iCol < nCols && iItem < nChildren; ++iCol) {
@@ -51,7 +53,7 @@ export default class SimpleGrid extends Component {
 
     // render the whole thing
     return (
-      <Grid>
+      <Grid fluid>
         {rows}
       </Grid>
     );

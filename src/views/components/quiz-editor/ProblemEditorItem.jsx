@@ -66,6 +66,7 @@ export default class ProblemEditorItem extends Component {
     const { busy, problemId, problem, updateProblem, deleteProblemId } = this.props;
     const isAdmin = userInfo && userInfo.isAdmin();
     const problemArgs = { problemId, problem };
+    const title = problem.title_en || problem.title_zh;
 
     // actions
     const onSubmit = (...args) => updateProblem(...args);
@@ -77,19 +78,23 @@ export default class ProblemEditorItem extends Component {
       (<ProblemEditor busy={busy} onSubmit={onSubmit} {...problemArgs}></ProblemEditor>)
     ;
 
-    // element: number
-    const numEl = <span className='color-gray' style={{float: 'right'}}>#{problem.num}</span>;
-
     // element: edit buttons
     const buttons = (<span>
       { this.EditButton }
       <ProblemDeleteModal {...{ problemId, problem, deleteProblemId }} />
-      { numEl }
     </span>);
 
     // render
     return (
       <Grid fluid style={{width: '100%'}}>
+        <Row style={{marginRight: '0.1em'}}>
+          <Col xs={11} className="inline-vcentered" style={{textAlign: 'left'}}>
+            <label>{title}</label>
+          </Col>
+          <Col xs={1} className="no-padding inline-vcentered" style={{textAlign: 'left'}}>
+            <span className='color-gray'>#{problem.num}</span>
+          </Col>
+        </Row>
         <Row>
           <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
             { buttons }

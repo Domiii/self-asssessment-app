@@ -17,6 +17,8 @@ import Markdown from 'src/views/components/markdown';
 
 const { isEmpty } = helpers;
 
+const EmptyObject = {};
+
 export class QuizProgressBar extends React.Component {
   static propTypes = {
     quiz: PropTypes.object.isRequired,
@@ -29,14 +31,24 @@ export class QuizProgressBar extends React.Component {
   };
 
   render() {
-    const { quiz, problem, quizzesRef, problemsRef, responsesRef, progressRef } = this.props;
+    const {
+      quiz, problem, quizzesRef, problemsRef, responsesRef, progressRef,
+      gotoPreviousProblem, gotoNextProblem
+    } = this.props;
+    const navBtnStyle = EmptyObject;
+    const disabled = !problem;
 
     return (<div>
       <Well className="no-margin">
         <h3 className="no-margin inline">{quiz.title}</h3>
 
+        <Button style={navBtnStyle}
+          bsStyle="primary" bsSize="small" disabled={disabled}
+          onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
+        <Button  style={navBtnStyle}
+          bsStyle="primary" bsSize="small" disabled={disabled}
+          onClick={gotoNextProblem}>>>></Button>
       </Well>
-      <div className="margin2" />
     </div>);
   }
 }
@@ -58,7 +70,7 @@ export class QuizProblem extends React.Component {
     
 
     // go render!
-    const QuizResponseMenuArgs = {};
+    const QuizResponseMenuArgs = EmptyObject;
     const mainStyle = {
       minHeight: '400px'
     };
@@ -228,30 +240,16 @@ export class QuizPage extends Component {
     }
     else {
       // render current problem
-      const navBtnStyle = {
-        width: '50%'
-      };
-      contentEl = (<div>
-        <QuizProblem problem={problem} />
-        <footer className="footer" style={{position: 'relative'}}>
-          <div className="margin" />
-          <div>
-            <Button style={navBtnStyle}
-              bsStyle="primary" bsSize="large"
-              onClick={gotoPreviousProblem}>&lt;&lt;&lt;</Button>
-            <Button  style={navBtnStyle}
-              bsStyle="primary" bsSize="large"
-              onClick={gotoNextProblem}>>>></Button>
-          </div>
-        </footer>
-      </div>);
+      contentEl = (<QuizProblem problem={problem} />);
     }
 
     return (
       <div className="quiz-wrapper flex-row-multi">
         <QuizProgressBar quiz={quiz} problem={problem} 
           quizzesRef={quizzesRef} problemsRef={problemsRef}
-          progressRef={progressRef} responsesRef={responsesRef} />
+          progressRef={progressRef} responsesRef={responsesRef}
+          gotoNextProblem={gotoNextProblem}
+          gotoPreviousProblem={gotoPreviousProblem} />
         { contentEl }
       </div>
     );

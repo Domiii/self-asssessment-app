@@ -34,31 +34,35 @@ export default class ProblemDeleteModal extends Component {
     const open = this.open.bind(this);
     const close = this.close.bind(this);
 
+    const modalContents = this.state.showModal && (
+      <Modal show={this.state.showModal} onHide={close}>
+        <Modal.Header closeButton>
+          <Modal.Title>Do you really want to delete the problem?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {description}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={ deleteProblem }
+            bsStyle="danger">
+            Yes
+          </Button>
+          <Button onClick={close}
+            bsStyle="primary"
+            bsSize="large">
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    ) || undefined;
+
     return (
       <span>
         <Button onClick={open} className="color-red" bsSize="small">
           <FAIcon name="remove" />
         </Button>
 
-        <Modal show={this.state.showModal} onHide={close}>
-          <Modal.Header closeButton>
-            <Modal.Title>Do you really want to delete the problem?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {description}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={ deleteProblem }
-              bsStyle="danger">
-              Yes
-            </Button>
-            <Button onClick={close}
-              bsStyle="primary"
-              bsSize="large">
-              Cancel
-            </Button>
-          </Modal.Footer>
-        </Modal>
+        { modalContents }
       </span>
     );
   }

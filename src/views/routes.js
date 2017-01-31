@@ -1,11 +1,11 @@
 import React from 'react';
 import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
-import SignIn from './pages/sign-in';
-import UserProfilePage from './pages/user-profile';
-import QuizEditorPage from './pages/quiz-editor';
-import QuizzesPage from './pages/quizzes';
-import { QuizPage, QuizProblem } from './pages/quiz';
+import SignIn from './pages/SignInPage';
+import UserProfilePage from './pages/UserProfilePage';
+import QuizEditorPage from './pages/QuizEditorPage';
+import QuizzesPage from './pages/QuizzesPage';
+import { QuizPage, QuizProblem } from './pages/QuizPage';
 
 
 export const paths = {

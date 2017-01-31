@@ -24,7 +24,7 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
-export class AddProblem extends Component {
+export class AddProblemEditor extends Component {
   static propTypes = {
     busy: PropTypes.bool.isRequired,
     addProblem: PropTypes.func.isRequired
@@ -152,7 +152,7 @@ export default class QuizEditorPage extends Component {
     const addProblem = (editorData) => {
       // TODO: Use transaction to avoid race condition
       const { problem } = editorData;
-      const lastProblem = _.maxBy(Object.values(problems), 'num');
+      const lastProblem = problems && _.maxBy(Object.values(problems), 'num') || null;
       problem.num = (lastProblem && lastProblem.num || 0)  + 1;
       return this.wrapPromise(problemsRef.add_problem(quizId, problem));
     };
@@ -173,9 +173,12 @@ export default class QuizEditorPage extends Component {
       return (<Alert bsStyle="danger">invalid quizId: {quizId}</Alert>);
     }
 
-    const addButton = (<Button active={this.state.adding} bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
-      <FAIcon name="plus" className="color-green" /> add new problem
-    </Button>);
+    const addButton = (
+      <Button active={this.state.adding} 
+        bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
+        <FAIcon name="plus" className="color-green" /> add new problem
+      </Button>
+    );
 
     const problemsEl = !problems ? (
       // no problems
@@ -194,7 +197,7 @@ export default class QuizEditorPage extends Component {
     return (
       <div>
         <h3>{quiz.title} {addButton}</h3>
-        { this.state.adding && <AddProblem busy={this.state.busy} quiz={quiz} addProblem={addProblem} /> }
+        { this.state.adding && <AddProblemEditor busy={this.state.busy} quiz={quiz} addProblem={addProblem} /> }
         { errEl }
         { problemsEl }
       </div>

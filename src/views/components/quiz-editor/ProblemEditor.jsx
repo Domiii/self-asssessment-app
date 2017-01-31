@@ -102,7 +102,7 @@ class _ProblemEditor extends Component {
     //quiz: PropTypes.object.isRequired,
     busy: PropTypes.bool,
     problemId: PropTypes.string,
-    problem: PropTypes.object.isRequired
+    problem: PropTypes.object
   };
 
   render() {
@@ -127,6 +127,16 @@ class _ProblemEditor extends Component {
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="problemId" value={problemId} component="input" type="hidden" />
         <Field name="problem.num" value={num} component="input" type="hidden" />
+        <FormInputField name="problem.title_en" label="Title (English)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name="problem.title_zh" label="Title (中文)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
         <FormInputField name="problem.description_en" label="Description (English)"
           component="textarea"
           inputProps={{rows: '5'}}

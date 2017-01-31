@@ -139,7 +139,14 @@ const QuizProblemsRef = refWrapper({
 
       children: {
         problem: {
-          path: '$(problemId)'
+          path: '$(problemId)',
+
+          children: {
+            title_en: 'title_en',
+            title_zh: 'title_zh',
+            description_en: 'description_en',
+            description_zh: 'description_zh'
+          }
         }
       }
     }
