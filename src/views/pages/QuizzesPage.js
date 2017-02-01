@@ -24,7 +24,8 @@ import _ from 'lodash';
 
 export class QuizListItem extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired
+    userInfo: PropTypes.object.isRequired,
+    lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
@@ -33,17 +34,19 @@ export class QuizListItem extends Component {
   };
 
   render() {
-    const { userInfo } = this.context;
+    const { userInfo, lookupLocalized } = this.context;
     const { quiz, quizId } = this.props;
     const quizViewPath = '/quiz-view/' + quizId;
     const quizPlayPath = '/quiz-play/' + quizId;
+
+    const title = lookupLocalized(quiz, 'title') || '<no title>';
 
     return (
       <span>
         <Well className="no-margin">
           <div>
             <Link to={quizViewPath} onlyActiveOnIndex={true}>
-              <h3 className="no-margin">{quiz.title}</h3>
+              <h3 className="no-margin">{title}</h3>
             </Link>
           </div>
           <Link to={quizViewPath} onlyActiveOnIndex={true}>
@@ -78,7 +81,7 @@ export class QuizList extends Component {
   }
 }
 
-class AddQuiz extends Component {
+class AddQuizEditor extends Component {
   static propTypes = {
     addQuiz: PropTypes.func.isRequired
   }
@@ -151,7 +154,7 @@ export default class QuizzesPage extends Component {
     }
 
     const adminTools = mayEdit && (<div>
-      <AddQuiz addQuiz={addQuiz} />
+      <AddQuizEditor addQuiz={addQuiz} />
       <hr />
     </div>);
 

@@ -36,7 +36,7 @@ export default class CodeBlock extends PureComponent {
   renderScratch() {
     const style = {
       display: 'flex',
-      margin: '0.25em 0'
+      margin: '4px 0'
     };
     return (<pre style={style} className="hljs">
       <InlineScratchWorkspace simpleCode={this.props.literal} />
@@ -45,7 +45,7 @@ export default class CodeBlock extends PureComponent {
 
   renderOther() {
     const style = {
-      margin: '0.25em 0'
+      margin: '4px 0'
     };
     return <div style={style}>
       <pre className="hljs no-margin no-padding">

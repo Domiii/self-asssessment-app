@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+
 import { Alert, Button, Jumbotron, Well, FormGroup } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import { SimpleGrid, FAIcon } from 'src/views/components/util';
@@ -15,9 +17,8 @@ class _QuizInfoEditor extends Component {
   }
 
   render() {
-    const { quiz } = this.props;
+    const { quizId, quiz } = this.props;
     const { handleSubmit, pristine, reset, submitting } = this.props;
-    const title = quiz && quiz.title;
 
     function onSubmit(...args) {
       reset();
@@ -26,9 +27,11 @@ class _QuizInfoEditor extends Component {
 
         //<FormGroup role="form">
     return (
-      <form onSubmit={onSubmit}>
+      <form className="form-horizontal" onSubmit={onSubmit}>
         <div>
-          <Field name="title" component="input" type="text" placeholder="new quiz title" />
+          <Field name="quizId" value={quizId} component="input" type="hidden" />
+          <Field name="quiz.title_en" component="input" type="text" placeholder="quiz title (EN)" />
+          <Field name="quiz.title_zh" component="input" type="text" placeholder="quiz title (中文)" />
           <span className="margin-half" /> 
           <Button type="submit" bsStyle="success" bsSize="small" disabled={pristine || submitting}>
             {(!quiz ?
@@ -48,5 +51,18 @@ class _QuizInfoEditor extends Component {
   }
 }
 
-const QuizInfoEditor = reduxForm({ form: 'quiz_editor' /* unique form name */})(_QuizInfoEditor);
+_QuizInfoEditor = reduxForm({ enableReinitialize: true })(_QuizInfoEditor);
+
+const QuizInfoEditor = connect(
+  (state, { quizId, quiz }) => {
+    return ({
+      form: 'quiz_editor_' + quizId,
+      initialValues: {
+        quizId,
+        quiz: quiz || {}
+      },
+    });
+  }
+)(_QuizInfoEditor);
+
 export default QuizInfoEditor;

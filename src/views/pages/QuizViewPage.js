@@ -20,6 +20,7 @@ import {
 } from 'src/views/components/quiz';
 
 import {
+  QuizInfoEditor,
   ProblemEditor,
   AddProblemEditor
 } from 'src/views/components/quiz-editor';
@@ -41,7 +42,8 @@ import _ from 'lodash';
 export default class QuizViewPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfo: PropTypes.object.isRequired
+    userInfo: PropTypes.object.isRequired,
+    lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
@@ -60,7 +62,19 @@ export default class QuizViewPage extends Component {
     };
   }
 
-  toggleAdding() { this.setState({ adding: !this.state.adding }); }
+  toggleAdding() {
+    this.setState({ 
+      adding: !this.state.adding,
+      editingQuiz: false
+    });
+  }
+
+  toggleEditing() {
+    this.setState({ 
+      editingQuiz: !this.state.editingQuiz,
+      adding: false
+    });
+  }
 
   wrapPromise(promise) {
     return promise
@@ -74,7 +88,7 @@ export default class QuizViewPage extends Component {
 
   render() {
     // prepare data
-    const { userInfo, router } = this.context;  
+    const { userInfo, router, lookupLocalized } = this.context;  
     const { quizzesRef, problemsRef, params } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
     const notLoadedYet = !quizzesRef.isLoaded;
@@ -84,15 +98,17 @@ export default class QuizViewPage extends Component {
     const problems = problemsRef.ofQuiz(quizId);
 
     // prepare actions
-    const addProblem = (editorData) => {
+    const gotoRoot = router.replace.bind(router, '/');
+    const addProblem = ({ problem }) => {
       // TODO: Use transaction to avoid race condition
-      const { problem } = editorData;
       const lastProblem = problems && _.maxBy(Object.values(problems), 'num') || null;
       problem.num = (lastProblem && lastProblem.num || 0)  + 1;
       return this.wrapPromise(problemsRef.add_problem(quizId, problem));
     };
-    const updateProblem = (editorData) => {
-      const { problemId, problem } = editorData;
+    const updateQuiz = ({quizId, quiz}) => {
+      return this.wrapPromise(quizzesRef.update_quiz(quizId, quiz));
+    };
+    const updateProblem = ({ problemId, problem }) => {
       return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
     };
     const deleteProblemId = (problemId) => {
@@ -107,23 +123,35 @@ export default class QuizViewPage extends Component {
 
     if (!quiz) {
       //setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">invalid quizId: {quizId}</Alert>);
+      return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    let addButton, addProblemEditor;
+    const quizTitle = lookupLocalized(quiz, 'title');
+
+    // elements
+    let tools, topEditors;
     if (mayEdit) {
-      addButton = (
+      tools = (<span>
+        <Button active={this.state.editingQuiz} 
+          bsStyle="success" bsSize="small" onClick={this.toggleEditing.bind(this)}>
+          <FAIcon name="pencil" className="" />
+        </Button>
         <Button active={this.state.adding} 
           bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
           <FAIcon name="plus" className="color-green" /> add new problem
         </Button>
-      );
-    }
-    if (this.state.adding) {
-      addProblemEditor = (
-        <AddProblemEditor busy={busy} quiz={quiz} addProblem={addProblem}>
-        </AddProblemEditor>
-      );
+      </span>);
+      if (this.state.adding) {
+        topEditors = (
+          <AddProblemEditor busy={busy} quiz={quiz} addProblem={addProblem}>
+          </AddProblemEditor>
+        );
+      }
+      if (this.state.editingQuiz) {
+        topEditors = (
+          <QuizInfoEditor quizId={quizId} quiz={quiz} onSubmit={updateQuiz}></QuizInfoEditor>
+        );
+      }
     }
 
     const problemsEl = !problems ? (
@@ -144,8 +172,8 @@ export default class QuizViewPage extends Component {
 
     return (
       <div>
-        <h3>{quiz.title} {addButton}</h3>
-        { addProblemEditor }
+        <h3>{quizTitle} {tools}</h3>
+        { topEditors }
         { errEl }
         { problemsEl }
       </div>

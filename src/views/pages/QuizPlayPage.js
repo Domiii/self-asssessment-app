@@ -76,6 +76,7 @@ export class QuizProblem extends React.Component {
   
     const { lookupLocalized } = this.context;
     const { problem } = this.props;
+    const title = lookupLocalized(problem, 'title');
     const description = lookupLocalized(problem, 'description');
     
 
@@ -90,13 +91,18 @@ export class QuizProblem extends React.Component {
       height: '100%', 
       display: 'flex', 
       flex: '1 100%', 
-      flexFlow: 'column'
+      flexFlow: 'column',
+      backgroundColor: 'white'
+    };
+    const titleStyle = {
+      marginTop: 0
     };
     
     return (<div>
       <div className="quiz-main" style={mainStyle}>
         <Jumbotron className="no-margin"style={jumboStyle}>
             <div style={{flex: '8 auto'}}>
+              <h2 style={titleStyle}>{title}</h2>
               <Markdown source={description} />
             </div>
             <div style={{flex: '1 auto', position: 'relative'}}>
