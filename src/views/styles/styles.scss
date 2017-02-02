@@ -45,20 +45,20 @@ a {
   flex-flow: row wrap;
 }
 
-.quiz-wrapper > * {
+.concept-wrapper > * {
   flex: 1 100%;
 }
 
-.quiz-main { 
+.concept-main { 
   flex: 7 0px;
   order: 1;
 }
-.quiz-response-menu { 
+.concept-response-menu { 
   flex: 1 auto;
   order: 2;
 }
 
-.quiz-response-menu > * {
+.concept-response-menu > * {
   min-height: 100%;
   display: flex;
   flex: 1 100%;

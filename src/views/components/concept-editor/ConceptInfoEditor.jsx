@@ -7,9 +7,9 @@ import { SimpleGrid, FAIcon } from 'src/views/components/util';
 import _ from 'lodash';
 
 //  see: http://redux-form.com/6.4.1/examples/simple/
-class _QuizInfoEditor extends Component {
+class _ConceptInfoEditor extends Component {
   static propTypes = {
-    quiz: PropTypes.object
+    concept: PropTypes.object
   };
 
   constructor(...args) {
@@ -17,7 +17,7 @@ class _QuizInfoEditor extends Component {
   }
 
   render() {
-    const { quizId, quiz } = this.props;
+    const { conceptId, concept } = this.props;
     const { handleSubmit, pristine, reset, submitting } = this.props;
 
     function onSubmit(...args) {
@@ -29,15 +29,15 @@ class _QuizInfoEditor extends Component {
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <div>
-          <Field name="quizId" value={quizId} component="input" type="hidden" />
-          <Field name="quiz.title_en" component="input" type="text" placeholder="quiz title (EN)" />
-          <Field name="quiz.title_zh" component="input" type="text" placeholder="quiz title (中文)" />
+          <Field name="conceptId" value={conceptId} component="input" type="hidden" />
+          <Field name="concept.title_en" component="input" type="text" placeholder="concept title (EN)" />
+          <Field name="concept.title_zh" component="input" type="text" placeholder="concept title (中文)" />
           <span className="margin-half" /> 
           <Button type="submit" bsStyle="success" bsSize="small" disabled={pristine || submitting}>
-            {(!quiz ?
+            {(!concept ?
               (<span>
                 <FAIcon name="plus" className="color-green" />
-                add new quiz
+                add new concept
               </span>):
               (<span>
                 <FAIcon name="upload" className="color-green" />
@@ -51,18 +51,18 @@ class _QuizInfoEditor extends Component {
   }
 }
 
-_QuizInfoEditor = reduxForm({ enableReinitialize: true })(_QuizInfoEditor);
+_ConceptInfoEditor = reduxForm({ enableReinitialize: true })(_ConceptInfoEditor);
 
-const QuizInfoEditor = connect(
-  (state, { quizId, quiz }) => {
+const ConceptInfoEditor = connect(
+  (state, { conceptId, concept }) => {
     return ({
-      form: 'quiz_editor_' + quizId,
+      form: 'concept_editor_' + conceptId,
       initialValues: {
-        quizId,
-        quiz: quiz || {}
+        conceptId,
+        concept: concept || {}
       },
     });
   }
-)(_QuizInfoEditor);
+)(_ConceptInfoEditor);
 
-export default QuizInfoEditor;
+export default ConceptInfoEditor;

@@ -1,25 +1,33 @@
 {
   "rules": {
-    "quizProblems": {
+    "conceptProblems": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
-    "quizzes": {
+    "concepts": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+    },
+    "conceptProgress": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+    },
+    "conceptProblemResponses": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
     "users": {
       "$uid" : {
+        ".read": "auth !== null",
+        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)",
+        
         "isAdmin" : {
-          ".read": "auth !== null",
-          ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+          ".write": "false"
         },
         "adminDisplayMode" : {
-          ".read": "auth !== null",
-          ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+          ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)",
         },
         "data": {
-          ".read": "auth !== null",
           ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
         }
       }

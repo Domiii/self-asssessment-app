@@ -10,8 +10,8 @@ import { FAIcon } from 'src/views/components/util';
 
 import ProblemPreview from './ProblemPreview';
 
-import ProblemEditor from 'src/views/components/quiz-editor/ProblemEditor';
-import ProblemEditTools from 'src/views/components/quiz-editor/ProblemEditTools';
+import ProblemEditor from 'src/views/components/concept-editor/ProblemEditor';
+import ProblemEditTools from 'src/views/components/concept-editor/ProblemEditTools';
 console.assert(ProblemEditTools);
 
 export class ProblemTags extends Component {

@@ -1,7 +1,7 @@
 import { refWrapper } from 'src/util/firebaseUtil';
 
 const ResponseFeedbackRef = refWrapper({
-  path: '/quizResponseFeedback'
+  path: '/conceptResponseFeedback'
 });
 
 export default ResponseFeedbackRef;

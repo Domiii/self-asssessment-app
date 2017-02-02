@@ -9,37 +9,37 @@ import {
 
 import { UserInfoRef } from 'src/core/users';
 import { 
-  QuizzesRef, 
-  QuizProblemsRef,
-  QuizProgressRef,
+  ConceptsRef, 
+  ConceptProblemsRef,
+  ConceptProgressRef,
   ProblemResponsesRef
-} from 'src/core/quizzes/';
+} from 'src/core/concepts/';
 
 import {
   ProblemGrid
-} from 'src/views/components/quiz';
+} from 'src/views/components/concept';
 
 import {
-  QuizInfoEditor,
+  ConceptInfoEditor,
   ProblemEditor,
   AddProblemEditor
-} from 'src/views/components/quiz-editor';
+} from 'src/views/components/concept-editor';
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
 @firebase((props, firebase) => ([
-  QuizzesRef.path,
-  QuizProblemsRef.path
+  ConceptsRef.path,
+  ConceptProblemsRef.path
 ]))
 @connect(
   ({ firebase }) => ({
-    quizzesRef: QuizzesRef(firebase),
-    problemsRef: QuizProblemsRef(firebase)
+    conceptsRef: ConceptsRef(firebase),
+    problemsRef: ConceptProblemsRef(firebase)
   })
 )
-export default class QuizViewPage extends Component {
+export default class ConceptViewPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
     userInfo: PropTypes.object.isRequired,
@@ -49,7 +49,7 @@ export default class QuizViewPage extends Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
-    quizzesRef: PropTypes.object.isRequired,
+    conceptsRef: PropTypes.object.isRequired,
     problemsRef: PropTypes.object.isRequired
   }
 
@@ -65,13 +65,13 @@ export default class QuizViewPage extends Component {
   toggleAdding() {
     this.setState({ 
       adding: !this.state.adding,
-      editingQuiz: false
+      editingConcept: false
     });
   }
 
   toggleEditing() {
     this.setState({ 
-      editingQuiz: !this.state.editingQuiz,
+      editingConcept: !this.state.editingConcept,
       adding: false
     });
   }
@@ -89,13 +89,13 @@ export default class QuizViewPage extends Component {
   render() {
     // prepare data
     const { userInfo, router, lookupLocalized } = this.context;  
-    const { quizzesRef, problemsRef, params } = this.props;
+    const { conceptsRef, problemsRef, params } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
-    const notLoadedYet = !quizzesRef.isLoaded;
+    const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
-    const { quizId } = params;
-    const quiz = quizzesRef.quiz(quizId);
-    const problems = problemsRef.ofQuiz(quizId);
+    const { conceptId } = params;
+    const concept = conceptsRef.concept(conceptId);
+    const problems = problemsRef.ofConcept(conceptId);
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
@@ -103,16 +103,16 @@ export default class QuizViewPage extends Component {
       // TODO: Use transaction to avoid race condition
       const lastProblem = problems && _.maxBy(Object.values(problems), 'num') || null;
       problem.num = (lastProblem && lastProblem.num || 0)  + 1;
-      return this.wrapPromise(problemsRef.add_problem(quizId, problem));
+      return this.wrapPromise(problemsRef.add_problem(conceptId, problem));
     };
-    const updateQuiz = ({quizId, quiz}) => {
-      return this.wrapPromise(quizzesRef.update_quiz(quizId, quiz));
+    const updateConcept = ({conceptId, concept}) => {
+      return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
     };
     const updateProblem = ({ problemId, problem }) => {
-      return this.wrapPromise(problemsRef.update_problem(quizId, problemId, problem));
+      return this.wrapPromise(problemsRef.update_problem(conceptId, problemId, problem));
     };
     const deleteProblemId = (problemId) => {
-      return this.wrapPromise(problemsRef.deleteProblem(quizId, problemId));
+      return this.wrapPromise(problemsRef.deleteProblem(conceptId, problemId));
     };
 
     // go render!
@@ -121,18 +121,18 @@ export default class QuizViewPage extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    if (!quiz) {
+    if (!concept) {
       //setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
+      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    const quizTitle = lookupLocalized(quiz, 'title');
+    const conceptTitle = lookupLocalized(concept, 'title');
 
     // elements
     let tools, topEditors;
     if (mayEdit) {
       tools = (<span>
-        <Button active={this.state.editingQuiz} 
+        <Button active={this.state.editingConcept} 
           bsStyle="success" bsSize="small" onClick={this.toggleEditing.bind(this)}>
           <FAIcon name="pencil" className="" />
         </Button>
@@ -143,24 +143,24 @@ export default class QuizViewPage extends Component {
       </span>);
       if (this.state.adding) {
         topEditors = (
-          <AddProblemEditor busy={busy} quiz={quiz} addProblem={addProblem}>
+          <AddProblemEditor busy={busy} concept={concept} addProblem={addProblem}>
           </AddProblemEditor>
         );
       }
-      if (this.state.editingQuiz) {
+      if (this.state.editingConcept) {
         topEditors = (
-          <QuizInfoEditor quizId={quizId} quiz={quiz} onSubmit={updateQuiz}></QuizInfoEditor>
+          <ConceptInfoEditor conceptId={conceptId} concept={concept} onSubmit={updateConcept}></ConceptInfoEditor>
         );
       }
     }
 
     const problemsEl = !problems ? (
       // no problems
-      <Alert bsStyle="info">quiz is empty</Alert>
+      <Alert bsStyle="info">concept is empty</Alert>
     ) : (
       // display problems
       <div><ProblemGrid {...{
-        busy, quizId, problems, mayEdit, updateProblem, deleteProblemId
+        busy, conceptId, problems, mayEdit, updateProblem, deleteProblemId
       }} /></div>
     );
 
@@ -172,7 +172,7 @@ export default class QuizViewPage extends Component {
 
     return (
       <div>
-        <h3>{quizTitle} {tools}</h3>
+        <h3>{conceptTitle} {tools}</h3>
         { topEditors }
         { errEl }
         { problemsEl }

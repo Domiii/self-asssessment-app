@@ -3,19 +3,19 @@ import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
-import QuizViewPage from './pages/QuizViewPage';
-import QuizzesPage from './pages/QuizzesPage';
-import { QuizPlayPage, QuizProblem } from './pages/QuizPlayPage';
+import ConceptViewPage from './pages/ConceptViewPage';
+import ConceptsPage from './pages/ConceptsPage';
+import { ConceptPlayPage, ConceptProblem } from './pages/ConceptPlayPage';
 
 
 export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
   USER_PROFILE: 'user',
-  QUIZZES: '',
-  QUIZ_VIEW: 'quiz-view/:quizId',
-  QUIZ_PLAY: 'quiz-play/:quizId',
-  QUIZ_PROBLEM: 'problem/:problemId'
+  CONCEPTS: '',
+  CONCEPT_VIEW: 'concept-view/:conceptId',
+  CONCEPT_PLAY: 'concept-play/:conceptId',
+  CONCEPT_PROBLEM: 'problem/:problemId'
 };
 
 
@@ -49,10 +49,10 @@ export const getRoutes = getState => {
     component: App,
     // redirect: {
     //   from: '*',
-    //   to: paths.QUIZZES
+    //   to: paths.CONCEPTS
     // },,
     indexRoute: {
-      component: QuizzesPage,
+      component: ConceptsPage,
       onEnter: requireAuth(getState)
     },
     childRoutes: [
@@ -63,10 +63,10 @@ export const getRoutes = getState => {
         onEnter: requireUnauth(getState)
       },
       {
-        name: 'quizzes',
-        path: paths.QUIZZES,
+        name: 'concepts',
+        path: paths.CONCEPTS,
         indexRoute: {
-          component: QuizzesPage,
+          component: ConceptsPage,
           onEnter: requireAuth(getState)
         }
       },
@@ -77,20 +77,20 @@ export const getRoutes = getState => {
         onEnter: requireAuth(getState)
       },
       {
-        name: 'quiz-view',
-        path: paths.QUIZ_VIEW,
-        component: QuizViewPage,
+        name: 'concept-view',
+        path: paths.CONCEPT_VIEW,
+        component: ConceptViewPage,
         onEnter: requireAuth(getState)
       },
       {
-        name: 'quiz-play',
-        path: paths.QUIZ_PLAY,
-        component: QuizPlayPage,
+        name: 'concept-play',
+        path: paths.CONCEPT_PLAY,
+        component: ConceptPlayPage,
         onEnter: requireAuth(getState),
         childRoutes: [
           {
-            path: paths.QUIZ_PROBLEM,
-            component: QuizPlayPage
+            path: paths.CONCEPT_PROBLEM,
+            component: ConceptPlayPage
           }
         ]
       }

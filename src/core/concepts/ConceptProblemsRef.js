@@ -2,21 +2,21 @@ import { refWrapper } from 'src/util/firebaseUtil';
 import _ from 'lodash';
 
 
-const QuizProblemsRef = refWrapper({
+const ConceptProblemsRef = refWrapper({
   // the root path of all objects of this type
-  path: '/quizProblems',
+  path: '/conceptProblems',
 
   methods: {
 
   },
 
   children: {
-    ofQuiz: {
-      path: '$(quizId)',
+    ofConcept: {
+      path: '$(conceptId)',
 
       cascadingMethods: {
-        updateKeepOrder(quizId, updates) {
-          // TODO: this.val and this.update_ofQuiz don't work in cascading methods
+        updateKeepOrder(conceptId, updates) {
+          // TODO: this.val and this.update_ofConcept don't work in cascading methods
 
           updates = updates || {};
           const problems = this.val;
@@ -31,34 +31,34 @@ const QuizProblemsRef = refWrapper({
           }, updates);
 
           const numUpdates = _.keyBy(problems, (problem) => {});
-          return this.update_ofQuiz(quizId, updates);
+          return this.update_ofConcept(conceptId, updates);
         },
 
         // TODO: update problem order
-        updateProblemOrder(quizId, problemId, problemData) {
+        updateProblemOrder(conceptId, problemId, problemData) {
           const updates = {
             [problemId]: problemData
           };
-          return this.update_ofQuiz(quizId, updates);
-          //return this.updateKeepOrder(quizId, updates);
+          return this.update_ofConcept(conceptId, updates);
+          //return this.updateKeepOrder(conceptId, updates);
         },
 
-        deleteProblem(quizId, problemId) {
-          return this.delete_problem(quizId, problemId)
+        deleteProblem(conceptId, problemId) {
+          return this.delete_problem(conceptId, problemId)
           .then(() => {
             // keep order after deleting
-            //return this.updateKeepOrder(quizId);
+            //return this.updateKeepOrder(conceptId);
           });
         },
 
-        getFirstProblem(quizId) {
-          const firstProblemId = this.getFirstProblemId(quizId);
-          return firstProblemId && this.problem(quizId, firstProblemId);
+        getFirstProblem(conceptId) {
+          const firstProblemId = this.getFirstProblemId(conceptId);
+          return firstProblemId && this.problem(conceptId, firstProblemId);
         },
 
-        getFirstProblemId(quizId) {
+        getFirstProblemId(conceptId) {
           // TODO: Make this more efficient
-          const problems = this.ofQuiz(quizId);
+          const problems = this.ofConcept(conceptId);
           if (!problems) {
             return null;
           }
@@ -74,9 +74,9 @@ const QuizProblemsRef = refWrapper({
           return firstKey;
         },
 
-        getLastProblemId(quizId) {
+        getLastProblemId(conceptId) {
           // TODO: Make this more efficient
-          const problems = this.ofQuiz(quizId);
+          const problems = this.ofConcept(conceptId);
           if (!problems) {
             return null;
           }
@@ -92,14 +92,14 @@ const QuizProblemsRef = refWrapper({
           return lastKey;
         },
 
-        getPreviousProblemId(quizId, currentProblemId) {
-          const problems = this.ofQuiz(quizId);
+        getPreviousProblemId(conceptId, currentProblemId) {
+          const problems = this.ofConcept(conceptId);
           if (!problems) {
             return null;
           }
-          const currentProblem = this.problem(quizId, currentProblemId);
+          const currentProblem = this.problem(conceptId, currentProblemId);
           if (!currentProblem) {
-            return this.getFirstProblemId(quizId);
+            return this.getFirstProblemId(conceptId);
           }
 
           let newNum = -99999999999;
@@ -111,17 +111,17 @@ const QuizProblemsRef = refWrapper({
               newKey = key;
             }
           }
-          return newKey || this.getLastProblemId(quizId);
+          return newKey || this.getLastProblemId(conceptId);
         },
 
-        getNextProblemId: function(quizId, currentProblemId) {
-          const problems = this.ofQuiz(quizId);
+        getNextProblemId: function(conceptId, currentProblemId) {
+          const problems = this.ofConcept(conceptId);
           if (!problems) {
             return null;
           }
-          const currentProblem = this.problem(quizId, currentProblemId);
+          const currentProblem = this.problem(conceptId, currentProblemId);
           if (!currentProblem) {
-            return this.getFirstProblemId(quizId);
+            return this.getFirstProblemId(conceptId);
           }
 
           let newNum = 99999999999;
@@ -133,7 +133,7 @@ const QuizProblemsRef = refWrapper({
               newKey = key;
             }
           }
-          return newKey || this.getFirstProblemId(quizId);
+          return newKey || this.getFirstProblemId(conceptId);
         }
       },
 
@@ -153,4 +153,4 @@ const QuizProblemsRef = refWrapper({
   }
 });
 
-export default QuizProblemsRef;
+export default ConceptProblemsRef;

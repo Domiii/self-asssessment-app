@@ -1,11 +1,11 @@
 import { UserInfoRef } from 'src/core/users';
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
-  QuizzesRef,
-  QuizProblemsRef,
-  QuizProgressRef,
+  ConceptsRef,
+  ConceptProblemsRef,
+  ConceptProgressRef,
   ProblemResponsesRef
-} from 'src/core/quizzes/';
+} from 'src/core/concepts/';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
@@ -17,43 +17,43 @@ import {
 } from 'react-router-bootstrap';
 import { SimpleGrid, FAIcon } from 'src/views/components/util';
 
-import QuizInfoEditor from 'src/views/components/quiz-editor/QuizInfoEditor';
+import ConceptInfoEditor from 'src/views/components/concept-editor/ConceptInfoEditor';
 
 import _ from 'lodash';
 
 
-export class QuizListItem extends Component {
+export class ConceptListItem extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired,
     lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
-    quiz: PropTypes.object.isRequired,
-    quizId: PropTypes.string.isRequired
+    concept: PropTypes.object.isRequired,
+    conceptId: PropTypes.string.isRequired
   };
 
   render() {
     const { userInfo, lookupLocalized } = this.context;
-    const { quiz, quizId } = this.props;
-    const quizViewPath = '/quiz-view/' + quizId;
-    const quizPlayPath = '/quiz-play/' + quizId;
+    const { concept, conceptId } = this.props;
+    const conceptViewPath = '/concept-view/' + conceptId;
+    const conceptPlayPath = '/concept-play/' + conceptId;
 
-    const title = lookupLocalized(quiz, 'title') || '<no title>';
+    const title = lookupLocalized(concept, 'title') || '<no title>';
 
     return (
       <span>
         <Well className="no-margin">
           <div>
-            <Link to={quizViewPath} onlyActiveOnIndex={true}>
+            <Link to={conceptViewPath} onlyActiveOnIndex={true}>
               <h3 className="no-margin">{title}</h3>
             </Link>
           </div>
-          <Link to={quizViewPath} onlyActiveOnIndex={true}>
+          <Link to={conceptViewPath} onlyActiveOnIndex={true}>
             view
           </Link>
           <span className="margin-half" />
-          <Link to={quizPlayPath} onlyActiveOnIndex={true}>
+          <Link to={conceptPlayPath} onlyActiveOnIndex={true}>
             play
           </Link>
         </Well>
@@ -62,61 +62,61 @@ export class QuizListItem extends Component {
   }
 }
 
-export class QuizList extends Component {
+export class ConceptList extends Component {
   static propTypes = {
-    quizzes: PropTypes.object.isRequired
+    concepts: PropTypes.object.isRequired
   };
 
   render() {
-    const { quizzes } = this.props;
+    const { concepts } = this.props;
 
     return (
-      <SimpleGrid objects={quizzes} 
+      <SimpleGrid objects={concepts} 
         nCols={4}
         colProps={{className: 'padding-half'}}
-        objectComponentCreator={(key, value) => <QuizListItem key={key} quizId={key} quiz={value} />}
+        objectComponentCreator={(key, value) => <ConceptListItem key={key} conceptId={key} concept={value} />}
       >
       </SimpleGrid>
     );
   }
 }
 
-class AddQuizEditor extends Component {
+class AddConceptEditor extends Component {
   static propTypes = {
-    addQuiz: PropTypes.func.isRequired
+    addConcept: PropTypes.func.isRequired
   }
 
   render() {
-    const { addQuiz } = this.props;
+    const { addConcept } = this.props;
 
     return (
-      <QuizInfoEditor onSubmit={addQuiz}></QuizInfoEditor>
+      <ConceptInfoEditor onSubmit={addConcept}></ConceptInfoEditor>
     );
   }
 }
 
 
 @firebase((props, firebase) => ([
-  QuizzesRef.path,
-  QuizProblemsRef.path,
+  ConceptsRef.path,
+  ConceptProblemsRef.path,
   ProblemResponsesRef.path,
-  QuizProgressRef.path
+  ConceptProgressRef.path
 ]))
 @connect(
   ({ firebase }) => {
     return {
-      quizzesRef: QuizzesRef(firebase),
-      problemsRef: QuizProblemsRef(firebase)
+      conceptsRef: ConceptsRef(firebase),
+      problemsRef: ConceptProblemsRef(firebase)
     };
   }
 )
-export default class QuizzesPage extends Component {
+export default class ConceptsPage extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired
   };
 
   static propTypes = {
-    quizzesRef: PropTypes.object.isRequired,
+    conceptsRef: PropTypes.object.isRequired,
     problemsRef: PropTypes.object.isRequired
   };
 
@@ -136,14 +136,13 @@ export default class QuizzesPage extends Component {
   render() {
     // prepare data + wrappers
     const { userInfo } = this.context;
-    const { quizzesRef } = this.props;
+    const { conceptsRef } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode();
-    const isBusy = !quizzesRef.isLoaded;
+    const isBusy = !conceptsRef.isLoaded;
 
     // prepare actions
-    //const addQuiz = quizzesRef.add_quiz.bind(quizzesRef);
-    const addQuiz = (q) => {
-      quizzesRef.add_quiz(q);
+    const addConcept = ({concept}) => {
+      conceptsRef.add_concept(concept);
     };
 
 
@@ -154,13 +153,13 @@ export default class QuizzesPage extends Component {
     }
 
     const adminTools = mayEdit && (<div>
-      <AddQuizEditor addQuiz={addQuiz} />
+      <AddConceptEditor addConcept={addConcept} />
       <hr />
     </div>);
 
     return (<div>
       {adminTools}
-      <QuizList quizzes={quizzesRef.val || {}} />
+      <ConceptList concepts={conceptsRef.val || {}} />
     </div>);
   }
 }

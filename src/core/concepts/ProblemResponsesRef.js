@@ -2,11 +2,11 @@ import { refWrapper } from 'src/util/firebaseUtil';
 
 
 const ProblemResponsesRef = refWrapper({
-  path: '/quizProblemResponses',
+  path: '/conceptProblemResponses',
 
   children: {
-    ofQuiz: {
-      path: '$(uid)/$(quizId)',
+    ofConcept: {
+      path: '$(uid)/$(conceptId)',
       children: {
         response: {
           path: '$(problemId)',

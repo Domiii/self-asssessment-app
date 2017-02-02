@@ -1,16 +1,16 @@
 import { refWrapper } from 'src/util/firebaseUtil';
 
 
-const QuizProgressRef = refWrapper({
-  path: '/quizProgress',
+const ConceptProgressRef = refWrapper({
+  path: '/conceptProgress',
 
   children: {
     ofUser: {
       path: '$(uid)',
 
       children: {
-        ofQuiz: {
-          path: '$(quizId)',
+        ofConcept: {
+          path: '$(conceptId)',
 
           children: {
             currentProblemId: 'currentProblemId'
@@ -21,4 +21,4 @@ const QuizProgressRef = refWrapper({
   }
 });
 
-export default QuizProgressRef;
+export default ConceptProgressRef;

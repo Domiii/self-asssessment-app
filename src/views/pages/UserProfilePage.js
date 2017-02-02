@@ -70,10 +70,20 @@ export default class UserProfilePage extends Component {
   render() {
     // data
     const { userInfo } = this.context;
-    const isBusy = !userInfo.isLoaded;
+    const isAdmin = userInfo && userInfo.isAdmin();
+    const isBusy = userInfo && !userInfo.isLoaded;
 
     // actions
-    const updateUser = userInfo.update.bind(userInfo);
+    const updateUser = (update) => {
+      if (isAdmin) {
+        // admins can override other stuff as well
+        userInfo.update.bind(userInfo);
+      }
+      else {
+        // normal users can only set their personal data
+        userInfo.set_data(update.data);
+      }
+    };
 
 
     // go render!

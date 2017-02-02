@@ -5,11 +5,11 @@ import { firebase, helpers } from 'redux-react-firebase';
 //import _ from 'lodash';
 
 import { 
-  QuizzesRef,
-  QuizProblemsRef,
-  QuizProgressRef,
+  ConceptsRef,
+  ConceptProblemsRef,
+  ConceptProgressRef,
   ProblemResponsesRef
-} from 'src/core/quizzes/';
+} from 'src/core/concepts/';
 
 import { FAIcon } from 'src/views/components/util';
 import Markdown from 'src/views/components/markdown';
@@ -19,12 +19,12 @@ const { isEmpty } = helpers;
 
 const EmptyObject = {};
 
-export class QuizProgressBar extends React.Component {
+export class ConceptProgressBar extends React.Component {
   static propTypes = {
-    quiz: PropTypes.object.isRequired,
+    concept: PropTypes.object.isRequired,
     problem: PropTypes.object,
 
-    quizzesRef: PropTypes.object.isRequired,
+    conceptsRef: PropTypes.object.isRequired,
     problemsRef: PropTypes.object.isRequired,
     responsesRef: PropTypes.object.isRequired,
     progressRef: PropTypes.object.isRequired
@@ -32,7 +32,7 @@ export class QuizProgressBar extends React.Component {
 
   render() {
     const {
-      quiz, problem, quizzesRef, problemsRef, responsesRef, progressRef,
+      concept, problem, conceptsRef, problemsRef, responsesRef, progressRef,
       gotoPreviousProblem, gotoNextProblem
     } = this.props;
     const navBtnStyle = EmptyObject;
@@ -40,7 +40,7 @@ export class QuizProgressBar extends React.Component {
 
     return (<div>
       <Well className="no-margin">
-        <h3 className="no-margin inline">{quiz.title}</h3>
+        <h3 className="no-margin inline">{concept.title}</h3>
 
         <span className="margin-half" />
 
@@ -59,7 +59,7 @@ export class QuizProgressBar extends React.Component {
 }
 
 
-export class QuizProblem extends React.Component {
+export class ConceptProblem extends React.Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func.isRequired
   };
@@ -81,7 +81,7 @@ export class QuizProblem extends React.Component {
     
 
     // go render!
-    const QuizResponseMenuArgs = EmptyObject;
+    const ConceptResponseMenuArgs = EmptyObject;
     const mainStyle = {
       minHeight: '400px'
     };
@@ -99,7 +99,7 @@ export class QuizProblem extends React.Component {
     };
     
     return (<div>
-      <div className="quiz-main" style={mainStyle}>
+      <div className="concept-main" style={mainStyle}>
         <Jumbotron className="no-margin"style={jumboStyle}>
             <div style={{flex: '8 auto'}}>
               <h2 style={titleStyle}>{title}</h2>
@@ -114,16 +114,16 @@ export class QuizProblem extends React.Component {
             </div>
         </Jumbotron>
       </div>
-      <QuizResponseMenu className="quiz-response-menu"
-        {...QuizResponseMenuArgs}>
-      </QuizResponseMenu>
+      <ConceptResponseMenu className="concept-response-menu"
+        {...ConceptResponseMenuArgs}>
+      </ConceptResponseMenu>
     </div>);
   }
 }
 
-class QuizResponseMenu extends React.Component {
+class ConceptResponseMenu extends React.Component {
   render() {
-    return (<div className="quiz-response-menu">
+    return (<div className="concept-response-menu">
       <Button
           block bsSize="large" bsStyle="warning"
           //onClick={}
@@ -153,22 +153,22 @@ class QuizResponseMenu extends React.Component {
 
 
 @firebase(({ params }, firebase) => ([
-  QuizzesRef.path,
-  QuizProblemsRef.path,
+  ConceptsRef.path,
+  ConceptProblemsRef.path,
   ProblemResponsesRef.path,
-  QuizProgressRef.path
+  ConceptProgressRef.path
 ]))
 @connect(
   ({ firebase }) => {
     return {
-      quizzesRef: QuizzesRef(firebase),
-      problemsRef: QuizProblemsRef(firebase),
+      conceptsRef: ConceptsRef(firebase),
+      problemsRef: ConceptProblemsRef(firebase),
       responsesRef: ProblemResponsesRef(firebase),
-      progressRef: QuizProgressRef(firebase)
+      progressRef: ConceptProgressRef(firebase)
     };
   }
 )
-export class QuizPlayPage extends Component {
+export class ConceptPlayPage extends Component {
   static contextTypes = {
     router: React.PropTypes.object.isRequired
   };
@@ -177,7 +177,7 @@ export class QuizPlayPage extends Component {
     firebase: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
 
-    quizzesRef: PropTypes.object.isRequired,
+    conceptsRef: PropTypes.object.isRequired,
     problemsRef: PropTypes.object.isRequired,
     responsesRef: PropTypes.object.isRequired,
     progressRef: PropTypes.object.isRequired
@@ -199,40 +199,40 @@ export class QuizPlayPage extends Component {
   render() {
     // get basic data + wrappers
     const { router } = this.context;
-    const { quizzesRef, problemsRef, responsesRef, progressRef, children } = this.props;
-    let { quizId, problemId } = this.props.params;
+    const { conceptsRef, problemsRef, responsesRef, progressRef, children } = this.props;
+    let { conceptId, problemId } = this.props.params;
 
     // prepare all actions
-    const getQuizById = quizzesRef.quiz.bind(quizzesRef);
+    const getConceptById = conceptsRef.concept.bind(conceptsRef);
     const getProblemById = problemsRef.problem.bind(problemsRef);
     const getFirstProblemId = problemsRef.getFirstProblemId.bind(problemsRef);
     const getFirstProblem = problemsRef.getFirstProblem.bind(problemsRef);
     const gotoProblem = (newProblemId) => {
       if (newProblemId) {
-        router.replace(`/quiz-play/${quizId}/problem/${newProblemId}`);
+        router.replace(`/concept-play/${conceptId}/problem/${newProblemId}`);
       }
     };
     const gotoFirstProblem = () => {
-      const newProblemId = getFirstProblemId(quizId);
+      const newProblemId = getFirstProblemId(conceptId);
       setTimeout(() => gotoProblem(newProblemId), 1000);
     };
 
     const gotoNextProblem = () => {
-      const newId = problemsRef.getNextProblemId(quizId, problemId);
+      const newId = problemsRef.getNextProblemId(conceptId, problemId);
       gotoProblem(newId);
     };
     const gotoPreviousProblem = () => {
-      const newId = problemsRef.getPreviousProblemId(quizId, problemId);
+      const newId = problemsRef.getPreviousProblemId(conceptId, problemId);
       gotoProblem(newId);
     };
     const gotoRoot = router.replace.bind(router, '/');
 
     // get derived data
-    const quizProblems = problemsRef.ofQuiz(quizId);
-    const isBusy = !quizzesRef.isLoaded;
-    const hasProblems = !isEmpty(quizProblems);
-    problemId = problemId || getFirstProblemId(quizId);
-    const problem = problemId && getProblemById(quizId, problemId);
+    const conceptProblems = problemsRef.ofConcept(conceptId);
+    const isBusy = !conceptsRef.isLoaded;
+    const hasProblems = !isEmpty(conceptProblems);
+    problemId = problemId || getFirstProblemId(conceptId);
+    const problem = problemId && getProblemById(conceptId, problemId);
 
 
     // go!
@@ -241,26 +241,26 @@ export class QuizPlayPage extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    const quiz = getQuizById(quizId);
-    if (!quiz) {
-      // invalid quiz id
-      return (<Alert bsStyle="danger">invalid quizId <Button onClick={gotoRoot}>go back</Button></Alert>);
+    const concept = getConceptById(conceptId);
+    if (!concept) {
+      // invalid concept id
+      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
     let contentEl;
     if (!problem) {
-      // quiz has no problems at all
-      contentEl = (<Alert bsStyle="info">quiz is empty</Alert>);
+      // concept has no problems at all
+      contentEl = (<Alert bsStyle="info">concept is empty</Alert>);
     }
     else {
       // render current problem
-      contentEl = (<QuizProblem problem={problem} />);
+      contentEl = (<ConceptProblem problem={problem} />);
     }
 
     return (
-      <div className="quiz-wrapper flex-row-multi">
-        <QuizProgressBar quiz={quiz} problem={problem} 
-          quizzesRef={quizzesRef} problemsRef={problemsRef}
+      <div className="concept-wrapper flex-row-multi">
+        <ConceptProgressBar concept={concept} problem={problem} 
+          conceptsRef={conceptsRef} problemsRef={problemsRef}
           progressRef={progressRef} responsesRef={responsesRef}
           gotoNextProblem={gotoNextProblem}
           gotoPreviousProblem={gotoPreviousProblem} />

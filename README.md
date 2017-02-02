@@ -12,7 +12,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * Finalize Editor
 * Tags
 * Question Hierarchy
-* finalize quiz + question editor GUI
+* finalize concept + question editor GUI
 * Add questions
 ** Convert existing question data to new format
 ** Fix format
@@ -41,7 +41,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ### Done
-* CRUD quizzes + quiz questions
+* CRUD concepts + concept questions
 * Implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
 * Implement generalized Firebase interface and corresponding utilities (see `src/util/firebaseUtil`)
 * Add bootstrap + react-bootstrap

@@ -99,7 +99,7 @@ import _ from 'lodash';
 //  see: http://redux-form.com/6.4.1/examples/simple/
 class _ProblemEditor extends Component {
   static propTypes = {
-    //quiz: PropTypes.object.isRequired,
+    //concept: PropTypes.object.isRequired,
     busy: PropTypes.bool,
     problemId: PropTypes.string,
     problem: PropTypes.object

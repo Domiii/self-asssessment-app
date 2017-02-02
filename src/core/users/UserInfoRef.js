@@ -16,6 +16,7 @@ const UserInfoRef = refWrapper({
       children: {
         isAdmin: 'isAdmin', 
         adminDisplayMode: 'adminDisplayMode',
+        data: 'data',
         userName: 'data/userName',
         email: 'data/email',
         locale: 'data/locale'

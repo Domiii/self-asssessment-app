@@ -8,12 +8,12 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import {
   ProblemViewSmall
-} from 'src/views/components/quiz';
+} from 'src/views/components/concept';
 
 export default class ProblemGrid extends Component {
   static propTypes = {
     busy:  PropTypes.bool.isRequired,
-    quizId: PropTypes.string.isRequired, 
+    conceptId: PropTypes.string.isRequired, 
     problems: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
     updateProblem: PropTypes.func.isRequired,
@@ -22,7 +22,7 @@ export default class ProblemGrid extends Component {
 
   render() {
     const { 
-      busy, quizId, problems, mayEdit, updateProblem, deleteProblemId
+      busy, conceptId, problems, mayEdit, updateProblem, deleteProblemId
     } = this.props;
 
     // actions
