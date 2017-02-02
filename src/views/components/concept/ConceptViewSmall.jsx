@@ -8,30 +8,30 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
-import ProblemPreview from './ProblemPreview';
+import ConceptPreview from './ConceptPreview';
 
-import ProblemEditor from 'src/views/components/concept-editor/ProblemEditor';
-import ProblemEditTools from 'src/views/components/concept-editor/ProblemEditTools';
-console.assert(ProblemEditTools);
+import ConceptEditor from 'src/views/components/concept-editor/ConceptEditor';
+import ConceptEditTools from 'src/views/components/concept-editor/ConceptEditTools';
+console.assert(ConceptEditTools);
 
-export class ProblemTags extends Component {
+export class ConceptTags extends Component {
   static propTypes = {
-    problemId: PropTypes.string.isRequired,
-    problem: PropTypes.object.isRequired
+    conceptId: PropTypes.string.isRequired,
+    concept: PropTypes.object.isRequired
   };
 
-  ProblemTag(tagText) {
+  ConceptTag(tagText) {
     return (<span className="alert alert-danger no-padding no-margin">tagText</span>);
   }
 
   render() {
-    const tags = this.problem && this.problem.tags || [];
-    const tagEls = tags.map(tag => this.ProblemTag(tag));
+    const tags = this.concept && this.concept.tags || [];
+    const tagEls = tags.map(tag => this.ConceptTag(tag));
     return tagEls && (<div>{tagEls}</div>) || null;
   }
 }
 
-export default class ProblemViewSmall extends Component {
+export default class ConceptViewSmall extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired,
     lookupLocalized: PropTypes.func.isRequired
@@ -40,10 +40,10 @@ export default class ProblemViewSmall extends Component {
   static propTypes = {
     busy: PropTypes.bool.isRequired,
     mayEdit: PropTypes.bool.isRequired,
-    problemId: PropTypes.string.isRequired,
-    problem: PropTypes.object.isRequired,
-    updateProblem: PropTypes.func.isRequired,
-    deleteProblemId: PropTypes.func.isRequired
+    conceptId: PropTypes.string.isRequired,
+    concept: PropTypes.object.isRequired,
+    updateConcept: PropTypes.func.isRequired,
+    deleteConceptId: PropTypes.func.isRequired
   };
 
   constructor(...args) {
@@ -55,26 +55,26 @@ export default class ProblemViewSmall extends Component {
   render() {
     // data
     const { userInfo, lookupLocalized } = this.context;
-    const { busy, problemId, problem, updateProblem, deleteProblemId, mayEdit } = this.props;
-    const problemArgs = { problemId, problem };
-    const title = lookupLocalized(problem, 'title');
+    const { busy, conceptId, concept, updateConcept, deleteConceptId, mayEdit } = this.props;
+    const conceptArgs = { conceptId, concept };
+    const title = lookupLocalized(concept, 'title');
 
     // actions
-    const onSubmit = (...args) => updateProblem(...args);
+    const onSubmit = (...args) => updateConcept(...args);
     //.then(() => this.stopEdit());
 
     // element: content
     const content = !mayEdit || !this.state.editing ?
-      (<ProblemPreview {...problemArgs} />) :
-      (<ProblemEditor busy={busy} onSubmit={onSubmit} {...problemArgs}></ProblemEditor>)
+      (<ConceptPreview {...conceptArgs} />) :
+      (<ConceptEditor busy={busy} onSubmit={onSubmit} {...conceptArgs}></ConceptEditor>)
     ;
 
     // element: edit buttons
     const editTools = mayEdit && (
       <Row>
         <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
-          <ProblemEditTools {...{ 
-            problemId, problem, deleteProblemId,
+          <ConceptEditTools {...{ 
+            conceptId, concept, deleteConceptId,
             editing: this.state.editing,
             toggleEdit: this.toggleEdit }} />
         </Col>
@@ -89,7 +89,7 @@ export default class ProblemViewSmall extends Component {
             <label>{title}</label>
           </Col>
           <Col xs={1} className="no-padding inline-vcentered" style={{textAlign: 'left'}}>
-            <span className='color-gray'>#{problem.num}</span>
+            <span className='color-gray'>#{concept.num}</span>
           </Col>
         </Row>
         { editTools }
@@ -100,7 +100,7 @@ export default class ProblemViewSmall extends Component {
         </Row>
         <Row>
           <Col xs={12}>
-            <ProblemTags {...problemArgs} />
+            <ConceptTags {...conceptArgs} />
           </Col>
         </Row>
       </Grid>

@@ -1,6 +1,6 @@
 
 export ConceptsRef from './ConceptsRef';
-export ConceptProblemsRef from './ConceptProblemsRef';
-export ProblemResponsesRef from './ProblemResponsesRef';
+export ChildConceptsRef from './ChildConceptsRef';
+export ConceptResponsesRef from './ConceptResponsesRef';
 export ConceptProgressRef from './ConceptProgressRef';
 export ResponseFeedbackRef from './ResponseFeedbackRef';

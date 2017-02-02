@@ -97,7 +97,7 @@ import _ from 'lodash';
 // }
 
 //  see: http://redux-form.com/6.4.1/examples/simple/
-class _ProblemEditor extends Component {
+class _ConceptEditor extends Component {
   static propTypes = {
     //concept: PropTypes.object.isRequired,
     busy: PropTypes.bool,
@@ -164,9 +164,9 @@ class _ProblemEditor extends Component {
   }
 }
 
-_ProblemEditor = reduxForm({ enableReinitialize: true })(_ProblemEditor);
+_ConceptEditor = reduxForm({ enableReinitialize: true })(_ConceptEditor);
 
-const ProblemEditor = connect(
+const ConceptEditor = connect(
   (state, { problemId, problem }) => {
     return ({
       form: 'problem_editor_' + problemId,
@@ -176,24 +176,24 @@ const ProblemEditor = connect(
       },
     });
   }
-)(_ProblemEditor);
+)(_ConceptEditor);
 
-export default ProblemEditor;
+export default ConceptEditor;
 
 
 
-export class AddProblemEditor extends Component {
+export class AddConceptEditor extends Component {
   static propTypes = {
     busy: PropTypes.bool.isRequired,
-    addProblem: PropTypes.func.isRequired
+    addConcept: PropTypes.func.isRequired
   }
 
   render() {
-    const { busy, addProblem } = this.props;
+    const { busy, addConcept } = this.props;
 
     return (<div>
       <hr />
-      <ProblemEditor busy={busy} onSubmit={addProblem}></ProblemEditor>
+      <ConceptEditor busy={busy} onSubmit={addConcept}></ConceptEditor>
       <hr />
     </div>);
   }

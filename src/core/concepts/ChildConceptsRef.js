@@ -1,13 +1,9 @@
 import { refWrapper } from 'src/util/firebaseUtil';
+import _ from 'lodash';
+import ConceptBase from './ConceptBase';
 
-const ConceptChildrenRef = refWrapper({
-  path: '/conceptChildren',
+const ChildConceptsRef = refWrapper(_.merge(ConceptBase, {
+  path: '/childConcepts',
+}));
 
-  children: {
-    concept: {
-      path: '$(conceptId)',
-    }
-  }
-});
-
-export default ConceptChildrenRef;
+export default ChildConceptsRef;

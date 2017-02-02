@@ -5,7 +5,7 @@ import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ConceptViewPage from './pages/ConceptViewPage';
 import ConceptsPage from './pages/ConceptsPage';
-import { ConceptPlayPage, ConceptProblem } from './pages/ConceptPlayPage';
+import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
 
 export const paths = {

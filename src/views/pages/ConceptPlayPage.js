@@ -6,9 +6,9 @@ import { firebase, helpers } from 'redux-react-firebase';
 
 import { 
   ConceptsRef,
-  ConceptProblemsRef,
+  ChildConceptsRef,
   ConceptProgressRef,
-  ProblemResponsesRef
+  ConceptResponsesRef
 } from 'src/core/concepts/';
 
 import { FAIcon } from 'src/views/components/util';
@@ -59,7 +59,7 @@ export class ConceptProgressBar extends React.Component {
 }
 
 
-export class ConceptProblem extends React.Component {
+export class ChildConcept extends React.Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func.isRequired
   };
@@ -154,16 +154,16 @@ class ConceptResponseMenu extends React.Component {
 
 @firebase(({ params }, firebase) => ([
   ConceptsRef.path,
-  ConceptProblemsRef.path,
-  ProblemResponsesRef.path,
+  ChildConceptsRef.path,
+  ConceptResponsesRef.path,
   ConceptProgressRef.path
 ]))
 @connect(
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      problemsRef: ConceptProblemsRef(firebase),
-      responsesRef: ProblemResponsesRef(firebase),
+      problemsRef: ChildConceptsRef(firebase),
+      responsesRef: ConceptResponsesRef(firebase),
       progressRef: ConceptProgressRef(firebase)
     };
   }
@@ -228,9 +228,9 @@ export class ConceptPlayPage extends Component {
     const gotoRoot = router.replace.bind(router, '/');
 
     // get derived data
-    const conceptProblems = problemsRef.ofConcept(conceptId);
+    const childConcepts = problemsRef.ofConcept(conceptId);
     const isBusy = !conceptsRef.isLoaded;
-    const hasProblems = !isEmpty(conceptProblems);
+    const hasProblems = !isEmpty(childConcepts);
     problemId = problemId || getFirstProblemId(conceptId);
     const problem = problemId && getProblemById(conceptId, problemId);
 
@@ -254,7 +254,7 @@ export class ConceptPlayPage extends Component {
     }
     else {
       // render current problem
-      contentEl = (<ConceptProblem problem={problem} />);
+      contentEl = (<ChildConcept problem={problem} />);
     }
 
     return (

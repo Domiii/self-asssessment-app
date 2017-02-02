@@ -1,8 +1,8 @@
 import { refWrapper } from 'src/util/firebaseUtil';
 
 
-const ProblemResponsesRef = refWrapper({
-  path: '/conceptProblemResponses',
+const ConceptResponsesRef = refWrapper({
+  path: '/conceptResponses',
 
   children: {
     ofConcept: {
@@ -19,4 +19,4 @@ const ProblemResponsesRef = refWrapper({
   }
 });
 
-export default ProblemResponsesRef;
+export default ConceptResponsesRef;

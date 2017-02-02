@@ -11,25 +11,25 @@ import { FormInputField, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
 
-class _ProblemImporter extends Component {
+class _ConceptImporter extends Component {
   static propTypes = {
     
   };
 }
 
 
-_ProblemImporter = reduxForm({ enableReinitialize: true })(_ProblemImporter);
+_ConceptImporter = reduxForm({ enableReinitialize: true })(_ConceptImporter);
 
-const ProblemImporter = connect(
-  (state, { problemId, problem }) => {
+const ConceptImporter = connect(
+  (state, { conceptId, concept }) => {
     return ({
-      form: 'problem_importer',
+      form: 'concept_importer',
       initialValues: {
-        problemId,
-        problem: problem || {}
+        conceptId,
+        concept: concept || {}
       },
     });
   }
-)(_ProblemImporter);
+)(_ConceptImporter);
 
-export default ProblemImporter;
+export default ConceptImporter;

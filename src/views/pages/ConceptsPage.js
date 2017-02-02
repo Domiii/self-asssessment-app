@@ -2,9 +2,9 @@ import { UserInfoRef } from 'src/core/users';
 import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
   ConceptsRef,
-  ConceptProblemsRef,
+  ChildConceptsRef,
   ConceptProgressRef,
-  ProblemResponsesRef
+  ConceptResponsesRef
 } from 'src/core/concepts/';
 
 import React, { Component, PropTypes } from 'react';
@@ -98,15 +98,15 @@ class AddConceptEditor extends Component {
 
 @firebase((props, firebase) => ([
   ConceptsRef.path,
-  ConceptProblemsRef.path,
-  ProblemResponsesRef.path,
+  ChildConceptsRef.path,
+  ConceptResponsesRef.path,
   ConceptProgressRef.path
 ]))
 @connect(
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      problemsRef: ConceptProblemsRef(firebase)
+      problemsRef: ChildConceptsRef(firebase)
     };
   }
 )

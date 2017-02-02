@@ -1,4 +1,4 @@
 export ProblemDeleteModal from './ProblemDeleteModal';
-export ProblemEditor, { AddProblemEditor } from './ProblemEditor';
+export ConceptEditor, { AddConceptEditor } from './ConceptEditor';
 export ProblemEditTools from './ProblemEditTools';
 export ConceptInfoEditor from './ConceptInfoEditor';

@@ -7,41 +7,41 @@ import {
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import {
-  ProblemViewSmall
+  ConceptViewSmall
 } from 'src/views/components/concept';
 
-export default class ProblemGrid extends Component {
+export default class ConceptGrid extends Component {
   static propTypes = {
     busy:  PropTypes.bool.isRequired,
     conceptId: PropTypes.string.isRequired, 
-    problems: PropTypes.object.isRequired,
+    concepts: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
-    updateProblem: PropTypes.func.isRequired,
-    deleteProblemId: PropTypes.func.isRequired
+    updateConcept: PropTypes.func.isRequired,
+    deleteConceptId: PropTypes.func.isRequired
   };
 
   render() {
     const { 
-      busy, conceptId, problems, mayEdit, updateProblem, deleteProblemId
+      busy, conceptId, concepts, mayEdit, updateConcept, deleteConceptId
     } = this.props;
 
     // actions
-    const keyOrder = key => problems[key] && problems[key].num;
+    const keyOrder = key => concepts[key] && concepts[key].num;
 
     // prepare props
-    const problemProps = _.mapValues(problems, 
-      (problem, problemId) => ({
+    const conceptProps = _.mapValues(concepts, 
+      (concept, conceptId) => ({
         busy,
-        problemId,
-        problem,
+        conceptId,
+        concept,
         mayEdit,
-        updateProblem,
-        deleteProblemId
+        updateConcept,
+        deleteConceptId
       })
     );
 
     // create grid
-    return (<SimpleGrid objects={problems} 
+    return (<SimpleGrid objects={concepts} 
       keyOrder={keyOrder}
       rowProps={{
         className:'show-grid', 
@@ -60,7 +60,7 @@ export default class ProblemGrid extends Component {
       nCols={3}
       objectComponentCreator={(key, value) => {
         return (
-          <ProblemViewSmall key={key} {...problemProps[key]}/>
+          <ConceptViewSmall key={key} {...conceptProps[key]}/>
         );
       }}
     >

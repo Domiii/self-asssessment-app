@@ -10,19 +10,19 @@ import {
 import { UserInfoRef } from 'src/core/users';
 import { 
   ConceptsRef, 
-  ConceptProblemsRef,
+  ChildConceptsRef,
   ConceptProgressRef,
-  ProblemResponsesRef
+  ConceptResponsesRef
 } from 'src/core/concepts/';
 
 import {
-  ProblemGrid
+  ConceptGrid
 } from 'src/views/components/concept';
 
 import {
   ConceptInfoEditor,
-  ProblemEditor,
-  AddProblemEditor
+  ConceptEditor,
+  AddConceptEditor
 } from 'src/views/components/concept-editor';
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
@@ -31,12 +31,12 @@ import _ from 'lodash';
 
 @firebase((props, firebase) => ([
   ConceptsRef.path,
-  ConceptProblemsRef.path
+  ChildConceptsRef.path
 ]))
 @connect(
   ({ firebase }) => ({
     conceptsRef: ConceptsRef(firebase),
-    problemsRef: ConceptProblemsRef(firebase)
+    childConceptsRef: ChildConceptsRef(firebase)
   })
 )
 export default class ConceptViewPage extends Component {
@@ -50,7 +50,7 @@ export default class ConceptViewPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    problemsRef: PropTypes.object.isRequired
+    childConceptsRef: PropTypes.object.isRequired
   }
 
   constructor(...args) {
@@ -89,30 +89,30 @@ export default class ConceptViewPage extends Component {
   render() {
     // prepare data
     const { userInfo, router, lookupLocalized } = this.context;  
-    const { conceptsRef, problemsRef, params } = this.props;
+    const { conceptsRef, childConceptsRef, params } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
     const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
     const { conceptId } = params;
     const concept = conceptsRef.concept(conceptId);
-    const problems = problemsRef.ofConcept(conceptId);
+    const childConcepts = childConceptsRef.ofConcept(conceptId);
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
-    const addProblem = ({ problem }) => {
+    const addConcept = ({ concept }) => {
       // TODO: Use transaction to avoid race condition
-      const lastProblem = problems && _.maxBy(Object.values(problems), 'num') || null;
+      const lastProblem = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
       problem.num = (lastProblem && lastProblem.num || 0)  + 1;
-      return this.wrapPromise(problemsRef.add_problem(conceptId, problem));
+      return this.wrapPromise(childConceptsRef.add_concept(conceptId, problem));
     };
     const updateConcept = ({conceptId, concept}) => {
       return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
     };
     const updateProblem = ({ problemId, problem }) => {
-      return this.wrapPromise(problemsRef.update_problem(conceptId, problemId, problem));
+      return this.wrapPromise(childConceptsRef.update_problem(conceptId, problemId, problem));
     };
     const deleteProblemId = (problemId) => {
-      return this.wrapPromise(problemsRef.deleteProblem(conceptId, problemId));
+      return this.wrapPromise(childConceptsRef.deleteProblem(conceptId, problemId));
     };
 
     // go render!
@@ -143,8 +143,8 @@ export default class ConceptViewPage extends Component {
       </span>);
       if (this.state.adding) {
         topEditors = (
-          <AddProblemEditor busy={busy} concept={concept} addProblem={addProblem}>
-          </AddProblemEditor>
+          <AddConceptEditor busy={busy} concept={concept} addConcept={addConcept}>
+          </AddConceptEditor>
         );
       }
       if (this.state.editingConcept) {
@@ -154,17 +154,17 @@ export default class ConceptViewPage extends Component {
       }
     }
 
-    const problemsEl = !problems ? (
-      // no problems
+    const childConceptsEl = !childConcepts ? (
+      // no childConcepts
       <Alert bsStyle="info">concept is empty</Alert>
     ) : (
-      // display problems
-      <div><ProblemGrid {...{
-        busy, conceptId, problems, mayEdit, updateProblem, deleteProblemId
+      // display childConcepts
+      <div><ConceptGrid {...{
+        busy, conceptId, childConcepts, mayEdit, updateProblem, deleteProblemId
       }} /></div>
     );
 
-    //console.log(problems && _.map(problems, p => p.description_en).join(', '));
+    //console.log(childConcepts && _.map(childConcepts, p => p.description_en).join(', '));
 
     const errEl = !this.state.error ? undefined : (
       <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
@@ -175,7 +175,7 @@ export default class ConceptViewPage extends Component {
         <h3>{conceptTitle} {tools}</h3>
         { topEditors }
         { errEl }
-        { problemsEl }
+        { childConceptsEl }
       </div>
     );
   }

@@ -1,10 +1,10 @@
 {
   "rules": {
-    "conceptProblems": {
+    "concepts": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
-    "concepts": {
+    "childConcepts": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
@@ -12,7 +12,7 @@
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
-    "conceptProblemResponses": {
+    "conceptResponses": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
