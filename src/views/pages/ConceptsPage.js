@@ -15,85 +15,13 @@ import { Link } from 'react-router';
 import {
   LinkContainer
 } from 'react-router-bootstrap';
-import { SimpleGrid, FAIcon } from 'src/views/components/util';
+import { FAIcon } from 'src/views/components/util';
 
-import ConceptInfoEditor from 'src/views/components/concept-editor/ConceptInfoEditor';
+import {
+  ConceptGrid
+} from 'src/views/components/concept';
 
 import _ from 'lodash';
-
-
-export class ConceptListItem extends Component {
-  static contextTypes = {
-    userInfo: PropTypes.object.isRequired,
-    lookupLocalized: PropTypes.func.isRequired
-  };
-
-  static propTypes = {
-    concept: PropTypes.object.isRequired,
-    conceptId: PropTypes.string.isRequired
-  };
-
-  render() {
-    const { userInfo, lookupLocalized } = this.context;
-    const { concept, conceptId } = this.props;
-    const conceptViewPath = '/concept-view/' + conceptId;
-    const conceptPlayPath = '/concept-play/' + conceptId;
-
-    const title = lookupLocalized(concept, 'title') || '<no title>';
-
-    return (
-      <span>
-        <Well className="no-margin">
-          <div>
-            <Link to={conceptViewPath} onlyActiveOnIndex={true}>
-              <h3 className="no-margin">{title}</h3>
-            </Link>
-          </div>
-          <Link to={conceptViewPath} onlyActiveOnIndex={true}>
-            view
-          </Link>
-          <span className="margin-half" />
-          <Link to={conceptPlayPath} onlyActiveOnIndex={true}>
-            play
-          </Link>
-        </Well>
-      </span>
-    );
-  }
-}
-
-export class ConceptList extends Component {
-  static propTypes = {
-    concepts: PropTypes.object.isRequired
-  };
-
-  render() {
-    const { concepts } = this.props;
-
-    return (
-      <SimpleGrid objects={concepts} 
-        nCols={4}
-        colProps={{className: 'padding-half'}}
-        objectComponentCreator={(key, value) => <ConceptListItem key={key} conceptId={key} concept={value} />}
-      >
-      </SimpleGrid>
-    );
-  }
-}
-
-class AddConceptEditor extends Component {
-  static propTypes = {
-    addConcept: PropTypes.func.isRequired
-  }
-
-  render() {
-    const { addConcept } = this.props;
-
-    return (
-      <ConceptInfoEditor onSubmit={addConcept}></ConceptInfoEditor>
-    );
-  }
-}
 
 
 @firebase((props, firebase) => ([
@@ -106,19 +34,56 @@ class AddConceptEditor extends Component {
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      problemsRef: ChildConceptsRef(firebase)
+      childConceptsRef: ChildConceptsRef(firebase)
     };
   }
 )
 export default class ConceptsPage extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired
+    router: PropTypes.object.isRequired,
+    userInfo: PropTypes.object.isRequired,
+    lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
+    params: PropTypes.object.isRequired,
+    firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    problemsRef: PropTypes.object.isRequired
-  };
+    childConceptsRef: PropTypes.object.isRequired
+  }
+
+  constructor(...args) {
+    super(...args);
+
+    this.state = {
+      busy: false,
+      adding: false
+    };
+  }
+
+  toggleAdding() {
+    this.setState({ 
+      adding: !this.state.adding,
+      editingConcept: false
+    });
+  }
+
+  toggleEditing() {
+    this.setState({ 
+      editingConcept: !this.state.editingConcept,
+      adding: false
+    });
+  }
+
+  wrapPromise(promise) {
+    return promise
+    .then(() => {
+      this.setState({busy: false, error: null});
+    })
+    .catch((err) => {
+      this.setState({busy: false, error: err});
+    });
+  }
 
   componentDidMount() {
   }
@@ -134,32 +99,96 @@ export default class ConceptsPage extends Component {
   }
   
   render() {
-    // prepare data + wrappers
-    const { userInfo } = this.context;
-    const { conceptsRef } = this.props;
-    const mayEdit = userInfo && userInfo.adminDisplayMode();
-    const isBusy = !conceptsRef.isLoaded;
+    // prepare data
+    const { userInfo, router, lookupLocalized } = this.context;  
+    const { conceptsRef, childConceptsRef, params } = this.props;
+    const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
+    const notLoadedYet = !conceptsRef.isLoaded;
+    const busy = this.state.busy;
+    const { conceptId } = params;
+    const concept = conceptsRef.concept(conceptId);
+    const childConcepts = childConceptsRef.ofConcept(conceptId);
 
     // prepare actions
-    const addConcept = ({concept}) => {
-      conceptsRef.add_concept(concept);
+    const gotoRoot = router.replace.bind(router, '/');
+    const addConcept = ({ concept }) => {
+      // TODO: Use transaction to avoid race condition
+      const lastProblem = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
+      problem.num = (lastProblem && lastProblem.num || 0)  + 1;
+      return this.wrapPromise(childConceptsRef.add_concept(conceptId, problem));
+    };
+    const updateConcept = ({conceptId, concept}) => {
+      return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
+    };
+    const updateProblem = ({ problemId, problem }) => {
+      return this.wrapPromise(childConceptsRef.update_problem(conceptId, problemId, problem));
+    };
+    const deleteProblemId = (problemId) => {
+      return this.wrapPromise(childConceptsRef.deleteProblem(conceptId, problemId));
     };
 
-
     // go render!
-    if (isBusy) {
+    if (notLoadedYet) {
       // still loading
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    const adminTools = mayEdit && (<div>
-      <AddConceptEditor addConcept={addConcept} />
-      <hr />
-    </div>);
+    if (!concept) {
+      //setTimeout(() => router.replace('/'), 3000);
+      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
+    }
 
-    return (<div>
-      {adminTools}
-      <ConceptList concepts={conceptsRef.val || {}} />
-    </div>);
+    const conceptTitle = lookupLocalized(concept, 'title');
+
+    // elements
+    let tools, topEditors;
+    if (mayEdit) {
+      tools = (<span>
+        <Button active={this.state.editingConcept} 
+          bsStyle="success" bsSize="small" onClick={this.toggleEditing.bind(this)}>
+          <FAIcon name="pencil" className="" />
+        </Button>
+        <Button active={this.state.adding} 
+          bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
+          <FAIcon name="plus" className="color-green" /> add new problem
+        </Button>
+      </span>);
+      if (this.state.adding) {
+        topEditors = (
+          <AddConceptEditor busy={busy} concept={concept} addConcept={addConcept}>
+          </AddConceptEditor>
+        );
+      }
+      if (this.state.editingConcept) {
+        topEditors = (
+          <ConceptInfoEditor conceptId={conceptId} concept={concept} onSubmit={updateConcept}></ConceptInfoEditor>
+        );
+      }
+    }
+
+    const childConceptsEl = !childConcepts ? (
+      // no childConcepts
+      <Alert bsStyle="info">concept is empty</Alert>
+    ) : (
+      // display childConcepts
+      <div><ConceptGrid {...{
+        busy, conceptId, childConcepts, mayEdit, updateProblem, deleteProblemId
+      }} /></div>
+    );
+
+    //console.log(childConcepts && _.map(childConcepts, p => p.description_en).join(', '));
+
+    const errEl = !this.state.error ? undefined : (
+      <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
+    );
+
+    return (
+      <div>
+        <h3>{conceptTitle} {tools}</h3>
+        { topEditors }
+        { errEl }
+        { childConceptsEl }
+      </div>
+    );
   }
 }
