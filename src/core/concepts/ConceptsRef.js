@@ -5,13 +5,23 @@ const ConceptsRef = refWrapper({
   pathTemplate: '/concepts',
 
   queryString(ownerId) {
-    return {
-      orderByChild: 'ownerId',
-      equalTo: ownerId
-    };
+    if (ownerId) {
+      // get all entries of given ancestor
+      return {
+        orderByChild: 'ownerId',
+        equalTo: ownerId
+      };
+    }
+    else {
+      // get root entries
+      return {
+        orderByChild: 'parentId',
+        equalTo: null
+      };
+    }
   },
 
-  cascadingMethods: {
+  methods: {
     // updateKeepOrder(parentId, updates) {
     //   // TODO: this.val and this.update_ofConcept don't work in cascading methods
 
@@ -40,13 +50,20 @@ const ConceptsRef = refWrapper({
     //   //return this.updateKeepOrder(parentId, updates);
     // },
 
-    // deleteChild(ownerId, conceptId) {
-    //   return this.delete_concept(ownerId, conceptId)
-    //   .then(() => {
-    //     // TODO: keep order after deleting
-    //     //return this.updateKeepOrder(parentId);
-    //   });
-    // },
+    getChildren(conceptId) {
+      return this.val && _.filter(this.val, {parentId: conceptId});
+    },
+
+    deleteConcept(conceptId) {
+      if (!conceptId) {
+        throw new Error('missing conceptId');
+      }
+      return this.delete_concept(conceptId)
+      .then(() => {
+        // TODO: keep order after deleting
+        //return this.updateKeepOrder(parentId);
+      });
+    },
 
     getFirstChild(parentId) {
       const firstChildId = this.getFirstChildId(parentId);

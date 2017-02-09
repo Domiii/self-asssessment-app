@@ -5,7 +5,10 @@ import {
   Popover, Tooltip, Modal
 } from 'react-bootstrap';
 
+import { ConceptPreview } from 'src/views/components/concept';
+
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+
 
 export default class ConceptDeleteModal extends Component {
   static contextTypes = {
@@ -13,7 +16,7 @@ export default class ConceptDeleteModal extends Component {
   };
 
   static propTypes = {
-    parentId: PropTypes.string.isRequired,
+    conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     deleteConcept: PropTypes.func.isRequired
   };
@@ -26,12 +29,12 @@ export default class ConceptDeleteModal extends Component {
 
     // data
     const { lookupLocalized } = this.context;
-    const { parentId, concept, deleteConcept } = this.props;
-    const description = lookupLocalized(concept, 'description');
+    const { conceptId, concept, deleteConcept } = this.props;
+    const title = lookupLocalized(concept, 'title');
 
     // actions
     const onClickDelete = () => {
-      deleteConcept(parentId);
+      deleteConcept(conceptId);
       this.close();
     };
 
@@ -45,7 +48,8 @@ export default class ConceptDeleteModal extends Component {
           <Modal.Title>Do you really want to delete the concept?</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {description}
+          <h2>{title}</h2>
+          <ConceptPreview concept={concept} />
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={ onClickDelete }

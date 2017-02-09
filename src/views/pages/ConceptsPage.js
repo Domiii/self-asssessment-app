@@ -19,6 +19,11 @@ import {
   ConceptGrid
 } from 'src/views/components/concept';
 
+import {
+  ConceptEditTools,
+  AddConceptEditor
+} from 'src/views/components/concept-editor';
+
 import _ from 'lodash';
 
 
@@ -61,6 +66,8 @@ export default class ConceptsPage extends Component {
       busy: false,
       adding: false
     };
+    this.toggleAdding = this.toggleAdding.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
   }
 
   toggleAdding() {
@@ -70,7 +77,7 @@ export default class ConceptsPage extends Component {
     });
   }
 
-  toggleEditing() {
+  toggleEdit() {
     this.setState({ 
       editingConcept: !this.state.editingConcept,
       adding: false
@@ -107,17 +114,21 @@ export default class ConceptsPage extends Component {
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
     const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
-    const { ownerId, conceptId } = params;
+    let { ownerId, conceptId } = params;
 
     const isRoot = !ownerId && !conceptId;
-    const ownerConcept = !isRoot && conceptsRef.concept(ownerId);
-    const currentConcept = !isRoot && conceptsRef.concept(conceptId);
-    const parentConcept = !isRoot && currentConcept.parentId && conceptsRef.concept(currentConcept.parentId);
+    ownerId = !isRoot && ownerId || null;
+    conceptId = !isRoot && conceptId || null;
+
+    const ownerConcept = !isRoot && conceptsRef.concept(ownerId) || null;
+    const currentConcept = !isRoot && conceptsRef.concept(conceptId) || null;
+    const parentId = !isRoot && currentConcept && currentConcept.parentId || null;
+    const parentConcept = parentId && conceptsRef.concept(currentConcept.parentId) || null;
 
     const ownerConcepts = conceptsRef.val;
     const childConcepts = isRoot && 
       ownerConcepts ||  // root concepts
-      (ownerConcepts && _.filter(ownerConcepts, {parentId: conceptId}));
+      conceptsRef.getChildren(conceptId);
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
@@ -128,15 +139,15 @@ export default class ConceptsPage extends Component {
       concept.parentId = isRoot ? null : conceptId;
 
       const newRef = conceptsRef.add_concept(concept);
-      const newOwnerId = isRoot ? newRef.name() : ownerId;
+      const newOwnerId = isRoot ? newRef.key : ownerId;
       newRef.update({ownerId: newOwnerId});
       return this.wrapPromise(newRef);
     };
     const updateConcept = ({ conceptId, concept }) => {
-      return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
+      return this.wrapPromise(conceptsRef.update_concept(concept));
     };
     const deleteConcept = (conceptId) => {
-      return this.wrapPromise(childConceptsRef.deleteConcept(conceptId));
+      return this.wrapPromise(conceptsRef.deleteConcept(conceptId));
     };
 
     // go render!
@@ -157,27 +168,35 @@ export default class ConceptsPage extends Component {
     // elements
     let tools, topEditors;
     if (mayEdit) {
+      const conceptArgs = { ownerId, parentId, conceptId, concept: currentConcept };
+
+      let editTools;
+      if (!isRoot) {
+        editTools = (<ConceptEditTools
+          {...conceptArgs}
+          {...{ 
+            deleteConcept,
+            editing: this.state.editingConcept,
+            toggleEdit: this.toggleEdit }} />);
+      }
+
       tools = (<span>
-        <Button active={this.state.editingConcept} 
-          bsStyle="success" bsSize="small" onClick={this.toggleEditing.bind(this)}>
-          <FAIcon name="pencil" className="" />
-        </Button>
+        {editTools}
         <Button active={this.state.adding} 
           bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
           <FAIcon name="plus" className="color-green" /> add new concept
         </Button>
       </span>);
+
       if (this.state.adding) {
         topEditors = (
-          undefined
-          //<AddConceptEditor busy={busy} concept={parentConcept} addConcept={addConcept}>
-          //</AddConceptEditor>
+          <AddConceptEditor busy={busy} concept={currentConcept} addConcept={addConcept}>
+          </AddConceptEditor>
         );
       }
       if (this.state.editingConcept) {
         topEditors = (
-          undefined
-          //<ConceptInfoEditor ownerId={ownerId} concept={concept} onSubmit={updateConcept}></ConceptInfoEditor>
+          <ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>
         );
       }
     }
@@ -188,7 +207,7 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <div><ConceptGrid {...{
-        busy, ownerId, concepts: childConcepts, mayEdit, updateConcept, deleteConcept
+        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, updateConcept, deleteConcept
       }} /></div>
     );
 
@@ -207,4 +226,4 @@ export default class ConceptsPage extends Component {
       </div>
     );
   }
-}
+} 

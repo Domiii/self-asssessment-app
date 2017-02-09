@@ -126,6 +126,8 @@ class _ConceptEditor extends Component {
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
+        <Field name="concept.parentId" value={concept.parentId} component="input" type="hidden" />
+        <Field name="concept.ownerId" value={concept.ownerId} component="input" type="hidden" />
         <Field name="concept.num" value={num} component="input" type="hidden" />
         <FormInputField name="concept.title_en" label="Title (English)"
           type="text" component="input"

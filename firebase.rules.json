@@ -1,7 +1,7 @@
 {
   "rules": {
     "concepts": {
-      ".indexOn": "ownerId",
+      ".indexOn": ["ownerId", "parentId"],
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },

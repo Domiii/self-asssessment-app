@@ -16,7 +16,9 @@ console.assert(ConceptEditTools);
 
 export class ConceptTags extends Component {
   static propTypes = {
+    ownerId: PropTypes.string,
     parentId: PropTypes.string,
+    conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired
   };
 
@@ -40,7 +42,9 @@ export default class ConceptViewSmall extends Component {
   static propTypes = {
     busy: PropTypes.bool.isRequired,
     mayEdit: PropTypes.bool.isRequired,
+    ownerId: PropTypes.string,
     parentId: PropTypes.string,
+    conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     updateConcept: PropTypes.func.isRequired,
     deleteConcept: PropTypes.func.isRequired
@@ -55,28 +59,26 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfo, lookupLocalized } = this.context;
-    const { busy, ancestorIds, concept, updateConcept, deleteConcept, mayEdit } = this.props;
-    const conceptArgs = { ancestorIds, concept };
+    const { busy, ownerId, parentId, conceptId, concept, updateConcept, deleteConcept, mayEdit } = this.props;
+    const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
-
-    // actions
-    const onSubmit = (...args) => updateConcept(...args);
-    //.then(() => this.stopEdit());
 
     // element: content
     const content = !mayEdit || !this.state.editing ?
       (<ConceptPreview {...conceptArgs} />) :
-      (<ConceptEditor busy={busy} onSubmit={onSubmit} {...conceptArgs}></ConceptEditor>)
+      (<ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>)
     ;
 
     // element: edit buttons
     const editTools = mayEdit && (
       <Row>
         <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
-          <ConceptEditTools {...{ 
-            parentId, concept, deleteConcept,
-            editing: this.state.editing,
-            toggleEdit: this.toggleEdit }} />
+          <ConceptEditTools
+            {...conceptArgs}
+            {...{ 
+              deleteConcept,
+              editing: this.state.editing,
+              toggleEdit: this.toggleEdit }} />
         </Col>
       </Row>
     );
@@ -93,7 +95,7 @@ export default class ConceptViewSmall extends Component {
           </Col>
         </Row>
         { editTools }
-        <Row>
+        <Row style={{paddingTop: '0.4em'}}>
           <Col xs={12}>
             { content }
           </Col>

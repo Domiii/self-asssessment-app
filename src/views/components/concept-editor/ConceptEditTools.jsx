@@ -14,7 +14,9 @@ console.assert(ConceptDeleteModal);
 export default class ConceptEditTools extends Component {
   static propTypes = {
     editing: PropTypes.bool,
+    ownerId: PropTypes.string,
     parentId: PropTypes.string,
+    conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     deleteConcept: PropTypes.func.isRequired,
     toggleEdit: PropTypes.func.isRequired
@@ -28,10 +30,11 @@ export default class ConceptEditTools extends Component {
   }
 
   render() {
-    const { parentId, concept, deleteConcept } = this.props;
+    //const { parentId, concept, deleteConcept } = this.props;
+
     return (<span>
       { this.EditButton }
-      <ConceptDeleteModal {...{ parentId, concept, deleteConcept }} />
+      <ConceptDeleteModal {...this.props} />
     </span>);
   }
 }

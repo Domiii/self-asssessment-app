@@ -8,15 +8,18 @@ export default class ConceptPreview extends Component {
   };
 
   static propTypes = {
-    conceptId: PropTypes.string.isRequired,
+    //conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired
   };
 
   render() {
     // data
     const { lookupLocalized } = this.context;
-    const { conceptId, concept } = this.props;
-    const description = lookupLocalized(concept, 'description');
+    const { 
+      //conceptId, 
+      concept
+    } = this.props;
+    const description = lookupLocalized(concept, 'description') || '';
 
     // tags
     // hierarchy
