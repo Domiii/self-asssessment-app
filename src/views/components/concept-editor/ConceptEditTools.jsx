@@ -8,15 +8,15 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
-import ProblemDeleteModal from './ProblemDeleteModal';
-console.assert(ProblemDeleteModal);
+import ConceptDeleteModal from './ConceptDeleteModal';
+console.assert(ConceptDeleteModal);
 
-export default class ProblemEditTools extends Component {
+export default class ConceptEditTools extends Component {
   static propTypes = {
     editing: PropTypes.bool,
-    problemId: PropTypes.string.isRequired,
-    problem: PropTypes.object.isRequired,
-    deleteProblemId: PropTypes.func.isRequired,
+    parentId: PropTypes.string,
+    concept: PropTypes.object.isRequired,
+    deleteConcept: PropTypes.func.isRequired,
     toggleEdit: PropTypes.func.isRequired
   };
 
@@ -28,10 +28,10 @@ export default class ProblemEditTools extends Component {
   }
 
   render() {
-    const { problemId, problem, deleteProblemId } = this.props;
+    const { parentId, concept, deleteConcept } = this.props;
     return (<span>
       { this.EditButton }
-      <ProblemDeleteModal {...{ problemId, problem, deleteProblemId }} />
+      <ConceptDeleteModal {...{ parentId, concept, deleteConcept }} />
     </span>);
   }
 }

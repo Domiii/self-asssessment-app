@@ -1,10 +1,11 @@
 {
   "rules": {
     "concepts": {
+      ".indexOn": "ownerId",
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
-    "childConcepts": {
+    "conceptTree": {
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },

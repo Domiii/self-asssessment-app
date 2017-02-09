@@ -3,7 +3,6 @@ import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
 import App from './app';
 import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
-import ConceptViewPage from './pages/ConceptViewPage';
 import ConceptsPage from './pages/ConceptsPage';
 import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
@@ -12,8 +11,7 @@ export const paths = {
   ROOT: '/',
   SIGN_IN: 'sign-in',
   USER_PROFILE: 'user',
-  CONCEPTS: '',
-  CONCEPT_VIEW: 'concept-view/:conceptId',
+  CONCEPTS: ':ownerId/:conceptId',
   CONCEPT_PLAY: 'concept-play/:conceptId',
   CONCEPT_PROBLEM: 'problem/:problemId'
 };
@@ -74,12 +72,6 @@ export const getRoutes = getState => {
         name: 'user',
         path: paths.USER_PROFILE,
         component: UserProfilePage,
-        onEnter: requireAuth(getState)
-      },
-      {
-        name: 'concept-view',
-        path: paths.CONCEPT_VIEW,
-        component: ConceptViewPage,
         onEnter: requireAuth(getState)
       },
       {

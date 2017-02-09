@@ -1,7 +1,7 @@
 import { refWrapper } from 'src/util/firebaseUtil';
 
 const ResponseFeedbackRef = refWrapper({
-  path: '/conceptResponseFeedback'
+  pathTemplate: '/conceptResponseFeedback'
 });
 
 export default ResponseFeedbackRef;

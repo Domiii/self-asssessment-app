@@ -13,16 +13,16 @@ import {
 export default class ConceptGrid extends Component {
   static propTypes = {
     busy:  PropTypes.bool.isRequired,
-    conceptId: PropTypes.string.isRequired, 
+    parentId: PropTypes.string, 
     concepts: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
     updateConcept: PropTypes.func.isRequired,
-    deleteConceptId: PropTypes.func.isRequired
+    deleteConcept: PropTypes.func.isRequired
   };
 
   render() {
     const { 
-      busy, conceptId, concepts, mayEdit, updateConcept, deleteConceptId
+      busy, parentId, concepts, mayEdit, updateConcept, deleteConcept
     } = this.props;
 
     // actions
@@ -30,13 +30,13 @@ export default class ConceptGrid extends Component {
 
     // prepare props
     const conceptProps = _.mapValues(concepts, 
-      (concept, conceptId) => ({
+      (concept, parentId) => ({
         busy,
-        conceptId,
+        parentId,
         concept,
         mayEdit,
         updateConcept,
-        deleteConceptId
+        deleteConcept
       })
     );
 

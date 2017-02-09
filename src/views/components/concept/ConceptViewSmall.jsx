@@ -16,7 +16,7 @@ console.assert(ConceptEditTools);
 
 export class ConceptTags extends Component {
   static propTypes = {
-    conceptId: PropTypes.string.isRequired,
+    parentId: PropTypes.string,
     concept: PropTypes.object.isRequired
   };
 
@@ -40,10 +40,10 @@ export default class ConceptViewSmall extends Component {
   static propTypes = {
     busy: PropTypes.bool.isRequired,
     mayEdit: PropTypes.bool.isRequired,
-    conceptId: PropTypes.string.isRequired,
+    parentId: PropTypes.string,
     concept: PropTypes.object.isRequired,
     updateConcept: PropTypes.func.isRequired,
-    deleteConceptId: PropTypes.func.isRequired
+    deleteConcept: PropTypes.func.isRequired
   };
 
   constructor(...args) {
@@ -55,8 +55,8 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfo, lookupLocalized } = this.context;
-    const { busy, conceptId, concept, updateConcept, deleteConceptId, mayEdit } = this.props;
-    const conceptArgs = { conceptId, concept };
+    const { busy, ancestorIds, concept, updateConcept, deleteConcept, mayEdit } = this.props;
+    const conceptArgs = { ancestorIds, concept };
     const title = lookupLocalized(concept, 'title');
 
     // actions
@@ -74,7 +74,7 @@ export default class ConceptViewSmall extends Component {
       <Row>
         <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
           <ConceptEditTools {...{ 
-            conceptId, concept, deleteConceptId,
+            parentId, concept, deleteConcept,
             editing: this.state.editing,
             toggleEdit: this.toggleEdit }} />
         </Col>

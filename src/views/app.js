@@ -17,7 +17,7 @@ const { pathToJS } = helpers;
   const uid = firebase._.authUid;
   const paths = [];
   if (uid) {
-    paths.push(UserInfoRef.user.getPath({uid}));
+    paths.push(UserInfoRef.user.makeQuery({uid}));
   }
   return paths;
 })

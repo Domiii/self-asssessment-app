@@ -7,15 +7,15 @@ import {
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
-export default class ProblemDeleteModal extends Component {
+export default class ConceptDeleteModal extends Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func.isRequired
   };
 
   static propTypes = {
-    problemId: PropTypes.string.isRequired,
-    problem: PropTypes.object.isRequired,
-    deleteProblemId: PropTypes.func.isRequired
+    parentId: PropTypes.string.isRequired,
+    concept: PropTypes.object.isRequired,
+    deleteConcept: PropTypes.func.isRequired
   };
 
   constructor(...args) { super(...args); this.state = { showModal: false }; }
@@ -26,12 +26,12 @@ export default class ProblemDeleteModal extends Component {
 
     // data
     const { lookupLocalized } = this.context;
-    const { problemId, problem, deleteProblemId } = this.props;
-    const description = lookupLocalized(problem, 'description');
+    const { parentId, concept, deleteConcept } = this.props;
+    const description = lookupLocalized(concept, 'description');
 
     // actions
-    const deleteProblem = () => {
-      deleteProblemId(problemId);
+    const onClickDelete = () => {
+      deleteConcept(parentId);
       this.close();
     };
 
@@ -42,13 +42,13 @@ export default class ProblemDeleteModal extends Component {
     const modalContents = this.state.showModal && (
       <Modal show={this.state.showModal} onHide={close}>
         <Modal.Header closeButton>
-          <Modal.Title>Do you really want to delete the problem?</Modal.Title>
+          <Modal.Title>Do you really want to delete the concept?</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {description}
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={ deleteProblem }
+          <Button onClick={ onClickDelete }
             bsStyle="danger">
             Yes
           </Button>

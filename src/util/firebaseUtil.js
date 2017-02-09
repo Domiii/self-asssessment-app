@@ -66,19 +66,46 @@ export function refWrapper(cfgOrPath) {
   return _refWrapper(null, cfgOrPath);
 }
 
+function _makeMakeQuery(getPath, queryString) {
+  // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
+  let querySuffixFunc = queryString instanceof Function && queryString;
+  let querySuffixConst = !(queryString instanceof Function) && queryString;
+  let getQuerySuffix = (...allArgs) => {
+    const res = querySuffixFunc && querySuffixFunc(...allArgs) || querySuffixConst;
+    if (_.isObject(res) && !_.isString(res)) {
+      return _.map(res, (value, key) => key + '=' + value).join('&');
+    }
+    return res;
+  };
+
+  function _defaultMakeQueryWithVariables(pathArgs, ...customArgs) {
+    const basePath = getPath(pathArgs);
+    const querySuffix = getQuerySuffix([...customArgs, pathArgs]);
+    return basePath + (querySuffix && ('#' + querySuffix) || '');
+  }
+
+  function _defaultMakeQueryNoVariables(...customArgs) {
+    const basePath = getPath();
+    const querySuffix = getQuerySuffix(...customArgs);
+    return basePath + (querySuffix && ('#' + querySuffix) || '');
+  }
+
+  return getPath.hasVariables && _defaultMakeQueryWithVariables || _defaultMakeQueryNoVariables;
+}
+
 function _refWrapper(parent, cfgOrPath) {
   let cfg;
   if (_.isString(cfgOrPath)) {
-    cfg = { path: cfgOrPath };
+    cfg = { pathTemplate: cfgOrPath };
   }
   else {
     cfg = cfgOrPath;
   }
-  console.assert(!!cfg, 'config was not provided under: ' + (parent && parent.path));
+  console.assert(!!cfg, 'config was not provided under: ' + (parent && parent.pathTemplate));
 
-  const { path, children } = cfg;
-  const fullPath = parent && pathJoin(parent.path, path) || path;
-  const getPath = createPathGetterFromTemplateProps(fullPath);
+  let { pathTemplate, children, queryString, makeQuery } = cfg;
+  pathTemplate = parent && pathJoin(parent.pathTemplate, pathTemplate) || pathTemplate;
+  const getPath = createPathGetterFromTemplateProps(pathTemplate);
   
   const WrapperClass = createRefWrapperBase();
 
@@ -89,8 +116,9 @@ function _refWrapper(parent, cfgOrPath) {
   }
   func.parent = parent;
   func.getPath = getPath;
-  func.path = fullPath;
+  func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
+  func.makeQuery = makeQuery || _makeMakeQuery(getPath, queryString);
 
   // recurse and add all children
   cfg.cascadingMethods = cfg.cascadingMethods || {};
@@ -119,7 +147,7 @@ function _refWrapper(parent, cfgOrPath) {
   Object.assign(WrapperClass.prototype, inheritedMethods);
 
   // add cascadingMethods
-  const varNames = parseTemplateString(fullPath).varNames;
+  const varNames = parseTemplateString(pathTemplate).varNames;
   const cascadingMethods = _.mapValues(cfg.cascadingMethods, function(method, name) {
     // replace path variables with props
     return function (...args2) {
@@ -174,6 +202,9 @@ function createChildDataAccessors(prototype, children, parentPath) {
 
     // update
     prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
+
+    // batch update (add to a single bigger update, instead of sending out multiple smaller updates individually)
+    prototype['batchUpdate_' + wrapperName] = createAddChildDataUpdate(getPath);
 
     // delete
     prototype['delete_' + wrapperName] = createChildDataDelete(getPath);
@@ -234,6 +265,22 @@ function createChildDataUpdate(getPath) {
     const path = getPath();
     return function _update(data) {
       return this.updateChild(path, data);
+    };
+  }
+}
+function createAddChildDataUpdate(getPath) {
+  if (getPath.hasVariables) {
+    return function _update(update, ...args) {
+      const pathArgs = _.initial(args);
+      const data = _.last(args);
+      const path = getPath(...pathArgs);
+      update[path] = update[path] && _.merge(update[path], data) || data;
+    };
+  }
+  else {
+    const path = getPath();
+    return function _update(update, data) {
+      update[path] = update[path] && _.merge(update[path], data) || data;
     };
   }
 }

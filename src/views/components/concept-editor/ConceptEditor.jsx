@@ -11,9 +11,9 @@ import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/component
 
 import _ from 'lodash';
 
-// class ProblemTagEditor extends Component {
+// class ConceptTagEditor extends Component {
 //   static propTypes = {
-//     problem: PropTypes.object.isRequired
+//     concept: PropTypes.object.isRequired
 //   };
 
 //   renderTags({ fields, meta: { touched, error } }) {
@@ -22,14 +22,14 @@ import _ from 'lodash';
 
 //   render() {
 //     // data
-//     const { problem } = this.props;
-//     let tags = problem.tags;
+//     const { concept } = this.props;
+//     let tags = concept.tags;
 
 //     // actions
 //     const renderTags = this.rendeTrags.bind(this);
 //     const updateTags = (tags) => {
-//       problem.tags = tags;
-//       this.props.notifyChange(problem);
+//       concept.tags = tags;
+//       this.props.notifyChange(concept);
 //     };
 //     const onEnterAdd = evt => {
 //       const val = evt.target.value;
@@ -37,8 +37,8 @@ import _ from 'lodash';
 //         // add tag
 //         tags = Object.assign({}, tags);
 //         tags[val] = val;
-//         if (!problem.tags) {
-//           problem.tags = tags;
+//         if (!concept.tags) {
+//           concept.tags = tags;
 //         }
 
 //         // reset "new tag" input field
@@ -65,7 +65,7 @@ import _ from 'lodash';
 
 //     let key = 0;
 //     const tagEls = _.map(tags, (tag, tagId) => {
-//       const name = 'problem.tags.' + tagId;
+//       const name = 'concept.tags.' + tagId;
 //       return (<Field className="form-control" 
 //         key={++key} id={name} name={name}
 //         type="text"
@@ -75,7 +75,7 @@ import _ from 'lodash';
 //     });
 
 //     // create elements
-//     return (<FormInputFieldArray name="problem.description_en" label="Description (English)"
+//     return (<FormInputFieldArray name="concept.description_en" label="Description (English)"
 //       component={renderTags}
 //       inputProps={{type: 'text'}}
 //       labelProps={{xs: 2}} inputColProps={{xs: 10}}
@@ -101,17 +101,17 @@ class _ConceptEditor extends Component {
   static propTypes = {
     //concept: PropTypes.object.isRequired,
     busy: PropTypes.bool,
-    problemId: PropTypes.string,
-    problem: PropTypes.object
+    conceptId: PropTypes.string,
+    concept: PropTypes.object
   };
 
   render() {
     // data
-    const { busy, problemId, problem } = this.props;
+    const { busy, conceptId, concept } = this.props;
     const { 
       handleSubmit, pristine, reset, submitting, values
     } = this.props;
-    const num = problem && problem.num || 0;
+    const num = concept && concept.num || 0;
 
     // actions
     function onSubmit(...args) {
@@ -120,30 +120,30 @@ class _ConceptEditor extends Component {
     };
 
     // elements
-    //const tagsEl = this.TagElements(problem);
+    //const tagsEl = this.TagElements(concept);
 
     // render go!
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
-        <Field name="problemId" value={problemId} component="input" type="hidden" />
-        <Field name="problem.num" value={num} component="input" type="hidden" />
-        <FormInputField name="problem.title_en" label="Title (English)"
+        <Field name="conceptId" value={conceptId} component="input" type="hidden" />
+        <Field name="concept.num" value={num} component="input" type="hidden" />
+        <FormInputField name="concept.title_en" label="Title (English)"
           type="text" component="input"
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />
-        <FormInputField name="problem.title_zh" label="Title (中文)"
+        <FormInputField name="concept.title_zh" label="Title (中文)"
           type="text" component="input"
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />
-        <FormInputField name="problem.description_en" label="Description (English)"
+        <FormInputField name="concept.description_en" label="Description (English)"
           component="textarea"
           inputProps={{rows: '5'}}
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />
-        <FormInputField name="problem.description_zh" label="Description (中文)"
+        <FormInputField name="concept.description_zh" label="Description (中文)"
           component="textarea"
           inputProps={{rows: '5'}}
           labelProps={{xs: 2, className: 'no-padding'}}
@@ -152,7 +152,7 @@ class _ConceptEditor extends Component {
 
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>
-            {(!problem ?
+            {(!concept ?
               (<span><FAIcon name="plus" className="color-green" /> add</span>):
               (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
@@ -167,12 +167,12 @@ class _ConceptEditor extends Component {
 _ConceptEditor = reduxForm({ enableReinitialize: true })(_ConceptEditor);
 
 const ConceptEditor = connect(
-  (state, { problemId, problem }) => {
+  (state, { conceptId, concept }) => {
     return ({
-      form: 'problem_editor_' + problemId,
+      form: 'concept_editor_' + conceptId,
       initialValues: {
-        problemId,
-        problem: problem || {}
+        conceptId,
+        concept: concept || {}
       },
     });
   }

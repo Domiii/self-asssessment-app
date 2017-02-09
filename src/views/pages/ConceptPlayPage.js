@@ -6,7 +6,7 @@ import { firebase, helpers } from 'redux-react-firebase';
 
 import { 
   ConceptsRef,
-  ChildConceptsRef,
+  ConceptTreeRef,
   ConceptProgressRef,
   ConceptResponsesRef
 } from 'src/core/concepts/';
@@ -153,16 +153,16 @@ class ConceptResponseMenu extends React.Component {
 
 
 @firebase(({ params }, firebase) => ([
-  ConceptsRef.path,
-  ChildConceptsRef.path,
-  ConceptResponsesRef.path,
-  ConceptProgressRef.path
+  ConceptsRef.makeQuery(),
+  //ConceptTreeRef.makeQuery(),
+  ConceptResponsesRef.makeQuery(),
+  ConceptProgressRef.makeQuery()
 ]))
 @connect(
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      problemsRef: ChildConceptsRef(firebase),
+      //conceptTreeRef: ConceptTreeRef(firebase),
       responsesRef: ConceptResponsesRef(firebase),
       progressRef: ConceptProgressRef(firebase)
     };

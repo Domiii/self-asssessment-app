@@ -2,14 +2,14 @@ import { refWrapper } from 'src/util/firebaseUtil';
 
 
 const ConceptResponsesRef = refWrapper({
-  path: '/conceptResponses',
+  pathTemplate: '/conceptResponses',
 
   children: {
     ofConcept: {
-      path: '$(uid)/$(conceptId)',
+      pathTemplate: '$(uid)/$(conceptId)',
       children: {
         response: {
-          path: '$(problemId)',
+          pathTemplate: '$(problemId)',
           children: {
             understanding: 'understanding'
           }

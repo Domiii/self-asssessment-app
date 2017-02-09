@@ -2,15 +2,15 @@ import { refWrapper } from 'src/util/firebaseUtil';
 
 
 const ConceptProgressRef = refWrapper({
-  path: '/conceptProgress',
+  pathTemplate: '/conceptProgress',
 
   children: {
     ofUser: {
-      path: '$(uid)',
+      pathTemplate: '$(uid)',
 
       children: {
         ofConcept: {
-          path: '$(conceptId)',
+          pathTemplate: '$(conceptId)',
 
           children: {
             currentProblemId: 'currentProblemId'

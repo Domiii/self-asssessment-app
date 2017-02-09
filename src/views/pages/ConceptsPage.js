@@ -1,8 +1,6 @@
-import { UserInfoRef } from 'src/core/users';
-import { makeGetDataDefault } from 'src/util/firebaseUtil';
 import { 
   ConceptsRef,
-  ChildConceptsRef,
+  ConceptTreeRef,
   ConceptProgressRef,
   ConceptResponsesRef
 } from 'src/core/concepts/';
@@ -24,17 +22,21 @@ import {
 import _ from 'lodash';
 
 
-@firebase((props, firebase) => ([
-  ConceptsRef.path,
-  ChildConceptsRef.path,
-  ConceptResponsesRef.path,
-  ConceptProgressRef.path
-]))
+@firebase((props, firebase) => {
+  const { params } = props;
+
+  return [
+    ConceptsRef.makeQuery(params.ownerId),
+    //ConceptTreeRef.makeQuery(),
+    ConceptResponsesRef.makeQuery(),
+    ConceptProgressRef.makeQuery()
+  ];
+})
 @connect(
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      childConceptsRef: ChildConceptsRef(firebase)
+      //conceptTreeRef: ConceptTreeRef(firebase)
     };
   }
 )
@@ -49,7 +51,7 @@ export default class ConceptsPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    childConceptsRef: PropTypes.object.isRequired
+    //conceptTreeRef: PropTypes.object.isRequired
   }
 
   constructor(...args) {
@@ -101,30 +103,40 @@ export default class ConceptsPage extends Component {
   render() {
     // prepare data
     const { userInfo, router, lookupLocalized } = this.context;  
-    const { conceptsRef, childConceptsRef, params } = this.props;
+    const { conceptsRef, conceptTreeRef, params } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
     const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
-    const { conceptId } = params;
-    const concept = conceptsRef.concept(conceptId);
-    const childConcepts = childConceptsRef.ofConcept(conceptId);
+    const { ownerId, conceptId } = params;
+
+    const isRoot = !ownerId && !conceptId;
+    const ownerConcept = !isRoot && conceptsRef.concept(ownerId);
+    const currentConcept = !isRoot && conceptsRef.concept(conceptId);
+    const parentConcept = !isRoot && currentConcept.parentId && conceptsRef.concept(currentConcept.parentId);
+
+    const ownerConcepts = conceptsRef.val;
+    const childConcepts = isRoot && 
+      ownerConcepts ||  // root concepts
+      (ownerConcepts && _.filter(ownerConcepts, {parentId: conceptId}));
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
     const addConcept = ({ concept }) => {
       // TODO: Use transaction to avoid race condition
-      const lastProblem = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
-      problem.num = (lastProblem && lastProblem.num || 0)  + 1;
-      return this.wrapPromise(childConceptsRef.add_concept(conceptId, problem));
+      const lastConcept = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
+      concept.num = (lastConcept && lastConcept.num || 0)  + 1;
+      concept.parentId = isRoot ? null : conceptId;
+
+      const newRef = conceptsRef.add_concept(concept);
+      const newOwnerId = isRoot ? newRef.name() : ownerId;
+      newRef.update({ownerId: newOwnerId});
+      return this.wrapPromise(newRef);
     };
-    const updateConcept = ({conceptId, concept}) => {
+    const updateConcept = ({ conceptId, concept }) => {
       return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
     };
-    const updateProblem = ({ problemId, problem }) => {
-      return this.wrapPromise(childConceptsRef.update_problem(conceptId, problemId, problem));
-    };
-    const deleteProblemId = (problemId) => {
-      return this.wrapPromise(childConceptsRef.deleteProblem(conceptId, problemId));
+    const deleteConcept = (conceptId) => {
+      return this.wrapPromise(childConceptsRef.deleteConcept(conceptId));
     };
 
     // go render!
@@ -133,12 +145,14 @@ export default class ConceptsPage extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    if (!concept) {
+    if (conceptId && !currentConcept) {
       //setTimeout(() => router.replace('/'), 3000);
       return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    const conceptTitle = lookupLocalized(concept, 'title');
+    const parentTitle = parentConcept &&
+      lookupLocalized(parentConcept, 'title') ||
+      'all concepts';
 
     // elements
     let tools, topEditors;
@@ -150,29 +164,31 @@ export default class ConceptsPage extends Component {
         </Button>
         <Button active={this.state.adding} 
           bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
-          <FAIcon name="plus" className="color-green" /> add new problem
+          <FAIcon name="plus" className="color-green" /> add new concept
         </Button>
       </span>);
       if (this.state.adding) {
         topEditors = (
-          <AddConceptEditor busy={busy} concept={concept} addConcept={addConcept}>
-          </AddConceptEditor>
+          undefined
+          //<AddConceptEditor busy={busy} concept={parentConcept} addConcept={addConcept}>
+          //</AddConceptEditor>
         );
       }
       if (this.state.editingConcept) {
         topEditors = (
-          <ConceptInfoEditor conceptId={conceptId} concept={concept} onSubmit={updateConcept}></ConceptInfoEditor>
+          undefined
+          //<ConceptInfoEditor ownerId={ownerId} concept={concept} onSubmit={updateConcept}></ConceptInfoEditor>
         );
       }
     }
 
     const childConceptsEl = !childConcepts ? (
       // no childConcepts
-      <Alert bsStyle="info">concept is empty</Alert>
+      <Alert bsStyle="info">concept has no children</Alert>
     ) : (
       // display childConcepts
       <div><ConceptGrid {...{
-        busy, conceptId, childConcepts, mayEdit, updateProblem, deleteProblemId
+        busy, ownerId, concepts: childConcepts, mayEdit, updateConcept, deleteConcept
       }} /></div>
     );
 
@@ -184,7 +200,7 @@ export default class ConceptsPage extends Component {
 
     return (
       <div>
-        <h3>{conceptTitle} {tools}</h3>
+        <h3>{parentTitle} {tools}</h3>
         { topEditors }
         { errEl }
         { childConceptsEl }

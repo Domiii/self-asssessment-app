@@ -3,11 +3,11 @@ import { lookupLocalized } from 'src/util/localizeUtil';
 
 // access to the current user's info
 const UserInfoRef = refWrapper({
-  path: '/users',
+  pathTemplate: '/users',
 
   children: {
     user: {
-      path: '$(uid)',
+      pathTemplate: '$(uid)',
       methods: {
         getLocalized(obj, entry) {
           return lookupLocalized(this.locale(), obj, entry);
