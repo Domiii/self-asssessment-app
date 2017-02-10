@@ -51,7 +51,7 @@ const ConceptsRef = refWrapper({
     // },
 
     getChildren(conceptId) {
-      return this.val && _.filter(this.val, {parentId: conceptId});
+      return this.val && _.pickBy(this.val, {parentId: conceptId});
     },
 
     deleteConcept(conceptId) {

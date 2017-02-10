@@ -5,6 +5,7 @@ import {
   Grid, Row, Col,
   Popover, Tooltip, Modal
 } from 'react-bootstrap';
+import { Link } from 'react-router'
 
 import { FAIcon } from 'src/views/components/util';
 
@@ -59,7 +60,9 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfo, lookupLocalized } = this.context;
-    const { busy, ownerId, parentId, conceptId, concept, updateConcept, deleteConcept, mayEdit } = this.props;
+    const { busy, parentId, conceptId, concept, updateConcept, deleteConcept, mayEdit } = this.props;
+    
+    const ownerId = concept.ownerId;
     const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
 
@@ -88,7 +91,12 @@ export default class ConceptViewSmall extends Component {
       <Grid fluid style={{width: '100%'}}>
         <Row style={{marginRight: '0.1em'}}>
           <Col xs={11} className="inline-vcentered" style={{textAlign: 'left'}}>
-            <label>{title}</label>
+            <Link to={`/concept/${concept.ownerId}/${conceptId}`}>
+              <h3 style={{display: 'inline'}} className="no-padding no-margin">{title}</h3>
+              {/**<Button bsSize="small">*/}
+              &nbsp;&nbsp;<FAIcon name="sign-in"/>
+              {/**</Button>*/}
+            </Link>
           </Col>
           <Col xs={1} className="no-padding inline-vcentered" style={{textAlign: 'left'}}>
             <span className='color-gray'>#{concept.num}</span>

@@ -1,5 +1,4 @@
 import { UserInfoRef } from 'src/core/users';
-import { paths } from './routes';
 import { isInitialized } from 'src/util/firebaseUtil';
 import { createSelector } from 'reselect';
 

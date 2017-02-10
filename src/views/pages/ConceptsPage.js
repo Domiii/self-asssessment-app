@@ -130,7 +130,6 @@ export default class ConceptsPage extends Component {
     const ownerConcept = !isRoot && conceptsRef.concept(ownerId) || null;
     const currentConcept = !isRoot && conceptsRef.concept(conceptId) || null;
     const parentId = !isRoot && currentConcept && currentConcept.parentId || null;
-    const parentConcept = parentId && conceptsRef.concept(currentConcept.parentId) || null;
 
     const ownerConcepts = conceptsRef.val;
     const childConcepts = isRoot && 
@@ -154,8 +153,15 @@ export default class ConceptsPage extends Component {
     const updateConcept = ({ conceptId, concept }) => {
       return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
     };
-    const deleteConcept = (conceptId) => {
-      return this.wrapPromise(conceptsRef.deleteConcept(conceptId));
+    const deleteConcept = (deleteConceptId) => {
+      // TODO: Don't delete if it still has children!?
+      return this.wrapPromise(conceptsRef.deleteConcept(deleteConceptId))
+        .then(() => {
+          if (deleteConceptId === conceptId) {
+            // deleted current concept -> Go to parent
+            
+          }
+        });
     };
 
     // go render!
@@ -169,8 +175,8 @@ export default class ConceptsPage extends Component {
       return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    const parentTitle = parentConcept &&
-      lookupLocalized(parentConcept, 'title') ||
+    const title = currentConcept &&
+      lookupLocalized(currentConcept, 'title') ||
       'all concepts';
 
     // elements
@@ -209,7 +215,7 @@ export default class ConceptsPage extends Component {
       }
     }
 
-    const childConceptsEl = !childConcepts ? (
+    const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? (
       // no childConcepts
       <Alert bsStyle="info">concept has no children</Alert>
     ) : (
@@ -227,7 +233,7 @@ export default class ConceptsPage extends Component {
 
     return (
       <div>
-        <h3>{parentTitle} {tools}</h3>
+        <h3>{title} {tools}</h3>
         { topEditors }
         { errEl }
         { childConceptsEl }
