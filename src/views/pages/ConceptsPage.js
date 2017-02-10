@@ -70,6 +70,13 @@ export default class ConceptsPage extends Component {
     this.toggleEdit = this.toggleEdit.bind(this);
   }
 
+  setAdding(adding) {
+    this.setState({ 
+      adding: adding,
+      editingConcept: false
+    });
+  }
+
   toggleAdding() {
     this.setState({ 
       adding: !this.state.adding,
@@ -141,10 +148,11 @@ export default class ConceptsPage extends Component {
       const newRef = conceptsRef.add_concept(concept);
       const newOwnerId = isRoot ? newRef.key : ownerId;
       newRef.update({ownerId: newOwnerId});
-      return this.wrapPromise(newRef);
+      return this.wrapPromise(newRef)
+        .then(() => this.setAdding(false));
     };
     const updateConcept = ({ conceptId, concept }) => {
-      return this.wrapPromise(conceptsRef.update_concept(concept));
+      return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
     };
     const deleteConcept = (conceptId) => {
       return this.wrapPromise(conceptsRef.deleteConcept(conceptId));
@@ -183,14 +191,14 @@ export default class ConceptsPage extends Component {
       tools = (<span>
         {editTools}
         <Button active={this.state.adding} 
-          bsStyle="success" bsSize="small" onClick={this.toggleAdding.bind(this)}>
+          bsStyle="success" bsSize="small" onClick={this.toggleAdding}>
           <FAIcon name="plus" className="color-green" /> add new concept
         </Button>
       </span>);
 
       if (this.state.adding) {
         topEditors = (
-          <AddConceptEditor busy={busy} concept={currentConcept} addConcept={addConcept}>
+          <AddConceptEditor busy={busy} addConcept={addConcept}>
           </AddConceptEditor>
         );
       }

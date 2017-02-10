@@ -74,14 +74,14 @@ export default class UserProfilePage extends Component {
     const isBusy = userInfo && !userInfo.isLoaded;
 
     // actions
-    const updateUser = (update) => {
+    const updateUser = (userFormData) => {
       if (isAdmin) {
         // admins can override other stuff as well
-        userInfo.update.bind(userInfo);
+        userInfo.update(userFormData);
       }
       else {
         // normal users can only set their personal data
-        userInfo.set_data(update.data);
+        userInfo.set_data(userFormData.data);
       }
     };
 

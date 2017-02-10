@@ -112,6 +112,8 @@ class _ConceptEditor extends Component {
       handleSubmit, pristine, reset, submitting, values
     } = this.props;
     const num = concept && concept.num || 0;
+    const parentId = concept && concept.parentId || null;
+    const ownerId = concept && concept.ownerId || null;
 
     // actions
     function onSubmit(...args) {
@@ -126,8 +128,8 @@ class _ConceptEditor extends Component {
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
-        <Field name="concept.parentId" value={concept.parentId} component="input" type="hidden" />
-        <Field name="concept.ownerId" value={concept.ownerId} component="input" type="hidden" />
+        <Field name="concept.parentId" value={parentId} component="input" type="hidden" />
+        <Field name="concept.ownerId" value={ownerId} component="input" type="hidden" />
         <Field name="concept.num" value={num} component="input" type="hidden" />
         <FormInputField name="concept.title_en" label="Title (English)"
           type="text" component="input"

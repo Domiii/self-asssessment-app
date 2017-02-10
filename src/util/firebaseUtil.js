@@ -51,7 +51,7 @@ export function makeGetDataDefault(firebaseDataRoot, path) {
  * NOTE that the `redux-react-firebase` module internally already takes care of
  *    dispatching actions for firebase operations and reducing firebase data.
  * 
- * @param {object|string} cfgOrPath.path|cfgOrPath The path of the given ref wrapper.
+ * @param {object|string} cfgOrPath.pathTemplate|cfgOrPath The path of the given ref wrapper.
  * @param {object} [cfgOrPath.children] Children wrappers within the same rootPath.
  * @param {object} [cfgOrPath.methods] Custom set of methods (selectors/actions) for this specific data set.
  * @param {object} [cfgOrPath.inheritedMethods] These methods will be assigned to self and all children.
@@ -178,7 +178,10 @@ function createChildDataAccessors(prototype, children, parentPath) {
 
   for (let wrapperName in children) {
     const childCfgOrPath = children[wrapperName];
-    const childPath = _.isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.path || '');
+    const childPath = _.isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.pathTemplate || '');
+    if (!childPath) {
+      throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPath}'`);
+    }
 
     // the path is the relative path between from the node of given prototype to current child
     // NOTE: The path is NOT the full path.
@@ -186,8 +189,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
     const getPath = createPathGetterFromTemplateArray(path);
 
     if (prototype[wrapperName]) {
-      console.error(`invalid: duplicate path name '${wrapperName}' under '${parentPath}'`);
-      return;
+      throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPath}'`);
     }
 
     // get
