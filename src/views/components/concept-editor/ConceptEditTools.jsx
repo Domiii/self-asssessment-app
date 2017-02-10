@@ -2,14 +2,12 @@ import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
 import { 
   Alert, Button, Jumbotron, Well,
-  Grid, Row, Col,
-  Popover, Tooltip, Modal
+  Grid, Row, Col
 } from 'react-bootstrap';
 
 import { FAIcon } from 'src/views/components/util';
 
 import ConceptDeleteModal from './ConceptDeleteModal';
-console.assert(ConceptDeleteModal);
 
 export default class ConceptEditTools extends Component {
   static propTypes = {

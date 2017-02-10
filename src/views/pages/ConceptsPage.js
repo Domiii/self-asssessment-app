@@ -13,14 +13,18 @@ import { Link } from 'react-router';
 import {
   LinkContainer
 } from 'react-router-bootstrap';
+
 import { FAIcon } from 'src/views/components/util';
 
 import {
-  ConceptGrid
+  ConceptGrid,
+  ConceptBreadcrumbs
 } from 'src/views/components/concept';
+
 
 import {
   ConceptEditTools,
+  ConceptEditor,
   AddConceptEditor
 } from 'src/views/components/concept-editor';
 
@@ -116,7 +120,7 @@ export default class ConceptsPage extends Component {
   
   render() {
     // prepare data
-    const { userInfo, router, lookupLocalized } = this.context;  
+    const { userInfo, router, lookupLocalized } = this.context;
     const { conceptsRef, conceptTreeRef, params } = this.props;
     const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
     const notLoadedYet = !conceptsRef.isLoaded;
@@ -159,7 +163,7 @@ export default class ConceptsPage extends Component {
         .then(() => {
           if (deleteConceptId === conceptId) {
             // deleted current concept -> Go to parent
-            
+
           }
         });
     };
@@ -176,8 +180,8 @@ export default class ConceptsPage extends Component {
     }
 
     const title = currentConcept &&
-      lookupLocalized(currentConcept, 'title') ||
-      'all concepts';
+      <ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} /> ||
+      <span className="color-gray">all concepts</span>;
 
     // elements
     let tools, topEditors;

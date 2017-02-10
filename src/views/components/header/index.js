@@ -9,22 +9,6 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
-/**
- * TODO: breadcrumbs for current concept
- 
-<Breadcrumb>
-  <Breadcrumb.Item href="#">
-    Home
-  </Breadcrumb.Item>
-  <Breadcrumb.Item href="http://getbootstrap.com/components/#breadcrumbs">
-    Library
-  </Breadcrumb.Item>
-  <Breadcrumb.Item active>
-    Data
-  </Breadcrumb.Item>
-</Breadcrumb>
-*/
-
 export default class Header extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
