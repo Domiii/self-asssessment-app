@@ -21,6 +21,7 @@ import {
   ConceptBreadcrumbs
 } from 'src/views/components/concept';
 
+import Markdown from 'src/views/components/markdown';
 
 import {
   ConceptEditTools,
@@ -140,13 +141,15 @@ export default class ConceptsPage extends Component {
     const childConcepts = isRoot && 
       ownerConcepts ||  // root concepts
       conceptsRef.getChildren(conceptId, isAdmin);
+    const description = currentConcept && lookupLocalized(currentConcept, 'description') || '';
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
     const addConcept = ({ concept }) => {
       // TODO: Use transaction to avoid race condition
       const lastConcept = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
-      concept.num = (lastConcept && lastConcept.num || 0)  + 1;
+      const previousNum = lastConcept && lastConcept.num || 0;
+      concept.num = parseInt(previousNum) + 1;
       concept.parentId = isRoot ? null : conceptId;
 
       const newRef = conceptsRef.add_concept(concept);
@@ -186,18 +189,18 @@ export default class ConceptsPage extends Component {
       return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
     }
 
-    const title = currentConcept &&
+    const titleEl = currentConcept &&
       <ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} /> ||
       <ConceptBreadcrumbs ownerConcepts={{}} currentConceptId={""} />;
 
     // elements
-    let tools, topEditors;
+    let toolsEl, conceptEditorEl;
     if (mayEdit) {
       const conceptArgs = { ownerId, parentId, conceptId, concept: currentConcept };
 
-      let editTools;
+      let basicToolsEl;
       if (!isRoot) {
-        editTools = (<ConceptEditTools
+        basicToolsEl = (<ConceptEditTools
           {...conceptArgs}
           {...{ 
             conceptActions,
@@ -205,22 +208,26 @@ export default class ConceptsPage extends Component {
             toggleEdit: this.toggleEdit }} />);
       }
 
-      tools = (<span>
-        {editTools}
-        <Button active={this.state.adding} 
+      const addButtonEl = (
+        <Button active={this.state.adding}
           bsStyle="success" bsSize="small" onClick={this.toggleAdding}>
           <FAIcon name="plus" className="color-green" /> add new concept
         </Button>
+      );
+
+      toolsEl = (<span>
+        { basicToolsEl }
+        { addButtonEl }
       </span>);
 
       if (this.state.adding) {
-        topEditors = (
+        conceptEditorEl = (
           <AddConceptEditor busy={busy} addConcept={addConcept}>
           </AddConceptEditor>
         );
       }
       if (this.state.editingConcept) {
-        topEditors = (
+        conceptEditorEl = (
           <ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>
         );
       }
@@ -242,11 +249,15 @@ export default class ConceptsPage extends Component {
       <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
     );
 
+    const descriptionEl = (<Well><Markdown source={description} /></Well>);
+
+    // render!
     return (
       <div>
-        <h3>{title} {tools}</h3>
-        { topEditors }
+        <h3>{titleEl} {toolsEl}</h3>
+        { conceptEditorEl }
         { errEl }
+        { descriptionEl }
         { childConceptsEl }
       </div>
     );

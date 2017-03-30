@@ -19,6 +19,7 @@ export default class ConceptPreview extends Component {
       //conceptId, 
       concept
     } = this.props;
+    
     const description = lookupLocalized(concept, 'description') || '';
 
     // tags

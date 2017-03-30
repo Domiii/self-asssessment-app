@@ -56,9 +56,9 @@ export default class ConceptEditTools extends Component {
     //const { parentId, concept, conceptActions } = this.props;
 
     return (<span>
-      { this.TogglePublicButton }
-      { this.EditButton }
       { this.DeleteButton }
+      { this.EditButton }
+      { this.TogglePublicButton }
     </span>);
   }
 }

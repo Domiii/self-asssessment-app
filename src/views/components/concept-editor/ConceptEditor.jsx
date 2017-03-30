@@ -130,7 +130,6 @@ class _ConceptEditor extends Component {
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
         <Field name="concept.parentId" value={parentId} component="input" type="hidden" />
         <Field name="concept.ownerId" value={ownerId} component="input" type="hidden" />
-        <Field name="concept.num" value={num} component="input" type="hidden" />
         <FormInputField name="concept.title_en" label="Title (English)"
           type="text" component="input"
           labelProps={{xs: 2, className: 'no-padding'}}
@@ -150,6 +149,11 @@ class _ConceptEditor extends Component {
         <FormInputField name="concept.description_zh" label="Description (中文)"
           component="textarea"
           inputProps={{rows: '5'}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name="concept.num" label="Order"
+          type="text" component="input"
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />

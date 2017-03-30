@@ -68,16 +68,41 @@ export default class ConceptViewSmall extends Component {
     const title = lookupLocalized(concept, 'title');
     const { updateConcept } = conceptActions;
 
+    // element: title line
+    const titleEl = (
+      <Row style={{marginRight: '0.1em'}}>
+        <Col xs={11} className="inline-vcentered" style={{textAlign: 'left'}}>
+          <Link to={ hrefConceptView(concept.ownerId, conceptId) }>
+            <h3 style={{display: 'inline'}} className="no-padding no-margin">{title}</h3>
+            {/**<Button bsSize="small">*/}
+            &nbsp;&nbsp;<FAIcon name="sign-in"/>
+            {/**</Button>*/}
+          </Link>
+        </Col>
+        <Col xs={1} className="no-padding inline-vcentered" style={{textAlign: 'left'}}>
+          <span className='color-gray'>#{concept.num}</span>
+        </Col>
+      </Row>
+    );
+
     // element: content
-    const content = !mayEdit || !this.state.editing ?
+    const contentPreviewEl = !mayEdit || !this.state.editing ?
       (<ConceptPreview {...conceptArgs} />) :
       (<ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>)
     ;
+    const contentEl = (
+      <Row style={{paddingTop: '0.4em'}}>
+        <Col xs={12}>
+          { contentPreviewEl }
+        </Col>
+      </Row>
+    );
 
     // element: edit buttons
-    const editTools = mayEdit && (
+    const editToolsEl = mayEdit && (
       <Row>
-        <Col xs={12} className="inline-vcentered" style={{textAlign: 'left'}}>
+        <Col xs={8} />
+        <Col xs={4} className="inline-vcentered" style={{textAlign: 'left'}}>
           <ConceptEditTools
             {...conceptArgs}
             {...{ 
@@ -88,33 +113,19 @@ export default class ConceptViewSmall extends Component {
       </Row>
     );
 
+    // const tagsEl = (<Row>
+    //   <Col xs={12}>
+    //     <ConceptTags {...conceptArgs} />
+    //   </Col>
+    // </Row>);
+
     // render
     return (
       <Grid fluid style={{width: '100%'}}>
-        <Row style={{marginRight: '0.1em'}}>
-          <Col xs={11} className="inline-vcentered" style={{textAlign: 'left'}}>
-            <Link to={ hrefConceptView(concept.ownerId, conceptId) }>
-              <h3 style={{display: 'inline'}} className="no-padding no-margin">{title}</h3>
-              {/**<Button bsSize="small">*/}
-              &nbsp;&nbsp;<FAIcon name="sign-in"/>
-              {/**</Button>*/}
-            </Link>
-          </Col>
-          <Col xs={1} className="no-padding inline-vcentered" style={{textAlign: 'left'}}>
-            <span className='color-gray'>#{concept.num}</span>
-          </Col>
-        </Row>
-        { editTools }
-        <Row style={{paddingTop: '0.4em'}}>
-          <Col xs={12}>
-            { content }
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
-            <ConceptTags {...conceptArgs} />
-          </Col>
-        </Row>
+        { titleEl }
+        { editToolsEl }
+        { contentEl }
+        { /* tagsEl */  }
       </Grid>
     );
   }
