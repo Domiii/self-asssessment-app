@@ -5,7 +5,9 @@ import {
   Grid, Row, Col,
   Popover, Tooltip, Modal
 } from 'react-bootstrap';
+
 import { Link } from 'react-router'
+import { hrefConceptView } from 'src/views/href';
 
 import { FAIcon } from 'src/views/components/util';
 
@@ -91,7 +93,7 @@ export default class ConceptViewSmall extends Component {
       <Grid fluid style={{width: '100%'}}>
         <Row style={{marginRight: '0.1em'}}>
           <Col xs={11} className="inline-vcentered" style={{textAlign: 'left'}}>
-            <Link to={`/concept/${concept.ownerId}/${conceptId}`}>
+            <Link to={ hrefConceptView(concept.ownerId, conceptId) }>
               <h3 style={{display: 'inline'}} className="no-padding no-margin">{title}</h3>
               {/**<Button bsSize="small">*/}
               &nbsp;&nbsp;<FAIcon name="sign-in"/>
