@@ -183,7 +183,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
       throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPath}'`);
     }
 
-    // the path is the relative path between from the node of given prototype to current child
+    // the path is the relative path from the node of given prototype to current child
     // NOTE: The path is NOT the full path.
     const path = pathJoin(parentPath, childPath);
     const getPath = createPathGetterFromTemplateArray(path);

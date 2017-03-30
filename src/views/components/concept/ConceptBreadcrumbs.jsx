@@ -25,7 +25,7 @@ export default class ConceptBreadcrumbs extends Component {
 
       // we are nesting a Link in the Item, and set active to always be true
       //    because, for some reason the default link handler triggers a page reload
-      var itemEl = currentConceptId === iteratorConceptId ? 
+      const itemEl = currentConceptId === iteratorConceptId ? 
         title :
         (<Link to={ hrefConceptView(concept.ownerId, iteratorConceptId) }>
           {title}

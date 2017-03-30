@@ -122,7 +122,8 @@ export default class ConceptsPage extends Component {
     // prepare data
     const { userInfo, router, lookupLocalized } = this.context;
     const { conceptsRef, conceptTreeRef, params } = this.props;
-    const mayEdit = userInfo && userInfo.adminDisplayMode() || false;
+    const isAdmin = userInfo && userInfo.adminDisplayMode() || false;
+    const mayEdit = isAdmin;
     const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
     let { ownerId, conceptId } = params;
@@ -135,10 +136,10 @@ export default class ConceptsPage extends Component {
     const currentConcept = !isRoot && conceptsRef.concept(conceptId) || null;
     const parentId = !isRoot && currentConcept && currentConcept.parentId || null;
 
-    const ownerConcepts = conceptsRef.val;
+    const ownerConcepts = conceptsRef.getRootConcepts(isAdmin);
     const childConcepts = isRoot && 
       ownerConcepts ||  // root concepts
-      conceptsRef.getChildren(conceptId);
+      conceptsRef.getChildren(conceptId, isAdmin);
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
@@ -167,6 +168,12 @@ export default class ConceptsPage extends Component {
           }
         });
     };
+    const toggleConceptPublic = (conceptId) => {
+      return this.wrapPromise(conceptsRef.togglePublic(conceptId));
+    };
+    const conceptActions = !mayEdit && {} || {
+      updateConcept, deleteConcept, toggleConceptPublic
+    };
 
     // go render!
     if (notLoadedYet) {
@@ -181,7 +188,7 @@ export default class ConceptsPage extends Component {
 
     const title = currentConcept &&
       <ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} /> ||
-      <span className="color-gray">all concepts</span>;
+      <ConceptBreadcrumbs ownerConcepts={{}} currentConceptId={""} />;
 
     // elements
     let tools, topEditors;
@@ -193,7 +200,7 @@ export default class ConceptsPage extends Component {
         editTools = (<ConceptEditTools
           {...conceptArgs}
           {...{ 
-            deleteConcept,
+            conceptActions,
             editing: this.state.editingConcept,
             toggleEdit: this.toggleEdit }} />);
       }
@@ -225,7 +232,7 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <div><ConceptGrid {...{
-        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, updateConcept, deleteConcept
+        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
       }} /></div>
     );
 

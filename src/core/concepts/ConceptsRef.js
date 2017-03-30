@@ -50,8 +50,34 @@ const ConceptsRef = refWrapper({
     //   //return this.updateKeepOrder(parentId, updates);
     // },
 
-    getChildren(conceptId) {
-      return this.val && _.pickBy(this.val, {parentId: conceptId});
+    getRootConcepts(all) {
+      if (all) {
+        return this.getAllRootConcepts();
+      }
+      return this.getPublicRootConcepts();
+    },
+
+    getAllRootConcepts() {
+      return this.val || {};
+    },
+
+    getPublicRootConcepts() {
+      return this.val && _.pickBy(this.val, {isPublic: true}) || {};
+    },
+
+    getChildren(parentId, all) {
+      if (all) {
+        return this.getAllChildren(parentId);
+      }
+      return this.getPublicChildren(parentId);
+    },
+
+    getAllChildren(parentId) {
+      return this.val && _.pickBy(this.val, {parentId}) || {};
+    },
+
+    getPublicChildren(parentId) {
+      return this.val && _.pickBy(this.val, {parentId, isPublic: true}) || {};
     },
 
     deleteConcept(conceptId) {
@@ -63,6 +89,14 @@ const ConceptsRef = refWrapper({
         // TODO: keep order after deleting
         //return this.updateKeepOrder(parentId);
       });
+    },
+
+    togglePublic(conceptId) {
+      const concept = this.concept(conceptId);
+      if (!concept) {
+          throw new Error('concept does not exist: ' + conceptId);
+      }
+      return this.set_isPublic(conceptId, !this.isPublic(conceptId));
     },
 
     getFirstChild(parentId) {
@@ -158,6 +192,7 @@ const ConceptsRef = refWrapper({
       children: {
         ownerId: 'ownerId',
         parentId: 'parentId',
+        isPublic: 'isPublic',
         title_en: 'title_en',
         title_zh: 'title_zh',
         description_en: 'description_en',

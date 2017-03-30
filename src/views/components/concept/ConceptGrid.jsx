@@ -17,13 +17,12 @@ export default class ConceptGrid extends Component {
     parentId: PropTypes.string,
     concepts: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
-    updateConcept: PropTypes.func.isRequired,
-    deleteConcept: PropTypes.func.isRequired
+    conceptActions: PropTypes.object.isRequired
   };
 
   render() {
     const { 
-      busy, ownerId, parentId, concepts, mayEdit, updateConcept, deleteConcept
+      busy, ownerId, parentId, concepts, mayEdit, conceptActions
     } = this.props;
 
     // actions
@@ -32,14 +31,14 @@ export default class ConceptGrid extends Component {
     // prepare props
     const conceptProps = _.mapValues(concepts, 
       (concept, conceptId) => ({
+        concept,
+        conceptId,
+
         busy,
         ownerId, 
         parentId,
-        conceptId,
-        concept,
         mayEdit,
-        updateConcept,
-        deleteConcept
+        conceptActions
       })
     );
 

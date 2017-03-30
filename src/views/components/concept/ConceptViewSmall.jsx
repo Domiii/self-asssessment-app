@@ -49,8 +49,7 @@ export default class ConceptViewSmall extends Component {
     parentId: PropTypes.string,
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
-    updateConcept: PropTypes.func.isRequired,
-    deleteConcept: PropTypes.func.isRequired
+    conceptActions: PropTypes.object.isRequired,
   };
 
   constructor(...args) {
@@ -62,11 +61,12 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfo, lookupLocalized } = this.context;
-    const { busy, parentId, conceptId, concept, updateConcept, deleteConcept, mayEdit } = this.props;
+    const { busy, parentId, conceptId, concept, conceptActions, mayEdit } = this.props;
     
     const ownerId = concept.ownerId;
     const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
+    const { updateConcept } = conceptActions;
 
     // element: content
     const content = !mayEdit || !this.state.editing ?
@@ -81,7 +81,7 @@ export default class ConceptViewSmall extends Component {
           <ConceptEditTools
             {...conceptArgs}
             {...{ 
-              deleteConcept,
+              conceptActions,
               editing: this.state.editing,
               toggleEdit: this.toggleEdit }} />
         </Col>
