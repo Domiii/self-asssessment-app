@@ -106,7 +106,7 @@ export class FormInputField extends FormInputFieldBase {
     return this.createField(<Field className="form-control" 
       key={name} id={name} name={name} 
       component={component}
-      placeholder={placeholder}
+      label={placeholder}
       {...(inputProps || {})}>
       {this.props.children}
     </Field>);

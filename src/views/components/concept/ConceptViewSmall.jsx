@@ -12,10 +12,7 @@ import { hrefConceptView } from 'src/views/href';
 import { FAIcon } from 'src/views/components/util';
 
 import ConceptPreview from './ConceptPreview';
-
-import ConceptEditor from 'src/views/components/concept-editor/ConceptEditor';
 import ConceptEditTools from 'src/views/components/concept-editor/ConceptEditTools';
-console.assert(ConceptEditTools);
 
 export class ConceptTags extends Component {
   static propTypes = {
@@ -39,6 +36,7 @@ export class ConceptTags extends Component {
 export default class ConceptViewSmall extends Component {
   static contextTypes = {
     userInfo: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
     lookupLocalized: PropTypes.func.isRequired
   };
 
@@ -54,8 +52,11 @@ export default class ConceptViewSmall extends Component {
 
   constructor(...args) {
     super(...args);
-    this.state = { editing: false };
-    this.toggleEdit = (() => { this.setState({ editing: !this.state.editing }); }).bind(this);
+    this.toggleEdit = (() => {
+      const { router } = this.context;
+      const { ownerId, conceptId } = this.props;
+      router.replace(hrefConceptView(ownerId, conceptId, 'edit'));
+    }).bind(this);
   }
 
   render() {
@@ -86,10 +87,8 @@ export default class ConceptViewSmall extends Component {
     );
 
     // element: content
-    const contentPreviewEl = !mayEdit || !this.state.editing ?
-      (<ConceptPreview {...conceptArgs} />) :
-      (<ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>)
-    ;
+    const contentPreviewEl = (<ConceptPreview {...conceptArgs} />);
+
     const contentEl = (
       <Row style={{paddingTop: '0.4em'}}>
         <Col xs={12}>
@@ -107,7 +106,7 @@ export default class ConceptViewSmall extends Component {
             {...conceptArgs}
             {...{ 
               conceptActions,
-              editing: this.state.editing,
+              editing: false,
               toggleEdit: this.toggleEdit }} />
         </Col>
       </Row>

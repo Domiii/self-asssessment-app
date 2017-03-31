@@ -37,7 +37,6 @@ import _ from 'lodash';
 
 @firebase((props, firebase) => {
   const { params } = props;
-
   const queries = [
     ConceptsRef.makeQuery(params.ownerId),
     ConceptResponsesRef.makeQuery(),
@@ -45,17 +44,21 @@ import _ from 'lodash';
   ];
 
   if (params.conceptId) {
-    var args = { conceptId: params.conceptId };
+    const args = { conceptId: params.conceptId };
     queries.push(ConceptChecksRef.ofConcept.makeQuery(args));
   }
 
   return queries;
 })
 @connect(
-  ({ firebase }) => {
+    ({ firebase }, props) => {
+      const { params } = props;
+      const checkArgs = { conceptId: params.conceptId };
+
     return {
       conceptsRef: ConceptsRef(firebase),
-      conceptChecksRef: ConceptChecksRef(firebase)
+      //UserInfoRef.user(firebase, {auth, uid: auth.uid});
+      conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs)
     };
   }
 )
@@ -122,13 +125,6 @@ export default class ConceptsPage extends Component {
       this.setState({busy: false, error: err});
     });
   }
-
-  shouldComponentUpdate(nextProps) {
-    return true;
-  }
-
-  componentWillUnmount() {
-  }
   
   render() {
     // prepare data
@@ -154,6 +150,8 @@ export default class ConceptsPage extends Component {
       conceptsRef.getChildren(conceptId, isAdmin);
     const description = currentConcept && lookupLocalized(currentConcept, 'description') || '';
 
+    const conceptChecks = currentConcept && conceptChecksRef.val;
+
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
     const addConcept = ({ concept }) => {
@@ -171,7 +169,8 @@ export default class ConceptsPage extends Component {
     };
     const updateConcept = ({ conceptId, concept, checks }) => {
       return this.wrapPromise(Promise.all([
-        conceptsRef.update_concept(conceptId, concept)
+        conceptsRef.set_concept(conceptId, concept),
+        conceptChecksRef.set(checks)
       ]));
     };
     const deleteConcept = (deleteConceptId) => {
@@ -187,6 +186,7 @@ export default class ConceptsPage extends Component {
     const toggleConceptPublic = (conceptId) => {
       return this.wrapPromise(conceptsRef.togglePublic(conceptId));
     };
+
     const conceptActions = !mayEdit && {} || {
       updateConcept, deleteConcept, toggleConceptPublic
     };
@@ -209,7 +209,11 @@ export default class ConceptsPage extends Component {
     // elements
     let toolsEl, conceptEditorEl;
     if (mayEdit) {
-      const conceptArgs = { ownerId, parentId, conceptId, concept: currentConcept };
+      const conceptArgs = {
+        ownerId, parentId, conceptId,
+        concept: currentConcept,
+        conceptChecks
+      };
 
       let basicToolsEl;
       if (!isRoot) {
@@ -262,7 +266,12 @@ export default class ConceptsPage extends Component {
       <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
     );
 
-    const descriptionEl = (<Well><Markdown source={description} /></Well>);
+    const descriptionEl = (<Well>
+      { !!description &&
+        (<Markdown source={description} />) ||
+        (<span className="color-gray">no description</span>)
+      }
+    </Well>);
 
     // render!
     return (

@@ -15,6 +15,7 @@ const ConceptChecksRef = refWrapper({
           children: {
             title_en: 'title_en',
             title_zh: 'title_zh',
+            num: 'num',
             responseTypeId: 'responseTypeId'
           }
         }

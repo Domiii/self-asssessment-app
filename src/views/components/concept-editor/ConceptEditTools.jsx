@@ -43,7 +43,7 @@ export default class ConceptEditTools extends Component {
 
   get TogglePublicButton() {
     const { conceptId, concept, conceptActions } = this.props;
-    const {toggleConceptPublic} = conceptActions;
+    const { toggleConceptPublic } = conceptActions;
     const icon = concept.isPublic ? 'unlock' : 'lock';
     const className = concept.isPublic ? 'color-green' : 'color-red';
     return (<Button onClick={() => toggleConceptPublic(conceptId)}
