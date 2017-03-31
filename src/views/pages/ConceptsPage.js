@@ -1,18 +1,21 @@
 import { 
   ConceptsRef,
-  ConceptTreeRef,
+  ConceptChecksRef,
   ConceptProgressRef,
   ConceptResponsesRef
 } from 'src/core/concepts/';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { Promise } from 'firebase';
 import { firebase } from 'redux-react-firebase';
 import { Alert, Button, Jumbotron, Well } from 'react-bootstrap';
 import { Link } from 'react-router';
 import {
   LinkContainer
 } from 'react-router-bootstrap';
+
+import { hrefConceptView } from 'src/views/href';
 
 import { FAIcon } from 'src/views/components/util';
 
@@ -35,18 +38,24 @@ import _ from 'lodash';
 @firebase((props, firebase) => {
   const { params } = props;
 
-  return [
+  const queries = [
     ConceptsRef.makeQuery(params.ownerId),
-    //ConceptTreeRef.makeQuery(),
     ConceptResponsesRef.makeQuery(),
     ConceptProgressRef.makeQuery()
   ];
+
+  if (params.conceptId) {
+    var args = { conceptId: params.conceptId };
+    queries.push(ConceptChecksRef.ofConcept.makeQuery(args));
+  }
+
+  return queries;
 })
 @connect(
   ({ firebase }) => {
     return {
       conceptsRef: ConceptsRef(firebase),
-      //conceptTreeRef: ConceptTreeRef(firebase)
+      conceptChecksRef: ConceptChecksRef(firebase)
     };
   }
 )
@@ -61,39 +70,47 @@ export default class ConceptsPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    //conceptTreeRef: PropTypes.object.isRequired
+    conceptChecksRef: PropTypes.object.isRequired
   }
 
   constructor(...args) {
     super(...args);
 
     this.state = {
-      busy: false,
-      adding: false
+      busy: false
     };
     this.toggleAdding = this.toggleAdding.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
   }
 
+  get isAddMode() {
+    const { params } = this.props;
+    return params.mode === 'add';
+  }
+
+  get isEditMode() {
+    const { params } = this.props;
+    return params.mode === 'edit';
+  }
+
+  setEditMode(mode) {
+    const { router } = this.context;
+    const { params } = this.props;
+    let { ownerId, conceptId } = params;
+
+    router.replace(hrefConceptView(ownerId, conceptId, mode));
+  }
+
   setAdding(adding) {
-    this.setState({ 
-      adding: adding,
-      editingConcept: false
-    });
+    this.setEditMode(adding ? 'add' : '');
   }
 
   toggleAdding() {
-    this.setState({ 
-      adding: !this.state.adding,
-      editingConcept: false
-    });
+    this.setAdding(!this.isAddMode);
   }
 
   toggleEdit() {
-    this.setState({ 
-      editingConcept: !this.state.editingConcept,
-      adding: false
-    });
+    this.setEditMode(this.isEditMode ? '' : 'edit');
   }
 
   wrapPromise(promise) {
@@ -106,12 +123,6 @@ export default class ConceptsPage extends Component {
     });
   }
 
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
   shouldComponentUpdate(nextProps) {
     return true;
   }
@@ -122,7 +133,7 @@ export default class ConceptsPage extends Component {
   render() {
     // prepare data
     const { userInfo, router, lookupLocalized } = this.context;
-    const { conceptsRef, conceptTreeRef, params } = this.props;
+    const { conceptsRef, conceptChecksRef, params } = this.props;
     const isAdmin = userInfo && userInfo.adminDisplayMode() || false;
     const mayEdit = isAdmin;
     const notLoadedYet = !conceptsRef.isLoaded;
@@ -158,8 +169,10 @@ export default class ConceptsPage extends Component {
       return this.wrapPromise(newRef)
         .then(() => this.setAdding(false));
     };
-    const updateConcept = ({ conceptId, concept }) => {
-      return this.wrapPromise(conceptsRef.update_concept(conceptId, concept));
+    const updateConcept = ({ conceptId, concept, checks }) => {
+      return this.wrapPromise(Promise.all([
+        conceptsRef.update_concept(conceptId, concept)
+      ]));
     };
     const deleteConcept = (deleteConceptId) => {
       // TODO: Don't delete if it still has children!?
@@ -186,7 +199,7 @@ export default class ConceptsPage extends Component {
 
     if (conceptId && !currentConcept) {
       //setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go back</Button></Alert>);
+      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go home</Button></Alert>);
     }
 
     const titleEl = currentConcept &&
@@ -204,12 +217,12 @@ export default class ConceptsPage extends Component {
           {...conceptArgs}
           {...{ 
             conceptActions,
-            editing: this.state.editingConcept,
+            editing: this.isEditMode,
             toggleEdit: this.toggleEdit }} />);
       }
 
       const addButtonEl = (
-        <Button active={this.state.adding}
+        <Button active={this.isAddMode}
           bsStyle="success" bsSize="small" onClick={this.toggleAdding}>
           <FAIcon name="plus" className="color-green" /> add new concept
         </Button>
@@ -220,13 +233,13 @@ export default class ConceptsPage extends Component {
         { addButtonEl }
       </span>);
 
-      if (this.state.adding) {
+      if (this.isAddMode) {
         conceptEditorEl = (
           <AddConceptEditor busy={busy} addConcept={addConcept}>
           </AddConceptEditor>
         );
       }
-      if (this.state.editingConcept) {
+      if (this.isEditMode) {
         conceptEditorEl = (
           <ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>
         );

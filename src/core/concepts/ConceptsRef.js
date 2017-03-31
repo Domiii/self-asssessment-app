@@ -6,7 +6,7 @@ const ConceptsRef = refWrapper({
 
   queryString(ownerId) {
     if (ownerId) {
-      // get all entries of given ancestor
+      // get all entries of given parent
       return {
         orderByChild: 'ownerId',
         equalTo: ownerId

@@ -5,23 +5,17 @@ const ConceptChecksRef = refWrapper({
   pathTemplate: '/conceptChecks',
 
   children: {
-    ofUser: {
-      pathTemplate: '$(uid)',
+    ofConcept: {
+      pathTemplate: '$(conceptId)',
 
       children: {
-        ofConcept: {
-          pathTemplate: '$(conceptId)',
+        conceptCheck: {
+          pathTemplate: '$(conceptCheckId)',
 
           children: {
-            conceptCheck: {
-              pathTemplate: '$(conceptCheckId)',
-
-              children: {
-                title_en: 'title_en',
-                title_zh: 'title_zh',
-                responseTypeId: 'responseTypeId'
-              }
-            }
+            title_en: 'title_en',
+            title_zh: 'title_zh',
+            responseTypeId: 'responseTypeId'
           }
         }
       }

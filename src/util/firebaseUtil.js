@@ -71,16 +71,16 @@ function _makeMakeQuery(getPath, queryString) {
   let querySuffixFunc = queryString instanceof Function && queryString;
   let querySuffixConst = !(queryString instanceof Function) && queryString;
   let getQuerySuffix = (...allArgs) => {
-    const res = querySuffixFunc && querySuffixFunc(...allArgs) || querySuffixConst;
+    let res = querySuffixFunc && querySuffixFunc(...allArgs) || querySuffixConst;
     if (_.isObject(res) && !_.isString(res)) {
-      return _.map(res, (value, key) => key + '=' + value).join('&');
+      res = _.map(res, (value, key) => key + '=' + value).join('&');
     }
     return res;
   };
 
   function _defaultMakeQueryWithVariables(pathArgs, ...customArgs) {
     const basePath = getPath(pathArgs);
-    const querySuffix = getQuerySuffix([...customArgs, pathArgs]);
+    const querySuffix = getQuerySuffix(...customArgs, ...pathArgs);
     return basePath + (querySuffix && ('#' + querySuffix) || '');
   }
 

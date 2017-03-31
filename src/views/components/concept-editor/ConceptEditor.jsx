@@ -6,7 +6,7 @@ import {
   Popover, Tooltip, Modal,
   FormGroup, FormControl, ControlLabel
 } from 'react-bootstrap';
-import { Field, reduxForm } from 'redux-form';
+import { Field, reduxForm, FormSection } from 'redux-form';
 import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
 
 import _ from 'lodash';
@@ -96,6 +96,56 @@ import _ from 'lodash';
 //   }
 // }
 
+class ConceptSection extends FormSection {
+  static defaultProps = {
+    name: 'concept'
+  };
+
+  static propTypes = {
+    conceptId: PropTypes.string,
+    concept: PropTypes.object
+  };
+
+  render() {
+    const { conceptId, concept } = this.props;
+    const num = concept && concept.num || 0;
+    const parentId = concept && concept.parentId || null;
+    const ownerId = concept && concept.ownerId || null;
+
+    return (<div>
+      <Field name="parentId" value={parentId} component="input" type="hidden" />
+      <Field name="ownerId" value={ownerId} component="input" type="hidden" />
+      <FormInputField name="title_en" label="Title (English)"
+        type="text" component="input"
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="title_zh" label="Title (中文)"
+        type="text" component="input"
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="description_en" label="Description (English)"
+        component="textarea"
+        inputProps={{rows: '5'}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="description_zh" label="Description (中文)"
+        component="textarea"
+        inputProps={{rows: '5'}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="num" label="Order"
+        type="text" component="input"
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+    </div>);
+  }
+}
+
 //  see: http://redux-form.com/6.4.1/examples/simple/
 class _ConceptEditor extends Component {
   static propTypes = {
@@ -103,22 +153,19 @@ class _ConceptEditor extends Component {
     busy: PropTypes.bool,
     conceptId: PropTypes.string,
     concept: PropTypes.object
-  };
+  }
 
   render() {
     // data
     const { busy, conceptId, concept } = this.props;
     const { 
-      handleSubmit, pristine, reset, submitting, values
+      handleSubmit, reset, pristine, submitting, values
     } = this.props;
-    const num = concept && concept.num || 0;
-    const parentId = concept && concept.parentId || null;
-    const ownerId = concept && concept.ownerId || null;
 
     // actions
     function onSubmit(...args) {
-      reset();
       handleSubmit(...args);
+      reset();
     };
 
     // elements
@@ -128,35 +175,7 @@ class _ConceptEditor extends Component {
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
-        <Field name="concept.parentId" value={parentId} component="input" type="hidden" />
-        <Field name="concept.ownerId" value={ownerId} component="input" type="hidden" />
-        <FormInputField name="concept.title_en" label="Title (English)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="concept.title_zh" label="Title (中文)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="concept.description_en" label="Description (English)"
-          component="textarea"
-          inputProps={{rows: '5'}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="concept.description_zh" label="Description (中文)"
-          component="textarea"
-          inputProps={{rows: '5'}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="concept.num" label="Order"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
+        <ConceptSection {...{ conceptId, concept }} />
 
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>
