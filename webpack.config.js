@@ -25,7 +25,18 @@ const PORT = 3000;
 const loaders = {
   js:   {test: /\.js[x]?$/, exclude: /node_modules/, loader: 'babel'},
   json: {test: /\.json$/, loader: 'json-loader' },
-  scss:  {test: /\.[s]?css$/, loader: 'style!css!postcss!sass'}
+  scss:  {test: /\.[s]?css$/, loader: 'style!css!postcss!sass'},
+  // the url-loader uses DataUrls. 
+  urls: { 
+    test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
+    loader: "url-loader?limit=10000&mimetype=application/font-woff" 
+  },
+
+  // the file-loader emits files. 
+  files: { 
+    test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
+    loader: "file-loader" 
+  },
 };
 
 
@@ -101,8 +112,10 @@ if (ENV_DEVELOPMENT) {
   config.module = {
     loaders: [
       loaders.js,
+      loaders.json,
       loaders.scss,
-      loaders.json
+      loaders.files,
+      loaders.urls
     ]
   };
 
@@ -181,8 +194,10 @@ if (ENV_TEST) {
   config.module = {
     loaders: [
       loaders.js,
+      loaders.json,
       loaders.scss,
-      loaders.json
+      loaders.files,
+      loaders.urls
     ]
   };
 }

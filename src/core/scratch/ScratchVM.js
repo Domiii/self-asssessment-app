@@ -1,5 +1,6 @@
-//import VirtualMachine from 'scratch-vm';
-// TODO!
+//import scratch-vm;
+import 'src/third-party/scratch/scratch-vm-vendor.es5.js';
+import 'src/third-party/scratch/scratch-vm.es5.js';
 
 // npm i -S https://github.com/LLK/scratch-vm.git (build failing?)
 

@@ -1,3 +1,11 @@
+// import CSS
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
+import 'src/third-party/font-awesome-4.7.0/css/font-awesome.min.css';
+import 'src/views/styles/styles.scss';
+
+// import JS
+// import 'bootstrap';   // bootstrap JS
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
@@ -6,13 +14,14 @@ import { syncHistoryWithStore } from 'react-router-redux';
 
 import configureStore from './core/store';
 import Root from './views/root';
-import './views/styles/styles.scss';
 
 import firebase from 'firebase';
 import firebaseConfig from './config/firebase.cfg';
 
 import { FAIcon } from 'src/views/components/util';
 
+
+// GO!
 const store = configureStore(firebaseConfig);
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
