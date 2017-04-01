@@ -9,15 +9,16 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ### TODO
-* Finalize Editor
-* Tags
-* Question Hierarchy
-* finalize concept + question editor GUI
-* Add questions
-** Convert existing question data to new format
-** Fix format
-** Add remaining questions - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
-** Add more questions
+* Add checks
+** Add ChecksPanel
+** Add CheckResponsePanel
+** format them nicely!
+* Record + show checkResponses
+* Log all kinds of user interactions
+* Visualize checks progress throughout the tree
+* Add Google Slides to markdown
+* Add checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
+* Add more checks
 * Visualize responses of each individual Question
 * ResponseSummary
 * Teacher view: Pick a user from list of all users and check their responses with options: [OverEstimated, UnderEstimated, JustRight]

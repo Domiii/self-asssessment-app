@@ -8,6 +8,13 @@ body {
   height: 100%;
 }
 
+/*
+ * Never "select" buttons.
+ * @see http://stackoverflow.com/questions/20340138/remove-blue-border-from-css-custom-styled-button-in-chrome
+ */
+button:focus {outline:none !important;}
+button:active { outline:none !important; }
+
 .hide {
   display: none !important;
 }
