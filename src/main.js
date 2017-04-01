@@ -1,7 +1,7 @@
 // import CSS
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
-import 'src/third-party/font-awesome-4.7.0/css/font-awesome.min.css';
+import 'font-awesome/css/font-awesome.min.css';
 import 'src/views/styles/styles.scss';
 
 // import JS
