@@ -48,9 +48,19 @@ if (module.hot) {
   });
 }
 
-// show a loading indicator
+// show a message while logging in
 ReactDOM.render(
-  (<FAIcon name="cog" spinning={true} className="color-red" />),
+  (<div style={{fontSize: '1.5em',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center', /* horizontal */
+      alignItems: 'center'}}
+      className="max-height color-light-red">
+    <p>logging in...</p>
+    <p>
+      <FAIcon name="cog" spinning={true}/>
+    </p>
+  </div>),
   rootElement
 );
 

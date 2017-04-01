@@ -1,13 +1,24 @@
 html {
   overflow-y: scroll;
+  height: 100%;
 }
 
 body {
   padding: 0;
+  height: 100%;
 }
 
 .hide {
   display: none !important;
+}
+
+.max-height {
+  height: 100%;
+}
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
 }
 
 /**
@@ -105,6 +116,10 @@ body {
 
 .color-red {
   color: red;
+}
+
+.color-light-red {
+  color: IndianRed;
 }
 
 

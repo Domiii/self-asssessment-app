@@ -194,7 +194,19 @@ export default class ConceptsPage extends Component {
     // go render!
     if (notLoadedYet) {
       // still loading
-      return (<FAIcon name="cog" spinning={true} />);
+      return (<div className="overlay">
+        <div style={{fontSize: '1.5em',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center', /* horizontal */
+          alignItems: 'center'}}
+          className="max-height color-gray">
+          <p>loading...</p>
+          <p>
+            <FAIcon name="cog" spinning={true}/>
+          </p>
+        </div>
+      </div>);
     }
 
     if (conceptId && !currentConcept) {

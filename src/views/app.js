@@ -76,7 +76,7 @@ export class App extends Component {
 
     if (!children) {
       router.replace('/');
-      return (<FAIcon name="cog" spinning={true} />);
+      return (<FAIcon name="cog" spinning={true} className="color-gray" />);
     }
 
     const signOut = () => {
@@ -95,24 +95,31 @@ export class App extends Component {
 
     if (isBusy) {
       // still loading
-      return (<FAIcon name="cog" spinning={true} />);
+      return (<div className="overlay">
+        <div style={{fontSize: '1.5em',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center', /* horizontal */
+          alignItems: 'center'}}
+          className="max-height color-gray">
+          <p>loading...</p>
+          <p>
+            <FAIcon name="cog" spinning={true}/>
+          </p>
+        </div>
+      </div>);
     }
-    
-    const mainEl = isBusy ? 
-      <FAIcon name="cog" spinning={true} /> : (
-      <main className="app-main">
-        { children }
-      </main>
-    );
 
     return (
-      <div className="app container">
+      <div className="app container max-height">
         <Header
           signOut={signOut}
           openURL={window::open}
         />
 
-        { mainEl }
+        <main className="app-main max-height">
+          { children }
+        </main>
       </div>
     );
   }
