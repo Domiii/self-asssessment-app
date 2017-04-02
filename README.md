@@ -9,10 +9,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ### TODO
-* Add checks
-** Add ChecksPanel
-** Add CheckResponsePanel
-** format them nicely!
+* Format check display nicely
 * Record + show checkResponses
 * Log all kinds of user interactions
 * Visualize checks progress throughout the tree

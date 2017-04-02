@@ -15,14 +15,14 @@ import _ from 'lodash';
 
 class _UserForm extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired
+    userInfoRef: PropTypes.object.isRequired
   };
 
 
   render() {
-    const { userInfo } = this.context;
+    const { userInfoRef } = this.context;
     const { handleSubmit, pristine, reset, submitting } = this.props;
-    const isAdmin = userInfo && userInfo.isAdmin();
+    const isAdmin = userInfoRef && userInfoRef.isAdmin();
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
@@ -64,24 +64,24 @@ export const UserForm = reduxForm({ form: 'user_info', enableReinitialize: true 
 
 export default class UserProfilePage extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired
+    userInfoRef: PropTypes.object.isRequired
   };
 
   render() {
     // data
-    const { userInfo } = this.context;
-    const isAdmin = userInfo && userInfo.isAdmin();
-    const isBusy = userInfo && !userInfo.isLoaded;
+    const { userInfoRef } = this.context;
+    const isAdmin = userInfoRef && userInfoRef.isAdmin();
+    const isBusy = userInfoRef && !userInfoRef.isLoaded;
 
     // actions
     const updateUser = (userFormData) => {
       if (isAdmin) {
         // admins can override other stuff as well
-        userInfo.update(userFormData);
+        userInfoRef.update(userFormData);
       }
       else {
         // normal users can only set their personal data
-        userInfo.set_data(userFormData.data);
+        userInfoRef.set_data(userFormData.data);
       }
     };
 
@@ -93,7 +93,7 @@ export default class UserProfilePage extends Component {
     }
 
     return (
-      <UserForm onSubmit={updateUser} initialValues={userInfo.val} />
+      <UserForm onSubmit={updateUser} initialValues={userInfoRef.val} />
     );
   }
 }

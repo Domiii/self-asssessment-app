@@ -23,6 +23,10 @@ button:active { outline:none !important; }
   height: 100%;
 }
 
+.max-width {
+  width: 100%;
+}
+
 .overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -127,6 +131,15 @@ button:active { outline:none !important; }
 
 .color-light-red {
   color: IndianRed;
+}
+
+.concept-description {
+  background-color: white;
+  background-image: none;
+}
+
+.concept-checks-panel {
+  
 }
 
 

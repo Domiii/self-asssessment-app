@@ -26,10 +26,10 @@ const { pathToJS } = helpers;
     const props = {};
 
     if (auth && auth.uid) {
-      props.userInfo = UserInfoRef.user(firebase, {auth, uid: auth.uid});
+      props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
 
 
-      //console.log(props.userInfo.val);
+      //console.log(props.userInfoRef.val);
     }
 
     return props;
@@ -42,20 +42,20 @@ export class App extends Component {
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
-    userInfo: PropTypes.object,
+    userInfoRef: PropTypes.object,
 
     children: PropTypes.object
   };
 
   static childContextTypes = {
-    userInfo: PropTypes.object,
+    userInfoRef: PropTypes.object,
     lookupLocalized: PropTypes.func
   };
 
   getChildContext() {
-    const lang = this.props.userInfo && this.props.userInfo.locale() || 'en';
+    const lang = this.props.userInfoRef && this.props.userInfoRef.locale() || 'en';
     return {
-      userInfo: this.props.userInfo,
+      userInfoRef: this.props.userInfoRef,
       lookupLocalized: lookupLocalized.bind(null, lang)
     }
   }
@@ -70,9 +70,9 @@ export class App extends Component {
   }
 
   render() {
-    const { userInfo, firebase, children } = this.props;
+    const { userInfoRef, firebase, children } = this.props;
     const { router } = this.context;
-    const isBusy = userInfo && !userInfo.isLoaded;
+    const isBusy = userInfoRef && !userInfoRef.isLoaded;
 
     if (!children) {
       router.replace('/');
@@ -88,7 +88,7 @@ export class App extends Component {
       }
     };
 
-    if (!userInfo && router.location.pathname !== '/sign-in') {
+    if (!userInfoRef && router.location.pathname !== '/sign-in') {
       setTimeout(() => router.replace('/sign-in'), 50);
       return (<FAIcon name="cog" spinning={true} />);
     }

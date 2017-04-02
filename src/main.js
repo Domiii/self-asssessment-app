@@ -1,7 +1,12 @@
-// import CSS
+// import third-party CSS
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
+
 import 'font-awesome/css/font-awesome.min.css';
+
+import 'react-flex/index.css';
+
+// import our own main CSS
 import 'src/views/styles/styles.scss';
 
 // import JS

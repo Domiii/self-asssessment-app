@@ -16,10 +16,18 @@ const UserInfoRef = refWrapper({
       children: {
         isAdmin: 'isAdmin', 
         adminDisplayMode: 'adminDisplayMode',
-        data: 'data',
+
+        data: 'data',   // personal user data (we currently copy this from their Google account)
         userName: 'data/userName',
         email: 'data/email',
-        locale: 'data/locale'
+        locale: 'data/locale',
+
+        prefs: {    // some UI user preferences
+          pathTemplate: 'prefs',
+          children: {
+            conceptFullWidthView: 'conceptFullWidthView'
+          }
+        }
       }
     }
   }

@@ -12,7 +12,7 @@ import { FAIcon } from 'src/views/components/util';
 export default class Header extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfo: PropTypes.object
+    userInfoRef: PropTypes.object
   };
 
   static propTypes = {
@@ -21,17 +21,17 @@ export default class Header extends Component {
   };
 
   render() {
-    const { router, userInfo } = this.context;
+    const { router, userInfoRef } = this.context;
     const { openURL, signOut } = this.props;
 
-    const busy = !userInfo || !userInfo.isLoaded;
-    const user = userInfo && userInfo.props.auth;
-    const lang = userInfo.locale();
+    const busy = !userInfoRef || !userInfoRef.isLoaded;
+    const user = userInfoRef && userInfoRef.props.auth;
+    const lang = userInfoRef.locale();
 
     // actions
     const gotoProfile = () => router.replace('/user');
-    const switchToEn = () => userInfo.set_locale('en');
-    const switchToZh = () => userInfo.set_locale('zh');
+    const switchToEn = () => userInfoRef.set_locale('en');
+    const switchToZh = () => userInfoRef.set_locale('zh');
 
     // elements
     const profileEl = (user && 

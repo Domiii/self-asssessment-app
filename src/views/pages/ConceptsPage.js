@@ -9,7 +9,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Promise } from 'firebase';
 import { firebase } from 'redux-react-firebase';
-import { Alert, Button, Jumbotron, Well } from 'react-bootstrap';
+import {
+  Alert, Button, Jumbotron,
+  Grid, Row, Col
+} from 'react-bootstrap';
+import { Flex, Item } from 'react-flex';
 import { Link } from 'react-router';
 import {
   LinkContainer
@@ -20,6 +24,8 @@ import { hrefConceptView } from 'src/views/href';
 import { FAIcon } from 'src/views/components/util';
 
 import {
+  ConceptDescription,
+  ConceptChecksPanel,
   ConceptGrid,
   ConceptBreadcrumbs
 } from 'src/views/components/concept';
@@ -53,7 +59,7 @@ import _ from 'lodash';
 @connect(
     ({ firebase }, props) => {
       const { params } = props;
-      const checkArgs = { conceptId: params.conceptId };
+      const checkArgs = { conceptId: params.conceptId || 0 };
 
     return {
       conceptsRef: ConceptsRef(firebase),
@@ -65,7 +71,7 @@ import _ from 'lodash';
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfo: PropTypes.object.isRequired,
+    userInfoRef: PropTypes.object.isRequired,
     lookupLocalized: PropTypes.func.isRequired
   };
 
@@ -117,6 +123,7 @@ export default class ConceptsPage extends Component {
   }
 
   wrapPromise(promise) {
+    //this.setState({busy: true});
     return promise
     .then(() => {
       this.setState({busy: false, error: null});
@@ -128,9 +135,10 @@ export default class ConceptsPage extends Component {
   
   render() {
     // prepare data
-    const { userInfo, router, lookupLocalized } = this.context;
+    const { userInfoRef, router, lookupLocalized } = this.context;
     const { conceptsRef, conceptChecksRef, params } = this.props;
-    const isAdmin = userInfo && userInfo.adminDisplayMode() || false;
+    const isAdmin = userInfoRef && userInfoRef.adminDisplayMode() || false;
+    const userPrefs = userInfoRef && userInfoRef.prefs() || {};
     const mayEdit = isAdmin;
     const notLoadedYet = !conceptsRef.isLoaded;
     const busy = this.state.busy;
@@ -148,7 +156,6 @@ export default class ConceptsPage extends Component {
     const childConcepts = isRoot && 
       ownerConcepts ||  // root concepts
       conceptsRef.getChildren(conceptId, isAdmin);
-    const description = currentConcept && lookupLocalized(currentConcept, 'description') || '';
 
     const conceptChecks = currentConcept && conceptChecksRef.val;
 
@@ -164,8 +171,11 @@ export default class ConceptsPage extends Component {
       const newRef = conceptsRef.add_concept(concept);
       const newOwnerId = isRoot ? newRef.key : ownerId;
       newRef.update({ownerId: newOwnerId});
+
+      this.setAdding(false);
+
       return this.wrapPromise(newRef)
-        .then(() => this.setAdding(false));
+        //.then(() => this.setAdding(false));
     };
     const updateConcept = ({ conceptId, concept, checks }) => {
       return this.wrapPromise(Promise.all([
@@ -185,6 +195,9 @@ export default class ConceptsPage extends Component {
     };
     const toggleConceptPublic = (conceptId) => {
       return this.wrapPromise(conceptsRef.togglePublic(conceptId));
+    };
+    const updateUserPrefs = (prefs) => {
+      return this.wrapPromise(userInfoRef.update_prefs(prefs));
     };
 
     const conceptActions = !mayEdit && {} || {
@@ -211,7 +224,10 @@ export default class ConceptsPage extends Component {
 
     if (conceptId && !currentConcept) {
       //setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">invalid conceptId <Button onClick={gotoRoot}>go home</Button></Alert>);
+      return (<Alert bsStyle="danger">
+        invalid conceptId
+        <Button onClick={gotoRoot}>go home</Button>
+      </Alert>);
     }
 
     const titleEl = currentConcept &&
@@ -262,36 +278,59 @@ export default class ConceptsPage extends Component {
       }
     }
 
+    const errEl = !this.state.error ? undefined : (
+      <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
+    );
+
     const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? (
       // no childConcepts
       <Alert bsStyle="info">concept has no children</Alert>
     ) : (
       // display childConcepts
-      <div><ConceptGrid {...{
+      <ConceptGrid {...{
         busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
-      }} /></div>
+      }} />
     );
-
-    //console.log(childConcepts && _.map(childConcepts, p => p.description_en).join(', '));
-
-    const errEl = !this.state.error ? undefined : (
-      <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
-    );
-
-    const descriptionEl = (<Well>
-      { !!description &&
-        (<Markdown source={description} />) ||
-        (<span className="color-gray">no description</span>)
-      }
-    </Well>);
 
     // render!
+    const conceptFullWidthView = userPrefs.conceptFullWidthView;
+    const flexProps = {
+      'row': !conceptFullWidthView,
+      'column': conceptFullWidthView
+    };
+    const itemProps = {
+      className: conceptFullWidthView && "max-width" || ''
+    };
     return (
       <div>
-        <h3>{titleEl} {toolsEl}</h3>
+        <h3>
+          {titleEl} {toolsEl}
+          { currentConcept && 
+            <div style={{ float: 'right' }}>
+              <Button bsStyle="primary" 
+                active={conceptFullWidthView}
+                onClick={() => 
+                  updateUserPrefs({conceptFullWidthView: !conceptFullWidthView})
+                }>
+                <FAIcon name="arrows-h" />
+              </Button>
+            </div>
+          }
+        </h3>
         { conceptEditorEl }
         { errEl }
-        { descriptionEl }
+        { currentConcept && 
+          <div>
+            <Flex {...flexProps} alignItems="start">
+              <Item {...itemProps}>
+                <ConceptDescription concept={currentConcept} />
+              </Item>
+              <Item {...itemProps}>
+                <ConceptChecksPanel {...{conceptChecks}} />
+              </Item>
+            </Flex>
+          </div>
+        }
         { childConceptsEl }
       </div>
     );

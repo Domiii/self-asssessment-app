@@ -35,7 +35,7 @@ export class ConceptTags extends Component {
 
 export default class ConceptViewSmall extends Component {
   static contextTypes = {
-    userInfo: PropTypes.object.isRequired,
+    userInfoRef: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
     lookupLocalized: PropTypes.func.isRequired
   };
@@ -61,7 +61,7 @@ export default class ConceptViewSmall extends Component {
 
   render() {
     // data
-    const { userInfo, lookupLocalized } = this.context;
+    const { userInfoRef, lookupLocalized } = this.context;
     const { busy, parentId, conceptId, concept, conceptActions, mayEdit } = this.props;
     
     const ownerId = concept.ownerId;

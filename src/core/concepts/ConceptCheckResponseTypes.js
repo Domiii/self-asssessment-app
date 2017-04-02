@@ -1,4 +1,4 @@
-const responseTypes = {
+const ConceptCheckResponseTypes = {
   default: {
     done: {
       title_en: 'Played around with it. Figured it out. Works for me! Got it!'
@@ -48,4 +48,4 @@ const responseTypes = {
   // },
 };
 
-export default responseTypes;
+export default ConceptCheckResponseTypes;

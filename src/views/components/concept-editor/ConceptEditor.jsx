@@ -12,6 +12,8 @@ import {
 } from 'redux-form';
 import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
 
+import { asArray } from 'src/util/miscUtil';
+
 import _ from 'lodash';
 
 // class ConceptTagEditor extends Component {
@@ -179,7 +181,7 @@ class ConceptChecksSection extends Component {
 
   get AddCheckButton() {
     return (
-      <Button active={false}
+      <Button block active={false}
         bsStyle="success" bsSize="small" onClick={this.addCheck}>
         <FAIcon name="plus" className="color-green" /> add new check
       </Button>
@@ -221,10 +223,10 @@ class ConceptChecksSection extends Component {
     );
 
     return (<div>
-      { this.AddCheckButton }
-      <ListGroup>
+      <ListGroup className="no-margin">
         {checkEls}
       </ListGroup>
+      { this.AddCheckButton }
     </div>);
   }
 }
@@ -262,6 +264,8 @@ class _ConceptEditor extends Component {
         <ConceptSection {...{ conceptId, concept }} />
         <FieldArray name="checks" component={ConceptChecksSection}/>
 
+        <div className ="margin" />
+
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>
             {(!concept ?
@@ -278,13 +282,6 @@ class _ConceptEditor extends Component {
 
 _ConceptEditor = reduxForm({ enableReinitialize: true })(_ConceptEditor);
 
-function normalizeArray(objs) {
-  if (!_.isArray(objs)) {
-    return _.values(objs);
-  }
-  return objs;
-}
-
 const ConceptEditor = connect(
   (state, { conceptId, concept, conceptChecks }) => {
     return ({
@@ -292,7 +289,7 @@ const ConceptEditor = connect(
       initialValues: {
         conceptId,
         concept: concept || {},
-        checks: conceptChecks && normalizeArray(conceptChecks) || []
+        checks: conceptChecks && asArray(conceptChecks) || []
       },
     });
   }

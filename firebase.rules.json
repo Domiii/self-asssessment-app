@@ -20,7 +20,6 @@
     "users": {
       "$uid" : {
         ".read": "auth !== null",
-        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)",
         
         "isAdmin" : {
           ".write": "false"
@@ -29,6 +28,9 @@
           ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)",
         },
         "data": {
+          ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
+        },
+        "prefs": {
           ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
         }
       }
