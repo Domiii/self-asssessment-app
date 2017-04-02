@@ -40,7 +40,7 @@ export default class ConceptCheckItem extends Component {
       );
     });
     return (
-      <ButtonGroup block className="max-width">
+      <ButtonGroup className="max-width">
         {responseEls}
       </ButtonGroup>
     );

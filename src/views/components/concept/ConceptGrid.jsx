@@ -35,7 +35,7 @@ export default class ConceptGrid extends Component {
         conceptId,
 
         busy,
-        ownerId, 
+        ownerId: concept.ownerId, 
         parentId,
         mayEdit,
         conceptActions

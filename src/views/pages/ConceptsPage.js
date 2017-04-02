@@ -288,7 +288,8 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <ConceptGrid {...{
-        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
+        busy, ownerId, 
+        parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
       }} />
     );
 

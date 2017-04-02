@@ -22,6 +22,7 @@ export const routeTemplates = {
   SIGN_IN: `${routeNames.SIGN_IN}`,
   USER_PROFILE: `${routeNames.USER_PROFILE}`,
   CONCEPTS: `${routeNames.CONCEPTS}`,
+  CONCEPT_MODE: `${routeNames.CONCEPT_VIEW}/:mode`,
   CONCEPT_VIEW: `${routeNames.CONCEPT_VIEW}/:ownerId/:conceptId`,
   CONCEPT_VIEW_MODE: `${routeNames.CONCEPT_VIEW}/:ownerId/:conceptId/:mode`,
   CONCEPT_PLAY: `${routeNames.CONCEPT_PLAY}/:ownerId/:conceptId`,

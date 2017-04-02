@@ -1,13 +1,20 @@
 import { routePaths } from './routes';
 
 export function hrefConceptView(ownerId, conceptId, mode) {
+  const url = [];
+
+  console.log([ownerId, conceptId, mode]);
+
+  url.push(routePaths.CONCEPT_VIEW);
   if (ownerId && conceptId) {
-    const url = [];
-    url.push(`${routePaths.CONCEPT_VIEW}/${ownerId}/${conceptId}`);
-    if (mode) {
-      url.push(mode);
-    }
-    return url.join('/');
+    url.push(`${ownerId}/${conceptId}`);
   }
-  return '/';
+  else if (!mode) {
+    return '/';
+  }
+
+  if (mode) {
+    url.push(mode);
+  }
+  return url.join('/');
 }

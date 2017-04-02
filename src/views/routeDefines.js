@@ -67,6 +67,14 @@ export const getRoutes = getState => {
         }
       },
       {
+        name: routeNames.CONCEPTS,
+        path: routeTemplates.CONCEPT_MODE,
+        indexRoute: {
+          component: ConceptsPage,
+          onEnter: requireAuth(getState)
+        }
+      },
+      {
         name: routeNames.CONCEPT_VIEW,
         path: routeTemplates.CONCEPT_VIEW,
         indexRoute: {
