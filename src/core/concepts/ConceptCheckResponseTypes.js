@@ -1,24 +1,26 @@
 const ConceptCheckResponseTypes = {
   default: {
     done: {
-      title_en: 'Played around with it. Figured it out. Works for me! Got it!'
+      title_en: 'Played around with it. Figured it out. Works for me! Got it!',
+      icon: 'check',
+      bsStyle: 'success'
     },
     addToList: {
-      title_en: 'I want to learn this! Add to my short-list.'
-    },
-    like: {
-      title_en: 'Like!'
+      title_en: 'I want to learn this! Add to my short-list.',
+      icon: 'plus',
+      bsStyle: 'success'
     },
     helpMe: {
-      title_en: 'I would like some help with this.'
-    },
-    dontCare: {
-      title_en: 'I don\'t quite care for this.'
+      title_en: 'I would like some help with this.',
+      icon: 'ambulance',
+      bsStyle: 'warning'
     },
 
     reportProblem: {
       title_en: 'I think, there is something wrong with the wording, there are typos or some other kind of issue that needs fixing.',
-      icon: ''
+      icon: 'exclamation-circle',
+      className: 'color-yellow',
+      bsStyle: 'danger'
     }
   },
   // yesNo: {
