@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { 
   Alert, ListGroupItem, ListGroup, ButtonGroup, Button,
   OverlayTrigger, Tooltip
@@ -33,6 +34,8 @@ export default class ConceptCheckItem extends Component {
           <OverlayTrigger key={name} placement="bottom" overlay={tooltip}>
             <Button style={{width:'4em', marginLeft: '0.5em'}} bsSize="large"
               bsStyle={response.bsStyle || 'default'}
+              ref={'check-'+name}
+              onClick={() => {ReactDOM.findDOMNode(this.refs['check-'+name]).blur();}}
               className={'no-padding ' + response.className || ''}>
               {response.icon && <FAIcon name={response.icon} /> }
             </Button>

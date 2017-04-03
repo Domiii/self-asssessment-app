@@ -2,22 +2,28 @@ const ConceptCheckResponseTypes = {
   default: {
     done: {
       title_en: 'Played around with it. Figured it out. Works for me! Got it!',
+      title_zh: '我玩過，已經會用了。沒問題的！',
       icon: 'check',
+      className: 'color-green',
       bsStyle: 'success'
     },
     addToList: {
       title_en: 'I want to learn this! Add to my short-list.',
+      title_zh: '我喜歡這題目。加到我的快捷學習清單～',
       icon: 'plus',
       bsStyle: 'success'
     },
     helpMe: {
       title_en: 'I would like some help with this.',
+      title_zh: '我需要一點幫忙～',
       icon: 'ambulance',
-      bsStyle: 'warning'
+      className: 'color-red',
+      bsStyle: 'success'
     },
 
     reportProblem: {
-      title_en: 'I think, there is something wrong with the wording, there are typos or some other kind of issue that needs fixing.',
+      title_en: 'I think, there is something wrong with this.',
+      title_zh: '我覺得這題目有問題',
       icon: 'exclamation-circle',
       className: 'color-yellow',
       bsStyle: 'danger'

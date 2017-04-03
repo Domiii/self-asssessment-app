@@ -32,21 +32,6 @@ const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
 
 
-function render(Root) {
-  // try {
-  ReactDOM.render(
-    <AppContainer>
-      <Root history={syncedHistory} store={store} />
-    </AppContainer>,
-    rootElement
-  );
-    // console.log("render success");
-  // }
-  // catch (err) {
-  //   console.error(err.stack);
-  // }
-}
-
 if (module.hot) {
   module.hot.accept('./views/root', () => {
     render(require('./views/root').default);
@@ -61,5 +46,18 @@ ReactDOM.render(
 
 // Wait until after authentication has finished before rendering the root
 firebase.auth().onAuthStateChanged(function (authData) {
-  render(Root);
+  // done! Let's kick this thing into gear!
+  
+  // try {
+  ReactDOM.render(
+    <AppContainer>
+      <Root history={syncedHistory} store={store} />
+    </AppContainer>,
+    rootElement
+  );
+    // console.log("render success");
+  // }
+  // catch (err) {
+  //   console.error(err.stack);
+  // }
 });

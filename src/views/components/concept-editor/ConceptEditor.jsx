@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { 
   Alert, Button, Jumbotron, Well,
   Grid, Row, Col,
-  Popover, Tooltip, Modal,
   FormGroup, FormControl,
   ListGroup, ListGroupItem
 } from 'react-bootstrap';
@@ -11,8 +10,7 @@ import {
   Field, reduxForm, FormSection, FieldArray
 } from 'redux-form';
 import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
-
-import { asArray } from 'src/util/miscUtil';
+import { ConceptCheckDeleteModal } from 'src/views/components/concept-editor/ConceptDeleteModal';
 
 import _ from 'lodash';
 
@@ -160,64 +158,65 @@ class ConceptCheck extends Component {
   }
 }
 
-class ConceptChecksSection extends Component {
-  static propTypes = {
-    conceptId: PropTypes.string,
-    concept: PropTypes.object,
-    fields: PropTypes.object
+class ConceptChecksSection extends FormSection {
+  static defaultProps = {
+    name: 'checks'
   };
 
-  constructor(...args) {
-    super(...args);
-
-    this.addCheck = this.addCheck.bind(this);
-  }
-
-  addCheck() {
-    const { fields } = this.props;
-
-    fields.push();
-  }
+  static propTypes = {
+    checks: PropTypes.object,
+    addConceptCheck: PropTypes.func.isRequired,
+    deleteConceptCheck: PropTypes.func.isRequired
+  };
 
   get AddCheckButton() {
+    const { addConceptCheck } = this.props;
+
     return (
       <Button block active={false}
-        bsStyle="success" bsSize="small" onClick={this.addCheck}>
+        bsStyle="success" bsSize="small" onClick={addConceptCheck}>
         <FAIcon name="plus" className="color-green" /> add new check
       </Button>
     );
   }
 
-  render() {
-    const { fields } = this.props;
+  DeleteCheckButton(conceptCheckId, conceptCheck) {
+    const { deleteConceptCheck } = this.props;
+    const modalProps = {
+      conceptCheckId, conceptCheck, deleteConceptCheck
+    };
 
-    const removeCheck = (index) => fields.remove(index);
+    return (
+      <ConceptCheckDeleteModal {...modalProps}  />
+    );
+  }
+
+  render() {
+    const { checks } = this.props;
 
     // TODO: Use FieldArray for this
     // see: http://redux-form.com/6.1.1/examples/fieldArrays/
 
-    const checkEls = fields.map(
-      (check, index) => (
+    const checkEls = _.map(checks,
+      (check, key) => (
         //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
-        <ListGroupItem key={index}>
-          <FormInputField name={`${check}.title_en`} label="Check description (EN)"
+        <ListGroupItem key={key}>
+          <FormInputField name={`${key}.title_en`} label="Check description (EN)"
             type="text" component="input"
             labelProps={{xs: 2, className: 'no-padding'}}
             inputColProps={{xs: 10, className: 'no-padding'}}
           />
-          <FormInputField name={`${check}.title_zh`} label="Check description (中文)"
+          <FormInputField name={`${key}.title_zh`} label="Check description (中文)"
             type="text" component="input"
             labelProps={{xs: 2, className: 'no-padding'}}
             inputColProps={{xs: 10, className: 'no-padding'}}
           />
-          <FormInputField name={`${check}.num`} label="Num"
+          <FormInputField name={`${key}.num`} label="Num"
             type="text" component="input"
             labelProps={{xs: 2, className: 'no-padding'}}
             inputColProps={{xs: 10, className: 'no-padding'}}
           />
-          <Button bsSize="small" onClick={removeCheck.bind(this, index)}>
-            <FAIcon name="trash" />
-          </Button>
+          { this.DeleteCheckButton(key, check) }
         </ListGroupItem>
       )
     );
@@ -238,12 +237,17 @@ class _ConceptEditor extends Component {
     busy: PropTypes.bool,
     conceptId: PropTypes.string,
     concept: PropTypes.object,
-    conceptChecks: PropTypes.any
+    conceptChecks: PropTypes.any,
+    addConceptCheck: PropTypes.func,
+    deleteConceptCheck: PropTypes.func
   }
 
   render() {
     // data
-    const { busy, conceptId, concept, conceptChecks } = this.props;
+    const {
+      busy, conceptId, concept, conceptChecks,
+      addConceptCheck, deleteConceptCheck
+    } = this.props;
     const { 
       handleSubmit, reset, pristine, submitting, values
     } = this.props;
@@ -262,7 +266,10 @@ class _ConceptEditor extends Component {
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
         <ConceptSection {...{ conceptId, concept }} />
-        <FieldArray name="checks" component={ConceptChecksSection}/>
+
+        {addConceptCheck &&
+          <ConceptChecksSection {...{ checks: conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
+        }
 
         <div className ="margin" />
 
@@ -270,9 +277,10 @@ class _ConceptEditor extends Component {
           <Button type="submit" disabled={pristine || submitting || busy}>
             {(!concept ?
               (<span><FAIcon name="plus" className="color-green" /> add</span>):
-              (<span><FAIcon name="upload" className="color-green" /> save</span>)
+              (<span><FAIcon name="upload" className="color-green" /> apply</span>)
             )}
           </Button>
+          <div className="margin" />
           <Button disabled={pristine || submitting || busy} onClick={reset}>reset</Button>
         </div>
       </form>
@@ -289,7 +297,7 @@ const ConceptEditor = connect(
       initialValues: {
         conceptId,
         concept: concept || {},
-        checks: conceptChecks && asArray(conceptChecks) || []
+        checks: conceptChecks
       },
     });
   }

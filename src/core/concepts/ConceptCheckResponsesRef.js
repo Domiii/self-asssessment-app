@@ -15,14 +15,21 @@ const ConceptCheckResponsesRef = refWrapper({
   pathTemplate: '/conceptResponses',
 
   children: {
-    ofConcept: {
-      pathTemplate: '$(uid)/$(conceptId)',
+    ofUser: {
+      pathTemplate: '$(uid)',
       children: {
-        response: {
-          pathTemplate: '$(checkId)',
-          // children: {
-            
-          // }
+
+        ofConcept: {
+          pathTemplate: '$(conceptId)',
+          children: {
+
+            responses: {
+              pathTemplate: '$(checkId)',
+              children: {
+                progress: 'progress'
+              }
+            }
+          }
         }
       }
     }

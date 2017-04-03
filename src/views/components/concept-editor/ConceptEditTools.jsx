@@ -55,7 +55,7 @@ export default class ConceptEditTools extends Component {
   render() {
     //const { parentId, concept, conceptActions } = this.props;
 
-    return (<span style={{display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden'}}>
+    return (<span style={{whiteSpace: 'nowrap', overflow: 'hidden'}}>
       { this.TogglePublicButton }
       { this.EditButton }
       { this.DeleteButton }

@@ -1,13 +1,13 @@
 import { 
   ConceptsRef,
   ConceptChecksRef,
-  ConceptProgressRef,
-  ConceptResponsesRef
+  ConceptResponsesRef,
+  ConceptCheckResponsesRef
 } from 'src/core/concepts/';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Promise } from 'firebase';
+import Firebase, { Promise } from 'firebase';
 import { firebase } from 'redux-react-firebase';
 import {
   Alert, Button, Jumbotron,
@@ -45,14 +45,16 @@ import _ from 'lodash';
 @firebase((props, firebase) => {
   const { params } = props;
   const queries = [
-    ConceptsRef.makeQuery(params.ownerId),
-    ConceptResponsesRef.makeQuery(),
-    ConceptProgressRef.makeQuery()
+    ConceptsRef.makeQuery(params.ownerId)
   ];
 
   if (params.conceptId) {
     const args = { conceptId: params.conceptId };
     queries.push(ConceptChecksRef.ofConcept.makeQuery(args));
+
+    const uid = Firebase._.authUid;
+    args.uid = uid;
+    queries.push(ConceptCheckResponsesRef.ofUser.ofConcept.makeQuery(args));
   }
 
   return queries;
@@ -61,12 +63,14 @@ import _ from 'lodash';
     ({ firebase }, props) => {
       const { params } = props;
       const checkArgs = { conceptId: params.conceptId || 0 };
+      const responsesRefArgs = {...checkArgs, uid: Firebase._.authUid };
 
-    return {
-      conceptsRef: ConceptsRef(firebase),
-      //UserInfoRef.user(firebase, {auth, uid: auth.uid});
-      conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs)
-    };
+      return {
+        conceptsRef: ConceptsRef(firebase),
+        //UserInfoRef.user(firebase, {auth, uid: auth.uid});
+        conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
+        conceptCheckResponsesRef: ConceptCheckResponsesRef.ofUser.ofConcept(firebase, responsesRefArgs)
+      };
   }
 )
 export default class ConceptsPage extends Component {
@@ -80,7 +84,8 @@ export default class ConceptsPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    conceptChecksRef: PropTypes.object.isRequired
+    conceptChecksRef: PropTypes.object.isRequired,
+    conceptCheckResponsesRef: PropTypes.object.isRequired
   };
 
   constructor(...args) {
@@ -137,7 +142,7 @@ export default class ConceptsPage extends Component {
   render() {
     // prepare data
     const { userInfoRef, router, lookupLocalized } = this.context;
-    const { conceptsRef, conceptChecksRef, params } = this.props;
+    const { conceptsRef, conceptChecksRef, conceptCheckResponsesRef, params } = this.props;
     const isAdmin = userInfoRef && userInfoRef.adminDisplayMode() || false;
     const userPrefs = userInfoRef && userInfoRef.prefs() || {};
     const mayEdit = isAdmin;
@@ -159,6 +164,7 @@ export default class ConceptsPage extends Component {
       conceptsRef.getChildren(conceptId, isAdmin);
 
     const conceptChecks = currentConcept && conceptChecksRef.val;
+    const checkResponses = currentConcept && conceptCheckResponsesRef.val;
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
@@ -181,7 +187,7 @@ export default class ConceptsPage extends Component {
     const updateConcept = ({ conceptId, concept, checks }) => {
       return this.wrapPromise(Promise.all([
         conceptsRef.set_concept(conceptId, concept),
-        conceptChecksRef.set(checks)
+        conceptChecksRef.update(checks)
       ]));
     };
     const deleteConcept = (deleteConceptId) => {
@@ -196,6 +202,16 @@ export default class ConceptsPage extends Component {
     };
     const toggleConceptPublic = (conceptId) => {
       return this.wrapPromise(conceptsRef.togglePublic(conceptId));
+    };
+    const addConceptCheck = () => {
+      const newCheck = {};
+      const lastCheck = conceptChecks && _.maxBy(Object.values(conceptChecks), 'num') || null;
+      const previousNum = lastCheck && lastCheck.num || 0;
+      newCheck.num = parseInt(previousNum) + 1;
+      return this.wrapPromise(conceptChecksRef.add_conceptCheck(newCheck));
+    };
+    const deleteConceptCheck = (conceptCheckId) => {
+      return this.wrapPromise(conceptChecksRef.delete_conceptCheck(conceptCheckId));
     };
     const updateUserPrefs = (prefs) => {
       return this.wrapPromise(userInfoRef.update_prefs(prefs));
@@ -227,7 +243,9 @@ export default class ConceptsPage extends Component {
       const conceptArgs = {
         ownerId, parentId, conceptId,
         concept: currentConcept,
-        conceptChecks
+        conceptChecks,
+        addConceptCheck,
+        deleteConceptCheck
       };
 
       let basicToolsEl;
@@ -254,8 +272,9 @@ export default class ConceptsPage extends Component {
 
       if (this.isAddMode) {
         conceptEditorEl = (
-          <AddConceptEditor busy={busy} addConcept={addConcept}>
-          </AddConceptEditor>
+          <AddConceptEditor {...{
+            busy, addConcept
+          }} />
         );
       }
       else if (this.isEditMode) {
@@ -291,8 +310,12 @@ export default class ConceptsPage extends Component {
         { conceptEditorEl }
         { errEl }
         { currentConcept && <ConceptPlayView 
-            concept={currentConcept} conceptChecks={conceptChecks} 
-            userPrefs={userPrefs} /> }
+          {...{
+            concept: currentConcept,
+            userPrefs,
+            conceptChecks,
+            checkResponses
+          }} /> }
         { childConceptsEl }
       </div>
     );

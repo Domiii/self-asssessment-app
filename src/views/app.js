@@ -14,8 +14,8 @@ import { LoadOverlay } from 'src/views/components/overlays';
 
 const { pathToJS } = helpers;
 
-@firebase((props, firebase) => {
-  const uid = firebase._.authUid;
+@firebase((props, Firebase) => {
+  const uid = Firebase._.authUid;
   const paths = [];
   if (uid) {
     paths.push(UserInfoRef.user.makeQuery({uid}));
