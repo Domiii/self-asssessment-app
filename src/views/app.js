@@ -10,6 +10,8 @@ import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 import { lookupLocalized } from 'src/util/localizeUtil';
 
+import { LoadOverlay } from 'src/views/components/overlays';
+
 const { pathToJS } = helpers;
 
 @firebase((props, firebase) => {
@@ -74,11 +76,6 @@ export class App extends Component {
     const { router } = this.context;
     const isBusy = userInfoRef && !userInfoRef.isLoaded;
 
-    if (!children) {
-      router.replace('/');
-      return (<FAIcon name="cog" spinning={true} className="color-gray" />);
-    }
-
     const signOut = () => {
       try {
         firebase.logout();
@@ -95,19 +92,7 @@ export class App extends Component {
 
     if (isBusy) {
       // still loading
-      return (<div className="overlay">
-        <div style={{fontSize: '1.5em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center', /* horizontal */
-          alignItems: 'center'}}
-          className="max-height color-gray">
-          <p>loading...</p>
-          <p>
-            <FAIcon name="cog" spinning={true}/>
-          </p>
-        </div>
-      </div>);
+      return (<LoadOverlay />);
     }
 
     return (

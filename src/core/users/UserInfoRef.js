@@ -25,7 +25,7 @@ const UserInfoRef = refWrapper({
         prefs: {    // some UI user preferences
           pathTemplate: 'prefs',
           children: {
-            conceptFullWidthView: 'conceptFullWidthView'
+            conceptPlayViewWideScreen: 'conceptPlayViewWideScreen'
           }
         }
       }

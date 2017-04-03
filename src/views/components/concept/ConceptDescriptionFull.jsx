@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import Markdown from 'src/views/components/markdown';
 import { Well } from 'react-bootstrap';
 
-export default class ConceptDescription extends Component {
+export default class ConceptDescriptionFull extends Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func
   };

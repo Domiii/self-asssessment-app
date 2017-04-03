@@ -23,7 +23,7 @@ import Root from './views/root';
 import firebase from 'firebase';
 import firebaseConfig from './config/firebase.cfg';
 
-import { FAIcon } from 'src/views/components/util';
+import { LoadOverlay } from 'src/views/components/overlays';
 
 
 // GO!
@@ -55,17 +55,7 @@ if (module.hot) {
 
 // show a message while logging in
 ReactDOM.render(
-  (<div style={{fontSize: '1.5em',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center', /* horizontal */
-      alignItems: 'center'}}
-      className="max-height color-light-red">
-    <p>logging in...</p>
-    <p>
-      <FAIcon name="cog" spinning={true}/>
-    </p>
-  </div>),
+  <LoadOverlay message="logging in..." className="color-light-red" />,
   rootElement
 );
 

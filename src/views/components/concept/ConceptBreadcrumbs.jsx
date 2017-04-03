@@ -10,8 +10,8 @@ export default class ConceptBreadcrumbs extends Component {
   };
 
   static propTypes = {
-    ownerConcepts: PropTypes.object.isRequired,
-    currentConceptId: PropTypes.string.isRequired,
+    ownerConcepts: PropTypes.object,
+    currentConceptId: PropTypes.string,
   };
 
   makeBreadcrumbs() {

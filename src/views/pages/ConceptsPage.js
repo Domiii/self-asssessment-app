@@ -13,7 +13,6 @@ import {
   Alert, Button, Jumbotron,
   Grid, Row, Col
 } from 'react-bootstrap';
-import { Flex, Item } from 'react-flex';
 import { Link } from 'react-router';
 import {
   LinkContainer
@@ -23,9 +22,11 @@ import { hrefConceptView } from 'src/views/href';
 
 import { FAIcon } from 'src/views/components/util';
 
+import { LoadOverlay } from 'src/views/components/overlays';
+
 import {
-  ConceptDescription,
-  ConceptChecksPanel,
+  ConceptPlayView,
+  ConceptPlayViewControls,
   ConceptGrid,
   ConceptBreadcrumbs
 } from 'src/views/components/concept';
@@ -80,7 +81,7 @@ export default class ConceptsPage extends Component {
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
     conceptChecksRef: PropTypes.object.isRequired
-  }
+  };
 
   constructor(...args) {
     super(...args);
@@ -207,19 +208,7 @@ export default class ConceptsPage extends Component {
     // go render!
     if (notLoadedYet) {
       // still loading
-      return (<div className="overlay">
-        <div style={{fontSize: '1.5em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center', /* horizontal */
-          alignItems: 'center'}}
-          className="max-height color-gray">
-          <p>loading...</p>
-          <p>
-            <FAIcon name="cog" spinning={true}/>
-          </p>
-        </div>
-      </div>);
+      return (<LoadOverlay />);
     }
 
     if (conceptId && !currentConcept) {
@@ -230,9 +219,7 @@ export default class ConceptsPage extends Component {
       </Alert>);
     }
 
-    const titleEl = currentConcept &&
-      <ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} /> ||
-      <ConceptBreadcrumbs ownerConcepts={{}} currentConceptId={""} />;
+    const titleEl = (<ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} />);
 
     // elements
     let toolsEl, conceptEditorEl;
@@ -271,7 +258,7 @@ export default class ConceptsPage extends Component {
           </AddConceptEditor>
         );
       }
-      if (this.isEditMode) {
+      else if (this.isEditMode) {
         conceptEditorEl = (
           <ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>
         );
@@ -288,50 +275,20 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <ConceptGrid {...{
-        busy, ownerId, 
-        parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
+        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
       }} />
     );
 
     // render!
-    const conceptFullWidthView = userPrefs.conceptFullWidthView;
-    const flexProps = {
-      'row': !conceptFullWidthView,
-      'column': conceptFullWidthView
-    };
-    const itemProps = {
-      className: conceptFullWidthView && "max-width" || ''
-    };
     return (
       <div>
         <h3>
           {titleEl} {toolsEl}
-          { currentConcept && 
-            <div style={{ float: 'right' }}>
-              <Button bsStyle="primary" 
-                active={conceptFullWidthView}
-                onClick={() => 
-                  updateUserPrefs({conceptFullWidthView: !conceptFullWidthView})
-                }>
-                <FAIcon name="arrows-h" />
-              </Button>
-            </div>
-          }
+          { currentConcept && <ConceptPlayViewControls updateUserPrefs={updateUserPrefs} /> }
         </h3>
         { conceptEditorEl }
         { errEl }
-        { currentConcept && 
-          <div>
-            <Flex {...flexProps} alignItems="start">
-              <Item {...itemProps}>
-                <ConceptDescription concept={currentConcept} />
-              </Item>
-              <Item {...itemProps}>
-                <ConceptChecksPanel {...{conceptChecks}} />
-              </Item>
-            </Flex>
-          </div>
-        }
+        { currentConcept && <ConceptPlayView concept={currentConcept} conceptChecks={conceptChecks} /> }
         { childConceptsEl }
       </div>
     );

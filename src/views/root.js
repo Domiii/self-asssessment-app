@@ -3,7 +3,6 @@ import { Provider } from 'react-redux';
 import { Router } from 'react-router';
 import { getRoutes } from './routeDefines';
 
-
 export default function Root({history, store}) {
   return (
     <Provider store={store}>

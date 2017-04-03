@@ -32,6 +32,15 @@ button:active { outline:none !important; }
   top: 0; left: 0; right: 0; bottom: 0;
 }
 
+.overlay-screen > div {
+  display: flex;
+  height: 100%;
+  font-size: 1.5em;
+  flex-direction: column;
+  justify-content: center; /* vertical */
+  align-items: center; /* horizontal */
+}
+
 /**
  * HACKFIX: react-bootstrap seems to slightly mess up the navbar?
  * @see http://stackoverflow.com/a/20432251/2228771
@@ -148,6 +157,10 @@ button:active { outline:none !important; }
 
 .concept-checks-panel {
   
+}
+
+.concept-play-view-controls {
+  float: right;
 }
 
 
