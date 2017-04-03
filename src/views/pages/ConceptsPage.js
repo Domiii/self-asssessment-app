@@ -284,11 +284,15 @@ export default class ConceptsPage extends Component {
       <div>
         <h3>
           {titleEl} {toolsEl}
-          { currentConcept && <ConceptPlayViewControls updateUserPrefs={updateUserPrefs} /> }
+          { currentConcept && <ConceptPlayViewControls
+              userPrefs={userPrefs}
+              updateUserPrefs={updateUserPrefs} /> }
         </h3>
         { conceptEditorEl }
         { errEl }
-        { currentConcept && <ConceptPlayView concept={currentConcept} conceptChecks={conceptChecks} /> }
+        { currentConcept && <ConceptPlayView 
+            concept={currentConcept} conceptChecks={conceptChecks} 
+            userPrefs={userPrefs} /> }
         { childConceptsEl }
       </div>
     );

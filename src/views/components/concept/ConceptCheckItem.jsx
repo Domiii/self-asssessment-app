@@ -30,7 +30,7 @@ export default class ConceptCheckItem extends Component {
         </Tooltip>
       );
       return (
-          <OverlayTrigger placement="bottom" overlay={tooltip}>
+          <OverlayTrigger key={name} placement="bottom" overlay={tooltip}>
             <Button style={{width:'4em', marginLeft: '0.5em'}} bsSize="large"
               bsStyle={response.bsStyle || 'default'}
               className={'no-padding ' + response.className || ''}>

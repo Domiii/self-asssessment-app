@@ -4,6 +4,7 @@ import {
   Grid, Row, Col
 } from 'react-bootstrap';
 import { Flex, Item } from 'react-flex';
+import { FAIcon } from 'src/views/components/util';
 
 import {
   ConceptDescriptionFull,
@@ -13,13 +14,13 @@ import {
 export class ConceptPlayView extends Component {
   static propTypes = {
     concept: PropTypes.object.isRequired,
-    conceptChecks: PropTypes.object.any
+    conceptChecks: PropTypes.any
   };
 
   render() {
-    const { concept, conceptChecks } = this.props;
-
-    const conceptPlayViewWideScreen = userPrefs.conceptPlayViewWideScreen;
+    const { concept, conceptChecks, userPrefs } = this.props;
+    const { conceptPlayViewWideScreen } = userPrefs;
+    
     const flexProps = {
       [!conceptPlayViewWideScreen && 'row' || 'column']: true
     };
@@ -49,7 +50,8 @@ export class ConceptPlayViewControls extends Component {
   };
 
   render() {
-    const { updateUserPrefs } = this.props;
+    const { userPrefs, updateUserPrefs } = this.props;
+    const { conceptPlayViewWideScreen } = userPrefs;
 
     return (<div className="concept-play-view-controls">
       <Button bsStyle="primary" 
