@@ -7,13 +7,17 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { ConceptCheckItem } from '.';
 
 
-export default class ConceptChecks extends Component {
+export default class ConceptChecksPanel extends Component {
   static propTypes = {
-    conceptChecks: PropTypes.any
+    conceptChecks: PropTypes.object,
+    conceptCheckResponses: PropTypes.object,
+    updateCheckResponse: PropTypes.func.isRequired
   };
 
   render() {
-    const { conceptChecks } = this.props;
+    const { 
+      conceptChecks, conceptCheckResponses, updateCheckResponse
+    } = this.props;
 
     if (!conceptChecks) {
       return (
@@ -21,8 +25,11 @@ export default class ConceptChecks extends Component {
       );
     }
 
-    const checkEls = _.map(conceptChecks, (check, index) => (
-      <ConceptCheckItem key={index} check={check} />
+    const checkEls = _.map(conceptChecks, (check, checkId) => (
+      <ConceptCheckItem 
+      key={checkId} checkId={checkId} check={check} 
+      selectedResponse={conceptCheckResponses && conceptCheckResponses[checkId]}
+      updateCheckResponse={updateCheckResponse} />
     ));
 
     return (

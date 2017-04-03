@@ -15,14 +15,34 @@ export default class ConceptCheckItem extends Component {
     lookupLocalized: PropTypes.func
   };
   static propTypes = {
-    check: PropTypes.object
+    checkId: PropTypes.string.isRequired,
+    check: PropTypes.object.isRequired,
+    selectedResponse: PropTypes.object,
+    updateCheckResponse: PropTypes.func.isRequired
   };
 
-  get ResponsesEl() {
-    // TODO: Allow for different response types, depending on settings
+  constructor(...args) {
+    super(...args);
+  }
 
-    
+  onCheckReponse(responseName) {
+    // store result
+    const { checkId, updateCheckResponse } = this.props;
+    const responses = ConceptCheckResponseTypes.default;
+
+    const response = responses[responseName];
+    if (response) {
+      // store response!
+      updateCheckResponse(checkId, responseName, response);
+    }
+
+    ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it
+  }
+
+  get ResponsesEl() {
     const { lookupLocalized } = this.context;
+    const { selectedResponse } = this.props;
+
     const responses = ConceptCheckResponseTypes.default;
     const responseEls = _.map(responses, (response, name) => {
       const tooltip = (
@@ -31,19 +51,21 @@ export default class ConceptCheckItem extends Component {
         </Tooltip>
       );
       return (
-          <OverlayTrigger key={name} placement="bottom" overlay={tooltip}>
-            <Button style={{width:'4em', marginLeft: '0.5em'}} bsSize="large"
-              bsStyle={response.bsStyle || 'default'}
-              ref={'check-'+name}
-              onClick={() => {ReactDOM.findDOMNode(this.refs['check-'+name]).blur();}}
-              className={'no-padding ' + response.className || ''}>
-              {response.icon && <FAIcon name={response.icon} /> }
-            </Button>
-          </OverlayTrigger>
+        <OverlayTrigger key={name} placement="bottom" overlay={tooltip}>
+          <Button 
+            bsSize="large"
+            active={ selectedResponse && selectedResponse[name] }
+            bsStyle={response.bsStyle || 'default'}
+            ref={'check-'+name}
+            onClick={ this.onCheckReponse.bind(this, name) }
+            className={'concept-check-response-button no-padding ' + (response.className || '')}>
+            {response.icon && <FAIcon name={response.icon} /> }
+          </Button>
+        </OverlayTrigger>
       );
     });
     return (
-      <ButtonGroup className="max-width">
+      <ButtonGroup className="max-width concept-check-response-buttons">
         {responseEls}
       </ButtonGroup>
     );

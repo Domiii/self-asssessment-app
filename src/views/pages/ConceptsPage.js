@@ -164,10 +164,14 @@ export default class ConceptsPage extends Component {
       conceptsRef.getChildren(conceptId, isAdmin);
 
     const conceptChecks = currentConcept && conceptChecksRef.val;
-    const checkResponses = currentConcept && conceptCheckResponsesRef.val;
+    const conceptCheckResponses = currentConcept && conceptCheckResponsesRef.val;
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
+    const updateCheckResponse = (checkId, responseName, response) => {
+      return this.wrapPromise(
+        conceptCheckResponsesRef.updateResponse(checkId, responseName, response));
+    };
     const addConcept = ({ concept }) => {
       // TODO: Use transaction to avoid race condition
       const lastConcept = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
@@ -314,7 +318,8 @@ export default class ConceptsPage extends Component {
             concept: currentConcept,
             userPrefs,
             conceptChecks,
-            checkResponses
+            conceptCheckResponses,
+            updateCheckResponse
           }} /> }
         { childConceptsEl }
       </div>

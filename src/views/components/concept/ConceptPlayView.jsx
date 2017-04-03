@@ -14,13 +14,17 @@ import {
 export class ConceptPlayView extends Component {
   static propTypes = {
     concept: PropTypes.object.isRequired,
-    conceptChecks: PropTypes.any
+    conceptChecks: PropTypes.object,
+    conceptCheckResponses: PropTypes.object,
+    updateCheckResponse: PropTypes.func.isRequired
   };
 
   render() {
-    const { concept, conceptChecks, userPrefs } = this.props;
+    const {
+      concept, conceptChecks, userPrefs, conceptCheckResponses, updateCheckResponse
+    } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
-    
+
     const flexProps = {
       [!conceptPlayViewWideScreen && 'row' || 'column']: true
     };
@@ -35,7 +39,9 @@ export class ConceptPlayView extends Component {
             <ConceptDescriptionFull concept={concept} />
           </Item>
           <Item {...itemProps}>
-            <ConceptChecksPanel conceptChecks={conceptChecks} />
+            <ConceptChecksPanel conceptChecks={conceptChecks}
+              conceptCheckResponses={conceptCheckResponses}
+              updateCheckResponse={updateCheckResponse} />
           </Item>
         </Flex>
       </div>

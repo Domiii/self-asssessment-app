@@ -21,12 +21,24 @@ const ConceptCheckResponsesRef = refWrapper({
 
         ofConcept: {
           pathTemplate: '$(conceptId)',
-          children: {
 
-            responses: {
+          methods: {
+            updateResponse(checkId, responseName, response) {
+              const currentResponse = this.response(checkId);
+              const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
+
+              return this.update_response(checkId, {
+                [responseName]: newStatus
+              });
+            }
+          },
+
+          children: {
+            response: {
               pathTemplate: '$(checkId)',
+
               children: {
-                progress: 'progress'
+                //progress: 'progress'
               }
             }
           }

@@ -163,6 +163,19 @@ button:active { outline:none !important; }
   float: right;
 }
 
+.concept-check-response-buttons {
+  text-align: center !important;
+  float: none !important;
+}
+.concept-check-response-button {
+  width: 4em;
+  margin-left: 0.5em;
+  float: none !important;
+}
+.concept-check-response-button.active {
+  border-width: 4px;
+}
+
 
 
 .inline {
