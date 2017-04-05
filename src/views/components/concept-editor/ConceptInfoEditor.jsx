@@ -37,7 +37,7 @@ class _ConceptInfoEditor extends Component {
             {(!concept ?
               (<span>
                 <FAIcon name="plus" className="color-green" />
-                add new concept
+                add new entry
               </span>):
               (<span>
                 <FAIcon name="upload" className="color-green" />

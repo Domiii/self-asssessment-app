@@ -10,6 +10,7 @@ import {
   LinkContainer
 } from 'react-router-bootstrap';
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { LoadOverlay } from 'src/views/components/overlays';
 
 import _ from 'lodash';
 
@@ -89,7 +90,7 @@ export default class UserProfilePage extends Component {
     // go render!
     if (isBusy) {
       // still loading
-      return (<FAIcon name="cog" spinning={true} />);
+      return (<LoadOverlay />);
     }
 
     return (

@@ -130,13 +130,13 @@ class ConceptSection extends FormSection {
       />
       <FormInputField name="description_en" label="Description (English)"
         component="textarea"
-        inputProps={{rows: '5'}}
+        inputProps={{rows: '15'}}
         labelProps={{xs: 2, className: 'no-padding'}}
         inputColProps={{xs: 10, className: 'no-padding'}}
       />
       <FormInputField name="description_zh" label="Description (中文)"
         component="textarea"
-        inputProps={{rows: '5'}}
+        inputProps={{rows: '15'}}
         labelProps={{xs: 2, className: 'no-padding'}}
         inputColProps={{xs: 10, className: 'no-padding'}}
       />
@@ -277,10 +277,10 @@ class _ConceptEditor extends Component {
           <Button type="submit" disabled={pristine || submitting || busy}>
             {(!concept ?
               (<span><FAIcon name="plus" className="color-green" /> add</span>):
-              (<span><FAIcon name="upload" className="color-green" /> apply</span>)
+              (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
           </Button>
-          <div className="margin" />
+          <span className="margin" />
           <Button disabled={pristine || submitting || busy} onClick={reset}>reset</Button>
         </div>
       </form>

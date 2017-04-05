@@ -265,7 +265,7 @@ export default class ConceptsPage extends Component {
       const addButtonEl = (
         <Button active={this.isAddMode}
           bsStyle="success" bsSize="small" onClick={this.toggleAdding}>
-          <FAIcon name="plus" className="color-green" /> add new concept
+          <FAIcon name="plus" className="color-green" /> add new entry
         </Button>
       );
 

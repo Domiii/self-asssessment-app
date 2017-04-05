@@ -46,7 +46,7 @@ export default class ConceptBreadcrumbs extends Component {
         key={1}
         active={ true }>
         <Link to="/" >
-          Concepts
+          All
         </Link>
       </Breadcrumb.Item>
     );

@@ -26,7 +26,7 @@ export default class Header extends Component {
 
     const busy = !userInfoRef || !userInfoRef.isLoaded;
     const user = userInfoRef && userInfoRef.props.auth;
-    const lang = userInfoRef.locale();
+    const lang = userInfoRef && userInfoRef.locale() || 'en';
 
     // actions
     const gotoProfile = () => router.replace('/user');
