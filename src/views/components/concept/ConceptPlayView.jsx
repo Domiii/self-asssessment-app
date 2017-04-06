@@ -13,6 +13,7 @@ import {
 
 export class ConceptPlayView extends Component {
   static propTypes = {
+    conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.object,
@@ -21,7 +22,7 @@ export class ConceptPlayView extends Component {
 
   render() {
     const {
-      concept, conceptChecks, userPrefs, conceptCheckResponses, updateCheckResponse
+      conceptId, concept, conceptChecks, userPrefs, conceptCheckResponses, updateCheckResponse
     } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
 
@@ -39,7 +40,7 @@ export class ConceptPlayView extends Component {
             <ConceptDescriptionFull concept={concept} />
           </Item>
           <Item {...itemProps}>
-            <ConceptChecksPanel conceptChecks={conceptChecks}
+            <ConceptChecksPanel conceptId={conceptId} conceptChecks={conceptChecks}
               conceptCheckResponses={conceptCheckResponses}
               updateCheckResponse={updateCheckResponse} />
           </Item>

@@ -164,26 +164,27 @@ class ConceptChecksSection extends FormSection {
   };
 
   static propTypes = {
+    conceptId: PropTypes.string.isRequired,
     checks: PropTypes.object,
     addConceptCheck: PropTypes.func.isRequired,
     deleteConceptCheck: PropTypes.func.isRequired
   };
 
   get AddCheckButton() {
-    const { addConceptCheck } = this.props;
+    const { conceptId, addConceptCheck } = this.props;
 
     return (
       <Button block active={false}
-        bsStyle="success" bsSize="small" onClick={addConceptCheck}>
+        bsStyle="success" bsSize="small" onClick={addConceptCheck.bind(null, conceptId)}>
         <FAIcon name="plus" className="color-green" /> add new check
       </Button>
     );
   }
 
   DeleteCheckButton(conceptCheckId, conceptCheck) {
-    const { deleteConceptCheck } = this.props;
+    const { conceptId, deleteConceptCheck } = this.props;
     const modalProps = {
-      conceptCheckId, conceptCheck, deleteConceptCheck
+      conceptId, conceptCheckId, conceptCheck, deleteConceptCheck
     };
 
     return (
@@ -268,7 +269,8 @@ class _ConceptEditor extends Component {
         <ConceptSection {...{ conceptId, concept }} />
 
         {addConceptCheck &&
-          <ConceptChecksSection {...{ checks: conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
+          <ConceptChecksSection {...
+            { conceptId, checks: conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
         }
 
         <div className ="margin" />

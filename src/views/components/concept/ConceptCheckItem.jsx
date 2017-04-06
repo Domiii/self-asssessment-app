@@ -15,6 +15,7 @@ export default class ConceptCheckItem extends Component {
     lookupLocalized: PropTypes.func
   };
   static propTypes = {
+    conceptId: PropTypes.string.isRequired,
     checkId: PropTypes.string.isRequired,
     check: PropTypes.object.isRequired,
     selectedResponse: PropTypes.object,
@@ -27,13 +28,13 @@ export default class ConceptCheckItem extends Component {
 
   onCheckReponse(responseName) {
     // store result
-    const { checkId, updateCheckResponse } = this.props;
+    const { conceptId, checkId, updateCheckResponse } = this.props;
     const responses = ConceptCheckResponseTypes.default;
 
     const response = responses[responseName];
     if (response) {
       // store response!
-      updateCheckResponse(checkId, responseName, response);
+      updateCheckResponse(conceptId, checkId, responseName, response);
     }
 
     ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it

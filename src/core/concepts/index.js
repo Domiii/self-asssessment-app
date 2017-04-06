@@ -7,3 +7,5 @@ export ConceptResponsesRef from './ConceptResponsesRef';
 export ConceptProgressRef from './ConceptProgressRef';
 export ResponseFeedbackRef from './ResponseFeedbackRef';
 export ConceptCheckResponseTypes from './ConceptCheckResponseTypes';
+
+export { computeAllChecksProgress } from './ConceptProgressTools';

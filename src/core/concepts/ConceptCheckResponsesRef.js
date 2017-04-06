@@ -17,28 +17,29 @@ const ConceptCheckResponsesRef = refWrapper({
   children: {
     ofUser: {
       pathTemplate: '$(uid)',
+      methods: {
+        updateResponse(conceptId, checkId, responseName, response) {
+          const currentResponse = this.response(conceptId, checkId);
+          const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
+
+          return this.update_response(conceptId, checkId, {
+            [responseName]: newStatus,
+            progress: response.progress || 0
+          });
+        }
+      },
+
       children: {
 
         ofConcept: {
           pathTemplate: '$(conceptId)',
-
-          methods: {
-            updateResponse(checkId, responseName, response) {
-              const currentResponse = this.response(checkId);
-              const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
-
-              return this.update_response(checkId, {
-                [responseName]: newStatus
-              });
-            }
-          },
 
           children: {
             response: {
               pathTemplate: '$(checkId)',
 
               children: {
-                //progress: 'progress'
+                progress: 'progress'
               }
             }
           }

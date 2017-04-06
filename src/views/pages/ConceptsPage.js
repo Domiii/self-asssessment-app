@@ -2,7 +2,9 @@ import {
   ConceptsRef,
   ConceptChecksRef,
   ConceptResponsesRef,
-  ConceptCheckResponsesRef
+  ConceptCheckResponsesRef,
+
+  computeAllChecksProgress
 } from 'src/core/concepts/';
 
 import React, { Component, PropTypes } from 'react';
@@ -49,12 +51,11 @@ import _ from 'lodash';
   ];
 
   if (params.conceptId) {
-    const args = { conceptId: params.conceptId };
-    queries.push(ConceptChecksRef.ofConcept.makeQuery(args));
+    const conceptId = params.conceptId;
+    queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
 
     const uid = Firebase._.authUid;
-    args.uid = uid;
-    queries.push(ConceptCheckResponsesRef.ofUser.ofConcept.makeQuery(args));
+    queries.push(ConceptCheckResponsesRef.ofUser.makeQuery({uid}));
   }
 
   return queries;
@@ -63,13 +64,13 @@ import _ from 'lodash';
     ({ firebase }, props) => {
       const { params } = props;
       const checkArgs = { conceptId: params.conceptId || 0 };
-      const responsesRefArgs = {...checkArgs, uid: Firebase._.authUid };
+      const responsesRefArgs = { uid: Firebase._.authUid };
 
       return {
         conceptsRef: ConceptsRef(firebase),
         //UserInfoRef.user(firebase, {auth, uid: auth.uid});
         conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-        conceptCheckResponsesRef: ConceptCheckResponsesRef.ofUser.ofConcept(firebase, responsesRefArgs)
+        conceptCheckResponsesRef: ConceptCheckResponsesRef.ofUser(firebase, responsesRefArgs)
       };
   }
 )
@@ -135,6 +136,7 @@ export default class ConceptsPage extends Component {
       this.setState({busy: false, error: null});
     })
     .catch((err) => {
+      console.error(err);
       this.setState({busy: false, error: err});
     });
   }
@@ -164,13 +166,17 @@ export default class ConceptsPage extends Component {
       conceptsRef.getChildren(conceptId, isAdmin);
 
     const conceptChecks = currentConcept && conceptChecksRef.val;
-    const conceptCheckResponses = currentConcept && conceptCheckResponsesRef.val;
+    const conceptCheckResponses = currentConcept && conceptCheckResponsesRef.ofConcept(conceptId);
+    const conceptProgress = currentConcept && 
+      computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val);
+
+    console.log(conceptProgress);
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
-    const updateCheckResponse = (checkId, responseName, response) => {
+    const updateCheckResponse = (conceptId, checkId, responseName, response) => {
       return this.wrapPromise(
-        conceptCheckResponsesRef.updateResponse(checkId, responseName, response));
+        conceptCheckResponsesRef.updateResponse(conceptId, checkId, responseName, response));
     };
     const addConcept = ({ concept }) => {
       // TODO: Use transaction to avoid race condition
@@ -189,6 +195,7 @@ export default class ConceptsPage extends Component {
         //.then(() => this.setAdding(false));
     };
     const updateConcept = ({ conceptId, concept, checks }) => {
+      concept.nChecks = _.size(checks);
       return this.wrapPromise(Promise.all([
         conceptsRef.set_concept(conceptId, concept),
         conceptChecksRef.update(checks)
@@ -212,10 +219,12 @@ export default class ConceptsPage extends Component {
       const lastCheck = conceptChecks && _.maxBy(Object.values(conceptChecks), 'num') || null;
       const previousNum = lastCheck && lastCheck.num || 0;
       newCheck.num = parseInt(previousNum) + 1;
-      return this.wrapPromise(conceptChecksRef.add_conceptCheck(newCheck));
+      return this.wrapPromise(conceptChecksRef.add_conceptCheck(newCheck)
+        .then(conceptsRef.update_concept(conceptId, {nChecks: _.size(conceptChecks)})));
     };
-    const deleteConceptCheck = (conceptCheckId) => {
-      return this.wrapPromise(conceptChecksRef.delete_conceptCheck(conceptCheckId));
+    const deleteConceptCheck = (conceptId, conceptCheckId) => {
+      return this.wrapPromise(conceptChecksRef.delete_conceptCheck(conceptCheckId)
+        .then(conceptsRef.update_concept(conceptId, {nChecks: _.size(conceptChecks)} )));
     };
     const updateUserPrefs = (prefs) => {
       return this.wrapPromise(userInfoRef.update_prefs(prefs));
@@ -289,7 +298,7 @@ export default class ConceptsPage extends Component {
     }
 
     const errEl = !this.state.error ? undefined : (
-      <Alert bsStyle="danger">{this.state.error.stack || this.state.error}</Alert>
+      <Alert bsStyle="danger"><pre>{this.state.error.stack || this.state.error}</pre></Alert>
     );
 
     const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? (
@@ -315,6 +324,7 @@ export default class ConceptsPage extends Component {
         { errEl }
         { currentConcept && <ConceptPlayView 
           {...{
+            conceptId,
             concept: currentConcept,
             userPrefs,
             conceptChecks,

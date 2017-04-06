@@ -87,6 +87,7 @@ export class ConceptCheckDeleteModal extends Component {
   };
 
   static propTypes = {
+    conceptId: PropTypes.string.isRequired,
     conceptCheckId: PropTypes.string.isRequired,
     conceptCheck: PropTypes.object.isRequired,
     deleteConceptCheck: PropTypes.func.isRequired
@@ -99,12 +100,12 @@ export class ConceptCheckDeleteModal extends Component {
   render() {
     // data
     const { lookupLocalized } = this.context;
-    const { conceptCheckId, conceptCheck, deleteConceptCheck } = this.props;
+    const { conceptId, conceptCheckId, conceptCheck, deleteConceptCheck } = this.props;
     const title = lookupLocalized(conceptCheck, 'title');
 
     // actions
     const onClickDelete = () => {
-      deleteConceptCheck(conceptCheckId);
+      deleteConceptCheck(conceptId, conceptCheckId);
       this.close();
     };
 

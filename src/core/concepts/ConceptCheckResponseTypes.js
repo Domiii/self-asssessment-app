@@ -1,6 +1,7 @@
 const ConceptCheckResponseTypes = {
   default: {
     done: {
+      progress: 1,
       title_en: 'Played around with it. Figured it out. Works for me! Got it!',
       title_zh: '我玩過，已經會用了。沒問題的！',
       icon: 'check',

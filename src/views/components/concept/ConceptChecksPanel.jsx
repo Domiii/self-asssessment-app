@@ -9,6 +9,7 @@ import { ConceptCheckItem } from '.';
 
 export default class ConceptChecksPanel extends Component {
   static propTypes = {
+    conceptId: PropTypes.string,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
@@ -16,7 +17,7 @@ export default class ConceptChecksPanel extends Component {
 
   render() {
     const { 
-      conceptChecks, conceptCheckResponses, updateCheckResponse
+      conceptId, conceptChecks, conceptCheckResponses, updateCheckResponse
     } = this.props;
 
     if (!conceptChecks) {
@@ -27,7 +28,7 @@ export default class ConceptChecksPanel extends Component {
 
     const checkEls = _.map(conceptChecks, (check, checkId) => (
       <ConceptCheckItem 
-      key={checkId} checkId={checkId} check={check} 
+      key={checkId} conceptId={conceptId} checkId={checkId} check={check} 
       selectedResponse={conceptCheckResponses && conceptCheckResponses[checkId]}
       updateCheckResponse={updateCheckResponse} />
     ));
