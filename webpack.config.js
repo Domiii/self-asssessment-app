@@ -160,7 +160,9 @@ if (ENV_PRODUCTION) {
     loaders: [
       loaders.js,
       loaders.json,
-      {test: /\.[s]?css$/, loader: ExtractTextPlugin.extract('css?-autoprefixer!postcss!sass')}
+      loaders.scss,
+      loaders.files,
+      loaders.urls
     ]
   };
 

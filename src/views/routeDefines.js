@@ -7,7 +7,7 @@ import App from './app';
 import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ConceptsPage from './pages/ConceptsPage';
-import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
+//import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
 // const requireLoading = getState => {
 //   return (nextState, replace) => {
@@ -89,19 +89,19 @@ export const getRoutes = getState => {
           component: ConceptsPage,
           onEnter: requireAuth(getState)
         }
-      },
-      {
-        name: routeNames.CONCEPT_PLAY,
-        path: routeTemplates.CONCEPT_PLAY,
-        component: ConceptPlayPage,
-        onEnter: requireAuth(getState),
-        childRoutes: [
-          {
-            path: routeTemplates.CONCEPT_PROBLEM,
-            component: ConceptPlayPage
-          }
-        ]
       }
+      // {
+      //   name: routeNames.CONCEPT_PLAY,
+      //   path: routeTemplates.CONCEPT_PLAY,
+      //   component: ConceptPlayPage,
+      //   onEnter: requireAuth(getState),
+      //   childRoutes: [
+      //     {
+      //       path: routeTemplates.CONCEPT_PROBLEM,
+      //       component: ConceptPlayPage
+      //     }
+      //   ]
+      // }
     ]
   };
 };
