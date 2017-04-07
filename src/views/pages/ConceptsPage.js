@@ -7,6 +7,7 @@ import {
   computeAllChecksProgress
 } from 'src/core/concepts/';
 
+import autoBind from 'react-autobind';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Firebase, { Promise } from 'firebase';
@@ -43,6 +44,7 @@ import {
 
 import _ from 'lodash';
 
+const EmptyObject = Object.freeze({});
 
 @firebase((props, firebase) => {
   const { params } = props;
@@ -77,8 +79,7 @@ import _ from 'lodash';
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object.isRequired,
-    lookupLocalized: PropTypes.func.isRequired
+    userInfoRef: PropTypes.object.isRequired
   };
 
   static propTypes = {
@@ -95,9 +96,186 @@ export default class ConceptsPage extends Component {
     this.state = {
       busy: false
     };
-    this.toggleAdding = this.toggleAdding.bind(this);
-    this.toggleEdit = this.toggleEdit.bind(this);
+
+    autoBind(this);
   }
+
+  // ###################################################
+  // General stuff
+  // ###################################################
+
+  get isNotLoadedYet() {
+    const { conceptsRef } = this.context;
+    return !conceptsRef.isLoaded;
+  }
+
+  // indicates whether the application is currently still processing an operation
+  get isBusy() {
+    return this.state.busy;
+  }
+
+  get isAdmin() {
+    const { userInfoRef } = this.context;
+    return userInfoRef && userInfoRef.adminDisplayMode() || false;
+  }
+
+  get mayEdit() {
+    return this.isAdmin;
+  }
+
+  get userPrefs() {
+    const { userInfoRef } = this.context;
+    return userInfoRef && userInfoRef.prefs() || EmptyObject;
+  }
+
+  get currentConceptId() {
+    const { params } = this.props;
+    const { conceptId } = params;
+
+    return !this.isRoot && conceptId || null;
+  }
+
+  get currentOwnerId() {
+    const { params } = this.props;
+    const { ownerId } = params;
+
+    return !this.isRoot && ownerId || null;
+  }
+
+  get isRoot() {
+    const { params } = this.props;
+    const { ownerId, conceptId } = params;
+    return !ownerId && !conceptId;
+  }
+
+  gotoRoot() {
+    const { router } = this.context;
+    router.replace('/');
+  }
+
+  wrapPromise(promise) {
+    //this.setState({busy: true});
+    return promise
+    .then(() => {
+      this.setState({busy: false, error: null});
+    })
+    .catch((err) => {
+      console.error(err);
+      this.setState({busy: false, error: err});
+    });
+  }
+
+  // ###################################################
+  // Privileged actions
+  // ###################################################
+
+  // all kinds of action wrappers
+  addConcept({ concept }) {
+    // const ownerId, parentId, siblings = ...;
+    const { conceptsRef } = this.props;
+    const parentId = this.currentConceptId;
+    const siblings = ...;
+
+    // TODO: Use transaction to avoid race condition
+    const lastConcept = siblings && 
+      _.maxBy(Object.values(siblings), 'num') || null;
+    const previousNum = lastConcept && lastConcept.num || 0;
+    concept.num = parseInt(previousNum) + 1;
+    concept.parentId = parentId;
+
+    // create new concept entry
+    const newRef = conceptsRef.add_concept(concept);
+
+    // update ownerId
+    const ownerId = this.currentOwnerId || 
+      newRef.key;  // ownerId is either given ownerId or self
+    const ownerUpdate = newRef.update({ownerId});
+
+    this.setAdding(false);
+
+    return this.wrapPromise(Promise.all([newRef, ownerUpdate]))
+      //.then(() => this.setAdding(false));
+  }
+
+  updateConcept({ conceptId, concept, checks }) {
+    const { conceptsRef, conceptChecksRef } = this.props;
+
+    concept.nChecks = _.size(checks);
+    return this.wrapPromise(Promise.all([
+      conceptsRef.set_concept(conceptId, concept),
+      conceptChecksRef.update(checks)
+    ]));
+  }
+
+  deleteConcept(deleteConceptId) {
+    const { conceptsRef } = this.props;
+
+    // TODO: Don't delete if it still has children!?
+    return this.wrapPromise(conceptsRef.deleteConcept(deleteConceptId))
+      .then(() => {
+        //if (deleteConceptId === conceptId) {
+          // deleted current concept -> Go to parent
+        // }
+      });
+  }
+
+  toggleConceptPublic(conceptId) {
+    const { conceptsRef } = this.props;
+
+    return this.wrapPromise(conceptsRef.togglePublic(conceptId));
+  }
+
+  addConceptCheck(conceptId) {
+    const { conceptsRef, conceptChecksRef } = this.props;
+    const conceptChecks = conceptChecksRef.val;
+
+    const newCheck = {};
+    const lastCheck = conceptChecks && 
+      _.maxBy(Object.values(conceptChecks), 'num') || null;
+    const previousNum = lastCheck 
+      && lastCheck.num || 0;
+
+    newCheck.num = parseInt(previousNum) + 1;
+
+    return this.wrapPromise(
+      conceptChecksRef.add_conceptCheck(newCheck)
+      .then(conceptsRef.update_concept(conceptId, 
+        {nChecks: conceptChecks && _.size(conceptChecks) || 0}))
+    );
+  }
+
+  deleteConceptCheck(conceptId, conceptCheckId) {
+    const { conceptsRef, conceptChecksRef } = this.props;
+    const conceptChecks = conceptChecksRef.val;
+
+    return this.wrapPromise(
+      conceptChecksRef.delete_conceptCheck(conceptCheckId)
+      .then(conceptsRef.update_concept(conceptId, 
+        {nChecks: conceptChecks && _.size(conceptChecks) || 0}))
+    );
+  }
+
+
+  // ###################################################
+  // User actions
+  // ###################################################
+  updateUserPrefs(prefs){
+    const { userInfoRef } = this.props;
+    return this.wrapPromise(userInfoRef.update_prefs(prefs));
+  }
+
+  updateCheckResponse(conceptId, checkId, responseName, response) {
+    const { conceptCheckResponsesRef } = this.props;
+
+    return this.wrapPromise(
+      conceptCheckResponsesRef.updateResponse(
+        conceptId, checkId, responseName, response));
+  }
+  
+
+  // ###################################################
+  // Editing
+  // ###################################################
 
   get isAddMode() {
     const { params } = this.props;
@@ -129,141 +307,64 @@ export default class ConceptsPage extends Component {
     this.setEditMode(this.isEditMode ? '' : 'edit');
   }
 
-  wrapPromise(promise) {
-    //this.setState({busy: true});
-    return promise
-    .then(() => {
-      this.setState({busy: false, error: null});
-    })
-    .catch((err) => {
-      console.error(err);
-      this.setState({busy: false, error: err});
-    });
-  }
-  
-  render() {
-    // prepare data
-    const { userInfoRef, router, lookupLocalized } = this.context;
-    const { conceptsRef, conceptChecksRef, conceptCheckResponsesRef, params } = this.props;
-    const isAdmin = userInfoRef && userInfoRef.adminDisplayMode() || false;
-    const userPrefs = userInfoRef && userInfoRef.prefs() || {};
-    const mayEdit = isAdmin;
-    const notLoadedYet = !conceptsRef.isLoaded;
 
-    if (notLoadedYet) {
+  // ###################################################
+  // Render
+  // ###################################################
+
+  render() {
+    if (!this.isNotLoadedYet) {
       // still loading
       return (<LoadOverlay />);
     }
 
-    const busy = this.state.busy;
-    let { ownerId, conceptId } = params;
+    if (this.isRoot) {
+      const rootConcepts = conceptsRef.getRootConcepts(isAdmin);
 
-    const isRoot = !ownerId && !conceptId;
-    ownerId = !isRoot && ownerId || null;
-    conceptId = !isRoot && conceptId || null;
+    }
+    else {
+      const currentConcept = conceptsRef.concept(conceptId);
+      const ownerConcept = conceptsRef.concept(ownerId);
+      if (!currentConcept || !ownerConcept) {
+        return (<Alert bsStyle="danger">
+          invalid concept
+          <Button onClick={this.gotoRoot}>go home</Button>
+        </Alert>);
+      }
 
-    const ownerConcept = !isRoot && conceptsRef.concept(ownerId) || null;
-    const currentConcept = !isRoot && conceptsRef.concept(conceptId) || null;
-    const parentId = !isRoot && currentConcept && currentConcept.parentId || null;
+      const ownerConcepts = conceptsRef.getRootConcepts(isAdmin);
+      const childConcepts = conceptsRef.getChildren(conceptId, isAdmin);
 
-    const ownerConcepts = conceptsRef.getRootConcepts(isAdmin);
-    const childConcepts = isRoot && 
-      ownerConcepts ||  // root concepts
-      conceptsRef.getChildren(conceptId, isAdmin);
+      const parentId = currentConcept.parentId;
+      const conceptChecks = conceptChecksRef.val;
+      const conceptCheckResponses = conceptCheckResponsesRef.ofConcept(conceptId);
+      const conceptProgress = 
+        computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val) || EmptyObject;
 
-    const conceptChecks = currentConcept && conceptChecksRef.val;
-    const conceptCheckResponses = currentConcept && conceptCheckResponsesRef.ofConcept(conceptId);
-    const conceptProgress = currentConcept && 
-      computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val) || {};
+
+    }
 
     // prepare actions
-    const gotoRoot = router.replace.bind(router, '/');
-    const updateCheckResponse = (conceptId, checkId, responseName, response) => {
-      return this.wrapPromise(
-        conceptCheckResponsesRef.updateResponse(conceptId, checkId, responseName, response));
-    };
-    const addConcept = ({ concept }) => {
-      // TODO: Use transaction to avoid race condition
-      const lastConcept = childConcepts && _.maxBy(Object.values(childConcepts), 'num') || null;
-      const previousNum = lastConcept && lastConcept.num || 0;
-      concept.num = parseInt(previousNum) + 1;
-      concept.parentId = isRoot ? null : conceptId;
-
-      const newRef = conceptsRef.add_concept(concept);
-      const newOwnerId = isRoot ? newRef.key : ownerId;
-      newRef.update({ownerId: newOwnerId});
-
-      this.setAdding(false);
-
-      return this.wrapPromise(newRef)
-        //.then(() => this.setAdding(false));
-    };
-    const updateConcept = ({ conceptId, concept, checks }) => {
-      concept.nChecks = _.size(checks);
-      return this.wrapPromise(Promise.all([
-        conceptsRef.set_concept(conceptId, concept),
-        conceptChecksRef.update(checks)
-      ]));
-    };
-    const deleteConcept = (deleteConceptId) => {
-      // TODO: Don't delete if it still has children!?
-      return this.wrapPromise(conceptsRef.deleteConcept(deleteConceptId))
-        .then(() => {
-          if (deleteConceptId === conceptId) {
-            // deleted current concept -> Go to parent
-
-          }
-        });
-    };
-    const toggleConceptPublic = (conceptId) => {
-      return this.wrapPromise(conceptsRef.togglePublic(conceptId));
-    };
-    const addConceptCheck = () => {
-      const newCheck = {};
-      const lastCheck = conceptChecks && _.maxBy(Object.values(conceptChecks), 'num') || null;
-      const previousNum = lastCheck && lastCheck.num || 0;
-      newCheck.num = parseInt(previousNum) + 1;
-      return this.wrapPromise(conceptChecksRef.add_conceptCheck(newCheck)
-        .then(conceptsRef.update_concept(conceptId, {nChecks: _.size(conceptChecks)})));
-    };
-    const deleteConceptCheck = (conceptId, conceptCheckId) => {
-      return this.wrapPromise(conceptChecksRef.delete_conceptCheck(conceptCheckId)
-        .then(conceptsRef.update_concept(conceptId, {nChecks: _.size(conceptChecks)} )));
-    };
-    const updateUserPrefs = (prefs) => {
-      return this.wrapPromise(userInfoRef.update_prefs(prefs));
-    };
-
-    const conceptActions = !mayEdit && {} || {
-      updateConcept, deleteConcept, toggleConceptPublic
-    };
 
     // go render!
 
-    if (conceptId && !currentConcept) {
-      //setTimeout(() => router.replace('/'), 3000);
-      return (<Alert bsStyle="danger">
-        invalid conceptId
-        <Button onClick={gotoRoot}>go home</Button>
-      </Alert>);
-    }
-
-    const titleEl = (<ConceptBreadcrumbs ownerConcepts={ownerConcepts} currentConceptId={conceptId} />);
-
     // elements
+    const conceptActions = !this.mayEdit && EmptyObject || {
+      addConceptCheck, deleteConceptCheck, 
+      updateConcept, deleteConcept, 
+      toggleConceptPublic
+    };
     let toolsEl, conceptEditorEl;
-    if (mayEdit) {
+    if (this.mayEdit) {
       const conceptArgs = {
         ownerId, parentId, conceptId,
         concept: currentConcept,
-        conceptChecks,
-        addConceptCheck,
-        deleteConceptCheck
+        conceptChecks
       };
 
-      let basicToolsEl;
-      if (!isRoot) {
-        basicToolsEl = (<ConceptEditTools
+      let currentConceptEditTools;
+      if (!this.isRoot) {
+        currentConceptEditTools = (<ConceptEditTools
           {...conceptArgs}
           {...{ 
             conceptActions,
@@ -279,7 +380,7 @@ export default class ConceptsPage extends Component {
       );
 
       toolsEl = (<span>
-        { basicToolsEl }
+        { currentConceptEditTools }
         { addButtonEl }
       </span>);
 
@@ -292,7 +393,9 @@ export default class ConceptsPage extends Component {
       }
       else if (this.isEditMode) {
         conceptEditorEl = (
-          <ConceptEditor busy={busy} onSubmit={updateConcept} {...conceptArgs}></ConceptEditor>
+          <ConceptEditor busy={busy}
+            onSubmit={updateConcept} {...conceptArgs} {...conceptActions}>
+          </ConceptEditor>
         );
       }
     }
@@ -317,13 +420,21 @@ export default class ConceptsPage extends Component {
     return (
       <div>
         <h3>
-          {titleEl} {toolsEl}
-          { currentConcept && <ConceptPlayViewControls
+          <div>
+            <ConceptBreadcrumbs 
+              ownerConcepts={ownerConcepts} 
+              currentConceptId={this.currentConceptId} />
+
+            {toolsEl}
+          </div>
+          <div>
+            { currentConcept && <ConceptPlayViewControls
               userPrefs={userPrefs}
               updateUserPrefs={updateUserPrefs} /> }
+          </div>
         </h3>
-        { conceptEditorEl }
         { errEl }
+        { conceptEditorEl }
         { currentConcept && <ConceptPlayView 
           {...{
             conceptId,

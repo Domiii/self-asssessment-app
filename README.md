@@ -1,14 +1,17 @@
-# Simple Self-Assessment App
+## Simple Self-Assessment App
 Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
-# Install instructions
-## `npm install`
-## `cd third_party/redux-react-firebase`
-## `npm install --prefix ../..`
-## `cd ../..`
+## Install instructions
+  1. `npm install`
+  1. `cd third_party/redux-react-firebase`
+  1. `npm install --prefix ../..`
+  1. `cd ../..`
 
+## Deployment
+  1. `npm run build`
+  1. `firebase deploy`
 
-### TODO
+## TODO
 * Format check display nicely
 * Record + show checkResponses
 * Log all kinds of user interactions

@@ -78,7 +78,7 @@ const ConceptsRef = refWrapper({
 
     getPublicChildren(parentId) {
       return this.val && _.pickBy(this.val, {parentId, isPublic: true}) || {};
-    },
+    },)
 
     deleteConcept(conceptId) {
       if (!conceptId) {
