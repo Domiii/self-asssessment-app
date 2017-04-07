@@ -26,11 +26,15 @@ export default class ConceptChecksPanel extends Component {
       );
     }
 
-    const checkEls = _.map(conceptChecks, (check, checkId) => (
-      <ConceptCheckItem 
-      key={checkId} conceptId={conceptId} checkId={checkId} check={check} 
-      selectedResponse={conceptCheckResponses && conceptCheckResponses[checkId]}
-      updateCheckResponse={updateCheckResponse} />
+    const checkArr = _.sortBy(_.map(conceptChecks,
+      (check, checkId) => ({check, checkId, num: check.num})
+    ),  'num');
+
+    const checkEls = _.map(checkArr, ({checkId, check}) => (
+      <ConceptCheckItem
+        key={checkId} conceptId={conceptId} {...{checkId, check}} 
+        selectedResponse={conceptCheckResponses && conceptCheckResponses[checkId]}
+        updateCheckResponse={updateCheckResponse} />
     ));
 
     return (

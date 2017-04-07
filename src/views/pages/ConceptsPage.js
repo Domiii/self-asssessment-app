@@ -149,6 +149,12 @@ export default class ConceptsPage extends Component {
     const userPrefs = userInfoRef && userInfoRef.prefs() || {};
     const mayEdit = isAdmin;
     const notLoadedYet = !conceptsRef.isLoaded;
+
+    if (notLoadedYet) {
+      // still loading
+      return (<LoadOverlay />);
+    }
+
     const busy = this.state.busy;
     let { ownerId, conceptId } = params;
 
@@ -168,9 +174,7 @@ export default class ConceptsPage extends Component {
     const conceptChecks = currentConcept && conceptChecksRef.val;
     const conceptCheckResponses = currentConcept && conceptCheckResponsesRef.ofConcept(conceptId);
     const conceptProgress = currentConcept && 
-      computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val);
-
-    console.log(conceptProgress);
+      computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val) || {};
 
     // prepare actions
     const gotoRoot = router.replace.bind(router, '/');
@@ -235,10 +239,6 @@ export default class ConceptsPage extends Component {
     };
 
     // go render!
-    if (notLoadedYet) {
-      // still loading
-      return (<LoadOverlay />);
-    }
 
     if (conceptId && !currentConcept) {
       //setTimeout(() => router.replace('/'), 3000);
@@ -307,7 +307,9 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <ConceptGrid {...{
-        busy, ownerId, parentId: conceptId, concepts: childConcepts, mayEdit, conceptActions
+        busy, ownerId, parentId: conceptId, 
+        concepts: childConcepts, conceptProgress,
+        mayEdit, conceptActions
       }} />
     );
 
@@ -329,6 +331,7 @@ export default class ConceptsPage extends Component {
             userPrefs,
             conceptChecks,
             conceptCheckResponses,
+            conceptProgress,
             updateCheckResponse
           }} /> }
         { childConceptsEl }

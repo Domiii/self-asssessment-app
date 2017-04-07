@@ -16,13 +16,17 @@ export default class ConceptGrid extends Component {
     ownerId: PropTypes.string, 
     parentId: PropTypes.string,
     concepts: PropTypes.object.isRequired,
+    conceptProgress: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
     conceptActions: PropTypes.object.isRequired
   };
 
   render() {
     const { 
-      busy, ownerId, parentId, concepts, mayEdit, conceptActions
+      busy, ownerId, parentId,
+      concepts,
+      conceptProgress,
+      mayEdit, conceptActions
     } = this.props;
 
     // actions
@@ -33,6 +37,7 @@ export default class ConceptGrid extends Component {
       (concept, conceptId) => ({
         concept,
         conceptId,
+        conceptProgress,
 
         busy,
         ownerId: concept.ownerId, 
@@ -56,8 +61,7 @@ export default class ConceptGrid extends Component {
         style: {
           position: 'relative',
           display: 'flex',
-          flexDirection: 'column',
-          border: '1px black solid'
+          flexDirection: 'column'
       }}}
       nCols={3}
       objectComponentCreator={(key, value) => {

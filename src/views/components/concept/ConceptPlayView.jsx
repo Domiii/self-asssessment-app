@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  Alert, Button, Jumbotron,
+  Alert, Button, Jumbotron, Well,
   Grid, Row, Col
 } from 'react-bootstrap';
 import { Flex, Item } from 'react-flex';
@@ -11,18 +11,33 @@ import {
   ConceptChecksPanel
 } from 'src/views/components/concept';
 
+import ProgressBar from 'src/views/components/ProgressBar';
+
 export class ConceptPlayView extends Component {
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.object,
+    conceptProgress: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
+  get ProgressBar() {
+    const { conceptId, conceptProgress } = this.props;
+    const progressPct = Math.round((conceptProgress && 
+      conceptProgress[conceptId] && 
+      conceptProgress[conceptId].progress 
+      || 0) * 100);
+
+    return (<ProgressBar progressPct={progressPct} />);
+  }
+
   render() {
     const {
-      conceptId, concept, conceptChecks, userPrefs, conceptCheckResponses, updateCheckResponse
+      conceptId, concept, conceptChecks, userPrefs, 
+      conceptCheckResponses,
+      updateCheckResponse
     } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
 
@@ -35,6 +50,7 @@ export class ConceptPlayView extends Component {
 
     return (
       <div>
+        { this.ProgressBar }
         <Flex {...flexProps} alignItems="start">
           <Item {...itemProps}>
             <ConceptDescriptionFull concept={concept} />

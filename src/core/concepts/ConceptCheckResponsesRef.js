@@ -24,7 +24,7 @@ const ConceptCheckResponsesRef = refWrapper({
 
           return this.update_response(conceptId, checkId, {
             [responseName]: newStatus,
-            progress: response.progress || 0
+            progress: newStatus && response.progress || 0
           });
         }
       },

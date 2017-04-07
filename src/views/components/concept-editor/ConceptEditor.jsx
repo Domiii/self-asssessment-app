@@ -198,29 +198,31 @@ class ConceptChecksSection extends FormSection {
     // TODO: Use FieldArray for this
     // see: http://redux-form.com/6.1.1/examples/fieldArrays/
 
-    const checkEls = _.map(checks,
-      (check, key) => (
-        //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
-        <ListGroupItem key={key}>
-          <FormInputField name={`${key}.title_en`} label="Check description (EN)"
-            type="text" component="input"
-            labelProps={{xs: 2, className: 'no-padding'}}
-            inputColProps={{xs: 10, className: 'no-padding'}}
-          />
-          <FormInputField name={`${key}.title_zh`} label="Check description (中文)"
-            type="text" component="input"
-            labelProps={{xs: 2, className: 'no-padding'}}
-            inputColProps={{xs: 10, className: 'no-padding'}}
-          />
-          <FormInputField name={`${key}.num`} label="Num"
-            type="text" component="input"
-            labelProps={{xs: 2, className: 'no-padding'}}
-            inputColProps={{xs: 10, className: 'no-padding'}}
-          />
-          { this.DeleteCheckButton(key, check) }
-        </ListGroupItem>
-      )
-    );
+    const checkArr = _.sortBy(_.map(conceptChecks,
+      (check, checkId) => ({check, checkId, num: check.num})
+    ),  'num');
+
+    const checkEls = _.map(checkArr, ({checkId, check}) => (
+      //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
+      <ListGroupItem key={checkId}>
+        <FormInputField name={`${checkId}.title_en`} label="Check description (EN)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name={`${checkId}.title_zh`} label="Check description (中文)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name={`${checkId}.num`} label="Num"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        { this.DeleteCheckButton(checkId, check) }
+      </ListGroupItem>
+    ));
 
     return (<div>
       <ListGroup className="no-margin">

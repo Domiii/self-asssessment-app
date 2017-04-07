@@ -10,6 +10,7 @@ import { Link } from 'react-router'
 import { hrefConceptView } from 'src/views/href';
 
 import { FAIcon } from 'src/views/components/util';
+import { getProgressColor } from 'src/views/components/ProgressBar';
 
 import ConceptPreview from './ConceptPreview';
 import ConceptEditTools from 'src/views/components/concept-editor/ConceptEditTools';
@@ -47,6 +48,7 @@ export default class ConceptViewSmall extends Component {
     parentId: PropTypes.string,
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
+    conceptProgress: PropTypes.object.isRequired,
     conceptActions: PropTypes.object.isRequired,
   };
 
@@ -62,12 +64,20 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfoRef, lookupLocalized } = this.context;
-    const { busy, parentId, conceptId, concept, conceptActions, mayEdit } = this.props;
+    const { busy, parentId, conceptId, 
+      concept, conceptProgress,
+      conceptActions, mayEdit } = this.props;
     
     const ownerId = concept.ownerId;
     const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
     const { updateConcept } = conceptActions;
+
+    const progressPct = Math.round((conceptProgress && 
+      conceptProgress[conceptId] && 
+      conceptProgress[conceptId].progress 
+      || NaN) * 100);
+    const progressColor = getProgressColor(progressPct);
 
     // element: title line
     const titleEl = (
@@ -90,8 +100,12 @@ export default class ConceptViewSmall extends Component {
     const contentPreviewEl = (<ConceptPreview {...conceptArgs} />);
 
     const contentEl = (
-      <Row style={{paddingTop: '0.4em'}}>
-        <Col xs={12}>
+      <Row style={{
+        paddingTop: '0.4em'}}>
+
+        <Col xs={12} style={{
+          maxHeight: '300px',
+          overflow: 'hidden'}}>
           { contentPreviewEl }
         </Col>
       </Row>
@@ -119,8 +133,10 @@ export default class ConceptViewSmall extends Component {
     // </Row>);
 
     // render
+    console.log(progressColor);
     return (
-      <Grid fluid style={{width: '100%'}}>
+      <Grid fluid style={{width: '100%',
+        border: `3px ${progressColor} solid`}}>
         { titleEl }
         { editToolsEl }
         { contentEl }
