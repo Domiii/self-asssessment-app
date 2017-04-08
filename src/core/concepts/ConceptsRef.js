@@ -50,18 +50,18 @@ const ConceptsRef = refWrapper({
     //   //return this.updateKeepOrder(parentId, updates);
     // },
 
-    getRootConcepts(all) {
+    getLoadedConcepts(all) {
       if (all) {
-        return this.getAllRootConcepts();
+        return this.getAllLoadedConcepts();
       }
-      return this.getPublicRootConcepts();
+      return this.getPublicLoadedConcepts();
     },
 
-    getAllRootConcepts() {
+    getAllLoadedConcepts() {
       return this.val || {};
     },
 
-    getPublicRootConcepts() {
+    getPublicLoadedConcepts() {
       return this.val && _.pickBy(this.val, {isPublic: true}) || {};
     },
 
@@ -78,7 +78,7 @@ const ConceptsRef = refWrapper({
 
     getPublicChildren(parentId) {
       return this.val && _.pickBy(this.val, {parentId, isPublic: true}) || {};
-    },)
+    },
 
     deleteConcept(conceptId) {
       if (!conceptId) {

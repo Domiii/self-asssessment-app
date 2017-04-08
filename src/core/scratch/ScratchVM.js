@@ -1,6 +1,6 @@
 //import scratch-vm;
-import 'src/third-party/scratch/scratch-vm-vendor.es5.js';
-import 'src/third-party/scratch/scratch-vm.es5.js';
+import 'src/third-party/scratch/scratch-vm-vendor.es5.dist.js';
+import 'src/third-party/scratch/scratch-vm.es5.dist.js';
 
 // npm i -S https://github.com/LLK/scratch-vm.git (build failing?)
 

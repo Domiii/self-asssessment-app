@@ -17,6 +17,7 @@ export class ConceptPlayView extends Component {
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
+    userPrefs: PropTypes.object.isRequired,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.object,
     conceptProgress: PropTypes.object,

@@ -100,29 +100,12 @@ export default class ConceptsPage extends Component {
     autoBind(this);
   }
 
+
+
   // ###################################################
-  // General stuff
+  // All kinds of data
   // ###################################################
-
-  get isNotLoadedYet() {
-    const { conceptsRef } = this.context;
-    return !conceptsRef.isLoaded;
-  }
-
-  // indicates whether the application is currently still processing an operation
-  get isBusy() {
-    return this.state.busy;
-  }
-
-  get isAdmin() {
-    const { userInfoRef } = this.context;
-    return userInfoRef && userInfoRef.adminDisplayMode() || false;
-  }
-
-  get mayEdit() {
-    return this.isAdmin;
-  }
-
+  
   get userPrefs() {
     const { userInfoRef } = this.context;
     return userInfoRef && userInfoRef.prefs() || EmptyObject;
@@ -140,6 +123,92 @@ export default class ConceptsPage extends Component {
     const { ownerId } = params;
 
     return !this.isRoot && ownerId || null;
+  }
+
+  get currentConcept() {
+    const { conceptsRef } = this.props;
+    return this.currentConceptId && conceptsRef.concept(this.currentConceptId);
+  }
+
+  get currentOwnerConcept() {
+    const { conceptsRef } = this.props;
+    return this.currentOwnerId && conceptsRef.concept(this.currentOwnerId);
+  }
+
+  get currentLoadedConcepts() {
+    const { conceptsRef } = this.props;
+    return conceptsRef.getLoadedConcepts(this.isAdmin);
+  }
+
+  get currentChildConcepts() {
+    const { conceptsRef } = this.props;
+    if (this.currentConceptId) {
+      return conceptsRef.getChildren(this.currentConceptId, this.isAdmin);
+    }
+    else {
+      return this.currentLoadedConcepts;
+    }
+  }
+
+  get currentParentId() {
+    return this.currentConcept.parentId
+  }
+
+  get currentConceptChecks() {
+    const { conceptChecksRef } = this.props;
+    return conceptChecksRef.val;
+  }
+
+  get currentCheckResponses() {
+    const { conceptCheckResponsesRef } = this.props;
+    return this.currentConceptId &&
+      conceptCheckResponsesRef.ofConcept(this.currentConceptId) ||
+      EmptyObject;
+  }
+
+  computeCurrentConceptProgress() {
+    const { conceptsRef, conceptCheckResponsesRef } = this.props;
+
+    return computeAllChecksProgress(
+      this.currentLoadedConcepts,
+      conceptCheckResponsesRef.val) || EmptyObject;
+  }
+
+
+  // ###################################################
+  // General stuff
+  // ###################################################
+
+  get isNotLoadedYet() {
+    const { conceptsRef } = this.props;
+    return !conceptsRef.isLoaded;
+  }
+
+  // indicates whether the application is currently still processing an operation
+  get isBusy() {
+    return this.state.busy;
+  }
+
+  get isAdmin() {
+    const { userInfoRef } = this.context;
+    return userInfoRef && userInfoRef.adminDisplayMode() || false;
+  }
+
+  get mayEdit() {
+    return this.isAdmin;
+  }
+
+  get areParamsValid() {
+    const { conceptsRef } = this.props;
+    const conceptId = this.currentConceptId, ownerId = this.currentOwnerId;
+    const currentConcept = conceptId && conceptsRef.concept(conceptId);
+    const ownerConcept = ownerId && conceptsRef.concept(ownerId);
+    const hasConceptParams = currentConcept && ownerConcept;
+
+    return (this.isRoot !== hasConceptParams) && 
+      (!!currentConcept === !!ownerConcept) &&
+      (!!conceptId === !!currentConcept) &&
+      (!!ownerId === !!ownerConcept);
   }
 
   get isRoot() {
@@ -165,16 +234,16 @@ export default class ConceptsPage extends Component {
     });
   }
 
+
   // ###################################################
   // Privileged actions
   // ###################################################
 
   // all kinds of action wrappers
   addConcept({ concept }) {
-    // const ownerId, parentId, siblings = ...;
     const { conceptsRef } = this.props;
     const parentId = this.currentConceptId;
-    const siblings = ...;
+    const siblings = conceptsRef.getAllChildren(parentId);
 
     // TODO: Use transaction to avoid race condition
     const lastConcept = siblings && 
@@ -193,7 +262,7 @@ export default class ConceptsPage extends Component {
 
     this.setAdding(false);
 
-    return this.wrapPromise(Promise.all([newRef, ownerUpdate]))
+    return this.wrapPromise(Promise.all([newRef, ownerUpdate]));
       //.then(() => this.setAdding(false));
   }
 
@@ -259,6 +328,7 @@ export default class ConceptsPage extends Component {
   // ###################################################
   // User actions
   // ###################################################
+
   updateUserPrefs(prefs){
     const { userInfoRef } = this.props;
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
@@ -313,64 +383,31 @@ export default class ConceptsPage extends Component {
   // ###################################################
 
   render() {
-    if (!this.isNotLoadedYet) {
+    if (this.isNotLoadedYet) {
       // still loading
       return (<LoadOverlay />);
     }
 
-    if (this.isRoot) {
-      const rootConcepts = conceptsRef.getRootConcepts(isAdmin);
-
-    }
-    else {
-      const currentConcept = conceptsRef.concept(conceptId);
-      const ownerConcept = conceptsRef.concept(ownerId);
-      if (!currentConcept || !ownerConcept) {
-        return (<Alert bsStyle="danger">
-          invalid concept
-          <Button onClick={this.gotoRoot}>go home</Button>
-        </Alert>);
-      }
-
-      const ownerConcepts = conceptsRef.getRootConcepts(isAdmin);
-      const childConcepts = conceptsRef.getChildren(conceptId, isAdmin);
-
-      const parentId = currentConcept.parentId;
-      const conceptChecks = conceptChecksRef.val;
-      const conceptCheckResponses = conceptCheckResponsesRef.ofConcept(conceptId);
-      const conceptProgress = 
-        computeAllChecksProgress(ownerConcepts, conceptCheckResponsesRef.val) || EmptyObject;
-
-
+    if (!this.areParamsValid) {
+      return (<Alert bsStyle="danger">
+        invalid concept
+        <Button onClick={this.gotoRoot}>go home</Button>
+      </Alert>);
     }
 
-    // prepare actions
-
-    // go render!
-
-    // elements
-    const conceptActions = !this.mayEdit && EmptyObject || {
-      addConceptCheck, deleteConceptCheck, 
-      updateConcept, deleteConcept, 
-      toggleConceptPublic
-    };
     let toolsEl, conceptEditorEl;
     if (this.mayEdit) {
-      const conceptArgs = {
-        ownerId, parentId, conceptId,
-        concept: currentConcept,
-        conceptChecks
-      };
-
-      let currentConceptEditTools;
-      if (!this.isRoot) {
-        currentConceptEditTools = (<ConceptEditTools
-          {...conceptArgs}
-          {...{ 
-            conceptActions,
-            editing: this.isEditMode,
-            toggleEdit: this.toggleEdit }} />);
-      }
+      const currentConceptEditTools = !this.currentConcept ? null :
+        (<ConceptEditTools {...{ 
+          ownerId: this.currentOwnerId,
+          parentId: this.currentParentId,
+          conceptId: this.currentConceptId,
+          concept: this.currentConcept,
+          toggleConceptPublic: this.toggleConceptPublic,
+          deleteConcept: this.deleteConcept,
+          editing: this.isEditMode,
+          toggleEdit: this.toggleEdit
+        }} />);
 
       const addButtonEl = (
         <Button active={this.isAddMode}
@@ -387,22 +424,34 @@ export default class ConceptsPage extends Component {
       if (this.isAddMode) {
         conceptEditorEl = (
           <AddConceptEditor {...{
-            busy, addConcept
+            busy: this.isBusy, 
+            addConcept: this.addConcept
           }} />
         );
       }
       else if (this.isEditMode) {
         conceptEditorEl = (
-          <ConceptEditor busy={busy}
-            onSubmit={updateConcept} {...conceptArgs} {...conceptActions}>
-          </ConceptEditor>
+          <ConceptEditor {...{
+            busy: this.isBusy,
+            onSubmit: this.updateConcept,
+            conceptId: this.currentConceptId,
+            concept: this.currentConcept,
+            conceptChecks: this.currentConceptChecks,
+            addConceptCheck: this.addConceptCheck,
+            deleteConceptCheck: this.deleteConceptCheck
+          }} />
         );
       }
     }
 
-    const errEl = !this.state.error ? undefined : (
-      <Alert bsStyle="danger"><pre>{this.state.error.stack || this.state.error}</pre></Alert>
+    const errEl = this.state.error && (
+      <Alert bsStyle="danger"><pre>
+        {this.state.error.message || this.state.error}
+      </pre></Alert>
     );
+
+    const childConcepts = this.currentChildConcepts;
+    const conceptProgress = this.computeCurrentConceptProgress();
 
     const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? (
       // no childConcepts
@@ -410,9 +459,16 @@ export default class ConceptsPage extends Component {
     ) : (
       // display childConcepts
       <ConceptGrid {...{
-        busy, ownerId, parentId: conceptId, 
-        concepts: childConcepts, conceptProgress,
-        mayEdit, conceptActions
+        busy: this.state.busy,
+        ownerId: this.currentOwnerId,
+        parentId: this.currentConceptId,
+        concepts: childConcepts,
+        mayEdit: this.mayEdit,
+        conceptProgress,
+
+        toggleConceptPublic: this.toggleConceptPublic,
+        deleteConcept: this.deleteConcept,
+        updateConcept: this.updateConcept
       }} />
     );
 
@@ -422,28 +478,29 @@ export default class ConceptsPage extends Component {
         <h3>
           <div>
             <ConceptBreadcrumbs 
-              ownerConcepts={ownerConcepts} 
+              ownerConcepts={this.currentLoadedConcepts} 
               currentConceptId={this.currentConceptId} />
 
-            {toolsEl}
+            { toolsEl }
           </div>
           <div>
-            { currentConcept && <ConceptPlayViewControls
-              userPrefs={userPrefs}
-              updateUserPrefs={updateUserPrefs} /> }
+            { this.currentConcept && <ConceptPlayViewControls {...{
+              userPrefs: this.userPrefs,
+              updateUserPrefs: this.updateUserPrefs
+            }} /> }
           </div>
         </h3>
         { errEl }
         { conceptEditorEl }
-        { currentConcept && <ConceptPlayView 
+        { this.currentConcept && <ConceptPlayView 
           {...{
-            conceptId,
-            concept: currentConcept,
-            userPrefs,
-            conceptChecks,
-            conceptCheckResponses,
+            conceptId: this.currentConceptId,
+            concept: this.currentConcept,
+            userPrefs: this.userPrefs,
+            conceptChecks: this.currentConceptChecks,
+            conceptCheckResponses: this.currentCheckResponses,
             conceptProgress,
-            updateCheckResponse
+            updateCheckResponse: this.updateCheckResponse
           }} /> }
         { childConceptsEl }
       </div>

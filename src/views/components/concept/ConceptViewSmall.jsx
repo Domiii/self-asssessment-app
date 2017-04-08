@@ -49,7 +49,10 @@ export default class ConceptViewSmall extends Component {
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     conceptProgress: PropTypes.object.isRequired,
-    conceptActions: PropTypes.object.isRequired,
+    
+    toggleConceptPublic: PropTypes.func.isRequired,
+    deleteConcept: PropTypes.func.isRequired,
+    updateConcept: PropTypes.func.isRequired
   };
 
   constructor(...args) {
@@ -66,12 +69,12 @@ export default class ConceptViewSmall extends Component {
     const { userInfoRef, lookupLocalized } = this.context;
     const { busy, parentId, conceptId, 
       concept, conceptProgress,
-      conceptActions, mayEdit } = this.props;
+      toggleConceptPublic, deleteConcept, updateConcept, 
+      mayEdit } = this.props;
     
     const ownerId = concept.ownerId;
     const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
-    const { updateConcept } = conceptActions;
 
     const progressPct = Math.round((conceptProgress && 
       conceptProgress[conceptId] && 
@@ -119,7 +122,8 @@ export default class ConceptViewSmall extends Component {
           <ConceptEditTools
             {...conceptArgs}
             {...{ 
-              conceptActions,
+              toggleConceptPublic,
+              deleteConcept,
               editing: false,
               toggleEdit: this.toggleEdit }} />
         </Col>
@@ -133,7 +137,6 @@ export default class ConceptViewSmall extends Component {
     // </Row>);
 
     // render
-    console.log(progressColor);
     return (
       <Grid fluid style={{width: '100%',
         border: `3px ${progressColor} solid`}}>

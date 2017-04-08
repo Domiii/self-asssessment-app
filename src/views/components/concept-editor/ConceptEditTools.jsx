@@ -15,7 +15,10 @@ export default class ConceptEditTools extends Component {
     parentId: PropTypes.string,
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
-    conceptActions: PropTypes.object.isRequired,
+
+    toggleConceptPublic: PropTypes.func.isRequired,
+    deleteConcept: PropTypes.func.isRequired,
+
     editing: PropTypes.bool,
     toggleEdit: PropTypes.func.isRequired
   };
@@ -29,11 +32,11 @@ export default class ConceptEditTools extends Component {
   }
 
   get DeleteButton() {
-    const { conceptId, concept, conceptActions } = this.props;
+    const { conceptId, concept, deleteConcept } = this.props;
     const modalProps = {
       conceptId,
       concept,
-      deleteConcept: conceptActions.deleteConcept
+      deleteConcept
     };
 
     return (
@@ -42,8 +45,7 @@ export default class ConceptEditTools extends Component {
   }
 
   get TogglePublicButton() {
-    const { conceptId, concept, conceptActions } = this.props;
-    const { toggleConceptPublic } = conceptActions;
+    const { conceptId, concept, toggleConceptPublic } = this.props;
     const icon = concept.isPublic ? 'unlock' : 'lock';
     const className = concept.isPublic ? 'color-green' : 'color-red';
     return (<Button onClick={() => toggleConceptPublic(conceptId)}
@@ -53,8 +55,6 @@ export default class ConceptEditTools extends Component {
   }
 
   render() {
-    //const { parentId, concept, conceptActions } = this.props;
-
     return (<span style={{whiteSpace: 'nowrap', overflow: 'hidden'}}>
       { this.TogglePublicButton }
       { this.EditButton }

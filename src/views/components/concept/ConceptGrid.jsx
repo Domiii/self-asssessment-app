@@ -18,7 +18,10 @@ export default class ConceptGrid extends Component {
     concepts: PropTypes.object.isRequired,
     conceptProgress: PropTypes.object.isRequired,
     mayEdit: PropTypes.bool.isRequired,
-    conceptActions: PropTypes.object.isRequired
+
+    toggleConceptPublic: PropTypes.func.isRequired,
+    deleteConcept: PropTypes.func.isRequired,
+    updateConcept: PropTypes.func.isRequired
   };
 
   render() {
@@ -26,7 +29,11 @@ export default class ConceptGrid extends Component {
       busy, ownerId, parentId,
       concepts,
       conceptProgress,
-      mayEdit, conceptActions
+      mayEdit,
+
+      toggleConceptPublic,
+      deleteConcept,
+      updateConcept
     } = this.props;
 
     // actions
@@ -43,7 +50,10 @@ export default class ConceptGrid extends Component {
         ownerId: concept.ownerId, 
         parentId,
         mayEdit,
-        conceptActions
+        
+        toggleConceptPublic,
+        deleteConcept,
+        updateConcept
       })
     );
 
