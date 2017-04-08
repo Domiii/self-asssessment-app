@@ -7,7 +7,7 @@ export function getProgressColor(progressPct) {
   if (isNaN(progressPct)) {
     return '#DDD';
   }
-  const progressColorHue = 80 * progressPct/100;
+  const progressColorHue = 90 * progressPct/100;
   return `hsl(${progressColorHue}, 100%, 40%)`;
 }
 

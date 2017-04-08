@@ -330,7 +330,7 @@ export default class ConceptsPage extends Component {
   // ###################################################
 
   updateUserPrefs(prefs){
-    const { userInfoRef } = this.props;
+    const { userInfoRef } = this.context;
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
   }
 
@@ -482,8 +482,6 @@ export default class ConceptsPage extends Component {
               currentConceptId={this.currentConceptId} />
 
             { toolsEl }
-          </div>
-          <div>
             { this.currentConcept && <ConceptPlayViewControls {...{
               userPrefs: this.userPrefs,
               updateUserPrefs: this.updateUserPrefs

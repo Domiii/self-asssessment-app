@@ -165,7 +165,7 @@ class ConceptChecksSection extends FormSection {
 
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
-    checks: PropTypes.object,
+    conceptChecks: PropTypes.object,
     addConceptCheck: PropTypes.func.isRequired,
     deleteConceptCheck: PropTypes.func.isRequired
   };
@@ -193,7 +193,7 @@ class ConceptChecksSection extends FormSection {
   }
 
   render() {
-    const { checks } = this.props;
+    const { conceptChecks } = this.props;
 
     // TODO: Use FieldArray for this
     // see: http://redux-form.com/6.1.1/examples/fieldArrays/
@@ -272,7 +272,7 @@ class _ConceptEditor extends Component {
 
         {addConceptCheck &&
           <ConceptChecksSection {...
-            { conceptId, checks: conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
+            { conceptId, conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
         }
 
         <div className ="margin" />
