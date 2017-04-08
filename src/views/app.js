@@ -1,3 +1,4 @@
+import DBStatusRef from 'src/core/DBStatusRef';
 import { UserInfoRef } from 'src/core/users';
 import { isInitialized } from 'src/util/firebaseUtil';
 import { createSelector } from 'reselect';
@@ -16,21 +17,26 @@ const { pathToJS } = helpers;
 
 @firebase((props, Firebase) => {
   const uid = Firebase._.authUid;
-  const paths = [];
+  const paths = [
+    DBStatusRef.makeQuery()
+  ];
   if (uid) {
     paths.push(UserInfoRef.user.makeQuery({uid}));
   }
   return paths;
 })
 @connect(
-  ({ firebase }) => {
+  ({ firebase }, ownProps) => {
     const auth = pathToJS(firebase, 'auth');
-    const props = {};
+    const dBStatusRef = DBStatusRef(firebase);
+
+    const props = {
+      dBStatusRef,
+      clientVersion: dBStatusRef.version()
+    };
 
     if (auth && auth.uid) {
       props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
-
-
       //console.log(props.userInfoRef.val);
     }
 
@@ -44,7 +50,8 @@ export class App extends Component {
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object,
+    userInfoRef: PropTypes.object.isRequired,
+    dBStatusRef: PropTypes.object.isRequired,
 
     children: PropTypes.object
   };
@@ -72,7 +79,7 @@ export class App extends Component {
   }
 
   render() {
-    const { userInfoRef, firebase, children } = this.props;
+    const { userInfoRef, dBStatusRef, firebase, children } = this.props;
     const { router } = this.context;
     const isBusy = userInfoRef && !userInfoRef.isLoaded;
 

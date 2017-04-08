@@ -1,5 +1,12 @@
 {
   "rules": {
+    "dbState": {
+      "current": {
+        ".read": "auth !== null",
+        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+      }
+    },
+
     "concepts": {
       ".indexOn": ["ownerId", "parentId"],
       ".read": "auth !== null",

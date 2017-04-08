@@ -471,38 +471,51 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
+    onBeforeWrite() {
+      // Firebase.ServerValue.TIMESTAMP
+      return true;
+    }
+
     set(val) {
-      return this._ref.set(val);
+      return this.onBeforeWrite() &&
+        this._ref.set(val);
     }
 
     setChild(path, newChild) {
-      return this.getRef(path).set(newChild);
+      return this.onBeforeWrite() &&
+        this.getRef(path).set(newChild);
     }
 
     update(values) {
-      return this._ref.update(values);
+      return this.onBeforeWrite() && 
+        this._ref.update(values);
     }
 
     updateChild(path, childValues) {
-      return this.getRef(path).update(childValues);
+      return this.onBeforeWrite() && 
+        this.getRef(path).update(childValues);
     }
 
 
     // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
     transaction(cb) {
-      return this._ref.transaction(cb);
+      return this.onBeforeWrite() && 
+        this._ref.transaction(cb);
     }
 
     transactionChild(path, cb) {
-      return this.getRef(path).transaction(cb);
+      return this.onBeforeWrite() && 
+        this.getRef(path).transaction(cb);
     }
 
     push(newChild) {
-      return this._ref.push(newChild);
+      return this.onBeforeWrite() && 
+        this._ref.push(newChild);
     }
 
     pushChild(path, newChild) {
-      return this.getRef(path).push(newChild);
+      return this.onBeforeWrite() && 
+        this.getRef(path).push(newChild);
     }
   }
 

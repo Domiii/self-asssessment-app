@@ -7,33 +7,72 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `npm install --prefix ../..`
   1. `cd ../..`
 
+## Get Started
+  1. `npm install firebase-tools`
+  1. `firebase login`
+  1. `firebase init`
+
 ## Deployment
   1. `npm run build`
   1. `firebase deploy`
 
 ## TODO
-* Format check display nicely
-* Record + show checkResponses
+* Store user data under `/users` on first login
+** Add rules
+* Versioning system (disable most of client functionality when client and DB version don't match)
 * Log all kinds of user interactions
-* Visualize checks progress throughout the tree
+** logUserActions
+** logUIActivities
+** logUIEvents
+* Add system for check progress caching
 * Add Google Slides to markdown
-* Add checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
-* Add more checks
-* Visualize responses of each individual Question
-* ResponseSummary
-* Teacher view: Pick a user from list of all users and check their responses with options: [OverEstimated, UnderEstimated, JustRight]
+* Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
+* Store updatedAt + createdAt data on all kinds of data?
+
+
+## TODO: logging
+
+logUserActions (hooks into all server actions; can be used to log all DB writes?)
+
+
+logUIActivities
+
+```json
+[
+    uid,
+    from,
+    duration,
+
+    nCharactersTyped,
+    nClicks,
+    hadOtherInteractions,
+
+    currentPage,
+    currentPageArgs,
+    currentPageStateInfo,
+]
+
+logUIEvents
+
+```json
+[
+  uid,
+  uiActionName,     // [UserIsBack, UserIdle, ApplicationFocusLost]
+  args
+]
+```
+
+## More TODO
+* Show orphaned concepts, checks and other orphaned data
+* Notifications
+
 * Filter: Finished, Unfinished, Untried
 * Filters: Checkboxes of response types
-* Advanced question rendering
-** Render per-question code beneath text
-** Add markdown support to question text
-** (Render symbol images in questions)
 * Display statistics
-* Make sure, 小筆記 feature works
+* Add 小筆記 feature
 * Activity logging
 * Fancy features
-** Render in-line code vertically centered
-** Handle invalid urls
+** Handle invalid urls + 404s properly
 
 ### Research TODO
 * Produce rules for self-evaluating whether we know non-concrete answers or not
