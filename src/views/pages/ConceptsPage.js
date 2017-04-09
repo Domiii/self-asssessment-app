@@ -482,7 +482,7 @@ export default class ConceptsPage extends Component {
               ownerConcepts={this.currentLoadedConcepts} 
               currentConceptId={this.currentConceptId} />
 
-            { toolsEl }
+            { toolsEl || <p style={{display: 'inline-block'}}>&nbsp;</p> }
             { this.currentConcept && <ConceptPlayViewControls {...{
               userPrefs: this.userPrefs,
               updateUserPrefs: this.updateUserPrefs

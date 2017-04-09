@@ -78,6 +78,7 @@ export default class UserProfilePage extends Component {
     const updateUser = (userFormData) => {
       if (isAdmin) {
         // admins can override other stuff as well
+        delete userFormData.isAdmin;
         userInfoRef.update(userFormData);
       }
       else {
@@ -93,8 +94,9 @@ export default class UserProfilePage extends Component {
       return (<LoadOverlay />);
     }
 
+    const userInfo = userInfoRef.val;
     return (
-      <UserForm onSubmit={updateUser} initialValues={userInfoRef.val} />
+      <UserForm onSubmit={updateUser} initialValues={userInfo} />
     );
   }
 }
