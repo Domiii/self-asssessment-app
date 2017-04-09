@@ -138,7 +138,9 @@ export default class ConceptViewSmall extends Component {
 
     // render
     return (
-      <Grid fluid style={{width: '100%',
+      <Grid fluid style={{
+        width: '100%',
+        height: '100%',
         border: `3px ${progressColor} solid`}}>
         { titleEl }
         { editToolsEl }
