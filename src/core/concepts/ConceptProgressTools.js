@@ -14,11 +14,15 @@ function addConceptProgress(allProgress, concepts, checkResponses, dstConceptId,
   }
 
   conceptProgress.nTotal += srcConcept.nChecks || 0;
-  conceptProgress.nCurrent += checkResponses && checkResponses[srcConceptId] && 
-    _.sum(_.map(checkResponses[srcConceptId], response => response.progress || 0)) ||
+  conceptProgress.nCurrent += (checkResponses && checkResponses[srcConceptId] && 
+    _.sum(_.map(checkResponses[srcConceptId], response => response.progress || 0))) ||
     0;
 
   conceptProgress.progress = conceptProgress.nCurrent / conceptProgress.nTotal;
+
+  // conceptProgress.srcConceptId = srcConceptId;
+  // conceptProgress.dstConceptId = dstConceptId;  
+  // console.log(JSON.stringify(conceptProgress));
 }
 
 export function computeAllChecksProgress(concepts, checkResponses) {

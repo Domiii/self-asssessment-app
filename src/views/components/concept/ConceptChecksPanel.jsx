@@ -1,11 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { 
-  Alert, ListGroup
+  Well, Alert, ListGroup
 } from 'react-bootstrap';
+
+import { EmptyObject } from 'src/util';
 
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { ConceptCheckItem } from '.';
 
+const EmptyArray = Object.freeze([]);
 
 export default class ConceptChecksPanel extends Component {
   static propTypes = {
@@ -22,7 +25,7 @@ export default class ConceptChecksPanel extends Component {
 
     if (!conceptChecks) {
       return (
-        <Alert bsStyle="info">concept has no checks</Alert>
+        <Well />
       );
     }
 
@@ -37,9 +40,21 @@ export default class ConceptChecksPanel extends Component {
         updateCheckResponse={updateCheckResponse} />
     ));
 
+    const deletedCheckResponses = _.filter(
+      _.keys(conceptCheckResponses || EmptyObject), 
+      checkId => !conceptChecks[checkId]);
+
+    const deletedCheckResponsesEls = _.map(deletedCheckResponses, (checkId) => (
+      <ConceptCheckItem
+        key={checkId} conceptId={conceptId} {...{checkId, check: null}} 
+        selectedResponse={conceptCheckResponses && conceptCheckResponses[checkId]}
+        updateCheckResponse={updateCheckResponse} />
+    ));
+
     return (
       <ListGroup>
         { checkEls }
+        { deletedCheckResponsesEls }
       </ListGroup>
     );
   }

@@ -167,7 +167,7 @@ export default class ConceptsPage extends Component {
   }
 
   computeCurrentConceptProgress() {
-    const { conceptsRef, conceptCheckResponsesRef } = this.props;
+    const { conceptCheckResponsesRef } = this.props;
 
     return computeAllChecksProgress(
       this.currentLoadedConcepts,
@@ -306,10 +306,11 @@ export default class ConceptsPage extends Component {
 
     newCheck.num = parseInt(previousNum) + 1;
 
+    const nChecks = 1 + (conceptChecks && _.size(conceptChecks) || 0);
+
     return this.wrapPromise(
       conceptChecksRef.add_conceptCheck(newCheck)
-      .then(conceptsRef.update_concept(conceptId, 
-        {nChecks: conceptChecks && _.size(conceptChecks) || 0}))
+      .then(conceptsRef.update_concept(conceptId, {nChecks}))
     );
   }
 
@@ -334,12 +335,12 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
   }
 
-  updateCheckResponse(conceptId, checkId, responseName, response) {
+  updateCheckResponse(conceptId, checkId, checkStillExists, responseName, response) {
     const { conceptCheckResponsesRef } = this.props;
 
     return this.wrapPromise(
       conceptCheckResponsesRef.updateResponse(
-        conceptId, checkId, responseName, response));
+        conceptId, checkId, checkStillExists, responseName, response));
   }
   
 

@@ -8,3 +8,6 @@ export function asArray(collection) {
   //     _.isObject(collection) ? _.values(collection) : null
   //   );
 }
+
+
+export const EmptyObject = Object.freeze({});

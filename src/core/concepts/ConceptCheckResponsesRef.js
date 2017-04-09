@@ -18,14 +18,19 @@ const ConceptCheckResponsesRef = refWrapper({
     ofUser: {
       pathTemplate: '$(uid)',
       methods: {
-        updateResponse(conceptId, checkId, responseName, response) {
+        updateResponse(conceptId, checkId, checkStillExists, responseName, response) {
           const currentResponse = this.response(conceptId, checkId);
           const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
 
-          return this.update_response(conceptId, checkId, {
-            [responseName]: newStatus,
-            progress: newStatus && response.progress || 0
-          });
+          if (checkStillExists) {
+            return this.update_response(conceptId, checkId, {
+              [responseName]: newStatus,
+              progress: newStatus && response.progress || 0
+            });
+          }
+          else if (!newStatus) {
+            return this.delete_response(conceptId, checkId);
+          }
         }
       },
 

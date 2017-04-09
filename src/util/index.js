@@ -1,0 +1,1 @@
+export { EmptyObject } from './miscUtil';

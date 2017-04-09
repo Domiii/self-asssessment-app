@@ -78,8 +78,7 @@ export default class ConceptViewSmall extends Component {
 
     const progressPct = Math.round((conceptProgress && 
       conceptProgress[conceptId] && 
-      conceptProgress[conceptId].progress 
-      || NaN) * 100);
+      conceptProgress[conceptId].progress) * 100);
     const progressColor = getProgressColor(progressPct);
 
     // element: title line
@@ -141,7 +140,7 @@ export default class ConceptViewSmall extends Component {
       <Grid fluid style={{
         width: '100%',
         height: '100%',
-        border: `3px ${progressColor} solid`}}>
+        border: `6px ${progressColor} solid`}}>
         { titleEl }
         { editToolsEl }
         { contentEl }

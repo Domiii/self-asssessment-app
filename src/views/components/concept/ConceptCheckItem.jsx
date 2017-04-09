@@ -9,6 +9,7 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
 import { ConceptCheckResponseTypes } from 'src/core/concepts';
 
+import { EmptyObject } from 'src/util';
 
 export default class ConceptCheckItem extends Component {
   static contextTypes = {
@@ -17,7 +18,7 @@ export default class ConceptCheckItem extends Component {
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
     checkId: PropTypes.string.isRequired,
-    check: PropTypes.object.isRequired,
+    check: PropTypes.object,
     selectedResponse: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };
@@ -28,13 +29,13 @@ export default class ConceptCheckItem extends Component {
 
   onCheckReponse(responseName) {
     // store result
-    const { conceptId, checkId, updateCheckResponse } = this.props;
+    const { conceptId, checkId, check, updateCheckResponse } = this.props;
     const responses = ConceptCheckResponseTypes.default;
 
     const response = responses[responseName];
     if (response) {
       // store response!
-      updateCheckResponse(conceptId, checkId, responseName, response);
+      updateCheckResponse(conceptId, checkId, !!check, responseName, response);
     }
 
     ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it
@@ -83,13 +84,16 @@ export default class ConceptCheckItem extends Component {
     const { lookupLocalized } = this.context;
     const { check } = this.props;
 
+    const styleOverride = !check && { backgroundColor: 'lightgray' } || EmptyObject;
+
     return (
       <ListGroupItem className="no-padding">
         <ListGroup className="no-margin">
-          <ListGroupItem>
-            { lookupLocalized(check, 'title') || '' }
+          <ListGroupItem style={styleOverride}>
+            { check && lookupLocalized(check, 'title') || '' }
+            { !check && '<deleted check>' }
           </ListGroupItem>
-          <ListGroupItem className="no-padding">
+          <ListGroupItem className="no-padding" style={styleOverride}>
             { this.ResponsesEl }
           </ListGroupItem>
         </ListGroup>
