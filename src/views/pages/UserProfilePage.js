@@ -34,7 +34,7 @@ class _UserForm extends Component {
           }}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />)}
-        <FormInputField name="data.userName" label="user name"
+        <FormInputField name="data.displayName" label="display name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
@@ -75,18 +75,7 @@ export default class UserProfilePage extends Component {
     const isBusy = userInfoRef && !userInfoRef.isLoaded;
 
     // actions
-    const updateUser = (userFormData) => {
-      if (isAdmin) {
-        // admins can override other stuff as well
-        delete userFormData.isAdmin;
-        userInfoRef.update(userFormData);
-      }
-      else {
-        // normal users can only set their personal data
-        userInfoRef.set_data(userFormData.data);
-      }
-    };
-
+    const updateUser = userInfoRef.updateUser.bind(userInfoRef);
 
     // go render!
     if (isBusy) {

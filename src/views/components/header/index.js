@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react';
 import { Link } from 'react-router';
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem, Button
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Button, ButtonGroup
 } from 'react-bootstrap';
 import {
   LinkContainer
@@ -24,20 +24,35 @@ export default class Header extends Component {
     const { router, userInfoRef } = this.context;
     const { openURL, signOut } = this.props;
 
-    const busy = !userInfoRef || !userInfoRef.isLoaded;
-    const user = userInfoRef && userInfoRef.props.auth;
-    const lang = userInfoRef && userInfoRef.locale() || 'en';
+    const isLoading = !userInfoRef || !userInfoRef.isLoaded;
+    const user = userInfoRef.val;
+    const userData = userInfoRef.data();
+    const lang = userInfoRef.locale() || 'en';
 
     // actions
     const gotoProfile = () => router.replace('/user');
     const switchToEn = () => userInfoRef.set_locale('en');
     const switchToZh = () => userInfoRef.set_locale('zh');
+    const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
 
     // elements
+    const adminToolsEL = !user.isAdmin ? null : (<NavItem>
+      <Button onClick={toggleAdminView} bsStyle="danger"
+        active={userInfoRef.adminDisplayMode()}>
+        <FAIcon name="gavel"/>
+      </Button>
+    </NavItem>);
+
     const profileEl = (user && 
       <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
         <span>
-          <FAIcon name="user" /> {user.displayName || user.email}
+          {
+            userData.photoURL &&
+            <img src={userData.photoURL} style={{width: '2em'}} /> ||
+            <FAIcon name="user" />
+          }
+          <span className="padding-half" />
+          {userData.displayName || userData.email}
         </span>
       </MenuItem>
     );
@@ -56,11 +71,16 @@ export default class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
+              { adminToolsEL }
               <NavItem>
-                <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
-                EN</Button>
-                <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
-                中文</Button>
+                <ButtonGroup>
+                  <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
+                    EN
+                  </Button>
+                  <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
+                    中文
+                  </Button>
+                </ButtonGroup>
               </NavItem>
               <NavDropdown eventKey="more-drop" id="user-dropdown" title={
                    <FAIcon name="cog" />

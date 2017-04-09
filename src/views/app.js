@@ -37,6 +37,14 @@ const { pathToJS } = helpers;
 
     if (auth && auth.uid) {
       props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
+
+      if (props.userInfoRef.isLoaded && !props.userInfoRef.val) {
+        // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
+        const userData = auth.providerData && auth.providerData.length && auth.providerData[0];
+        if (userData) {
+          props.userInfoRef.setUserData(userData);
+        }
+      }
       //console.log(props.userInfoRef.val);
     }
 
@@ -81,7 +89,7 @@ export class App extends Component {
   render() {
     const { userInfoRef, dBStatusRef, firebase, children } = this.props;
     const { router } = this.context;
-    const isBusy = userInfoRef && !userInfoRef.isLoaded;
+    const isStillLoading = userInfoRef && (!userInfoRef.val);
 
     const signOut = () => {
       try {
@@ -97,7 +105,7 @@ export class App extends Component {
       return (<FAIcon name="cog" spinning={true} />);
     }
 
-    if (isBusy) {
+    if (isStillLoading) {
       // still loading
       return (<LoadOverlay />);
     }

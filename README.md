@@ -19,6 +19,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ## TODO
 * Store user data under `/users` on first login
 ** Add rules
+* Offer text/markdown-based replies by users for every concept
 * Versioning system (disable most of client functionality when client and DB version don't match)
 * Log all kinds of user interactions
 ** logUserActions
@@ -28,6 +29,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * Add Google Slides to markdown
 * Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
 * Store updatedAt + createdAt data on all kinds of data?
+* Test new user + un-privileged users
 
 
 ## TODO: logging

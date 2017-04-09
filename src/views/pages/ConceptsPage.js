@@ -454,10 +454,7 @@ export default class ConceptsPage extends Component {
     const childConcepts = this.currentChildConcepts;
     const conceptProgress = this.computeCurrentConceptProgress();
 
-    const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? (
-      // no childConcepts
-      <Alert bsStyle="info">concept has no children</Alert>
-    ) : (
+    const childConceptsEl = (!childConcepts || _.isEmpty(childConcepts)) ? null : (
       // display childConcepts
       <ConceptGrid {...{
         busy: this.state.busy,
