@@ -1,7 +1,8 @@
 export default {
-  apiKey: 'AIzaSyBtHF7eYytrXe6NuKHI6kLSeFNrUDRnUVU',
-  authDomain: 'test-app-3ecc2.firebaseapp.com',
-  databaseURL: 'https://test-app-3ecc2.firebaseio.com',
-  storageBucket: 'test-app-3ecc2.appspot.com',
-  messagingSenderId: '774073717986'
+  apiKey: "AIzaSyAZMBTlXHPO5PYpBj0UliY63c6kFITom3g",
+  authDomain: "super-awesome-buffet.firebaseapp.com",
+  databaseURL: "https://super-awesome-buffet.firebaseio.com",
+  projectId: "super-awesome-buffet",
+  storageBucket: "super-awesome-buffet.appspot.com",
+  messagingSenderId: "685592590103"
 };
