@@ -36,12 +36,16 @@ export default class Header extends Component {
     const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
 
     // elements
-    const adminToolsEL = !user.isAdmin ? null : (<NavItem>
-      <Button onClick={toggleAdminView} bsStyle="danger"
-        active={userInfoRef.adminDisplayMode()}>
-        <FAIcon name="gavel"/>
-      </Button>
-    </NavItem>);
+    const adminToolsEL = !user.isAdmin ? null : (
+      <NavItem className='header-right'>
+        <Button onClick={toggleAdminView} bsStyle={userInfoRef.adminDisplayMode() && 'success' || 'danger'}
+          className="header-gavel-button"
+          active={userInfoRef.adminDisplayMode()}>
+          <FAIcon name="gavel"/>
+        </Button>
+        <span className="padding-half" />
+      </NavItem>
+    );
 
     const profileEl = (user && 
       <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
@@ -70,9 +74,9 @@ export default class Header extends Component {
             </Nav>*/ }
           </Navbar.Header>
           <Navbar.Collapse>
-            <Nav pullRight>
+            <Nav pullRight className="header-right-container">
               { adminToolsEL }
-              <NavItem>
+              <NavItem className='header-right'>
                 <ButtonGroup>
                   <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
                     EN
