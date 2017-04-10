@@ -8,9 +8,11 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `cd ../..`
 
 ## Get Started
-  1. `npm install firebase-tools`
+  1. `npm install -g firebase-tools`
   1. `firebase login`
   1. `firebase init`
+    * `public` directory -> `dist`
+    * `database.rules.json` file -> `firebase.rules.json`
 
 ## Deployment
   1. `npm run build`
