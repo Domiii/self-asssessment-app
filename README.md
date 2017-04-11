@@ -17,9 +17,9 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
-* Store user data under `/users` on first login
-** Add rules
-* Offer text/markdown-based replies by users for every concept
+* Submission by students:
+** Offer text/markdown-based replies by users for every concept
+
 * Versioning system (disable most of client functionality when client and DB version don't match)
 * Log all kinds of user interactions
 ** logUserActions
@@ -65,8 +65,13 @@ logUIEvents
 ```
 
 ## More TODO
+
 * Show orphaned concepts, checks and other orphaned data
 * Notifications
+* Groups + Grouping
+* More Submission features
+** Backend for viewing, checking off and working with submissions
+** Peer assessment
 
 * Filter: Finished, Unfinished, Untried
 * Filters: Checkboxes of response types

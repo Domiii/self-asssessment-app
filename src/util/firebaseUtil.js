@@ -3,7 +3,16 @@ import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
 import { helpers } from 'redux-react-firebase';
-const { pathToJS, isLoaded, dataToJS } = helpers;
+const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
+
+const defaultConfig = {
+  pushedAt(obj) {
+    return Firebase.database.ServerValue.TIMESTAMP;
+  },
+  updatedAt(obj) {
+    return Firebase.database.ServerValue.TIMESTAMP;
+  }
+};
 
 
 export function authenticate(provider) {
@@ -63,7 +72,7 @@ export function makeGetDataDefault(firebaseDataRoot, path) {
  * TODO: Use reselect + internal caching so we can reduce re-creation of wrappers
  */
 export function refWrapper(cfgOrPath) {
-  return _refWrapper(null, cfgOrPath);
+  return _refWrapper(defaultConfig, null, cfgOrPath);
 }
 
 function _makeMakeQuery(getPath, queryString) {
@@ -93,7 +102,7 @@ function _makeMakeQuery(getPath, queryString) {
   return getPath.hasVariables && _defaultMakeQueryWithVariables || _defaultMakeQueryNoVariables;
 }
 
-function _refWrapper(parent, cfgOrPath) {
+function _refWrapper(inheritedSettings, parent, cfgOrPath) {
   let cfg;
   if (_.isString(cfgOrPath)) {
     cfg = { pathTemplate: cfgOrPath };
@@ -103,10 +112,14 @@ function _refWrapper(parent, cfgOrPath) {
   }
   console.assert(!!cfg, 'config was not provided under: ' + (parent && parent.pathTemplate));
 
+  inheritedSettings = Object.assign({}, inheritedSettings, cfg);
+
   let { pathTemplate, children, queryString, makeQuery } = cfg;
-  pathTemplate = parent && pathJoin(parent.pathTemplate, pathTemplate) || pathTemplate;
+  pathTemplate = parent && 
+    pathJoin(parent.pathTemplate, pathTemplate) || 
+    pathTemplate;
+
   const getPath = createPathGetterFromTemplateProps(pathTemplate);
-  
   const WrapperClass = createRefWrapperBase();
 
   // create the factory function
@@ -127,13 +140,22 @@ function _refWrapper(parent, cfgOrPath) {
     for (let wrapperName in cfg.children) {
       const childCfg = cfg.children[wrapperName];
 
-      WrapperClass._ChildWrappers = func[wrapperName] = _refWrapper(func, childCfg);
+      WrapperClass._ChildWrappers = func[wrapperName] = 
+        _refWrapper(inheritedSettings, func, childCfg);
 
       if (childCfg.cascadingMethods) {
         // add all descendant cascading methods as well
         Object.assign(cfg.cascadingMethods, childCfg.cascadingMethods);
       }
     }
+  }
+
+  // add pushedAt + updatedAt to prototype
+  if (_.isFunction(inheritedSettings.pushedAt)) {
+    WrapperClass.prototype._decoratePushedAt = inheritedSettings.pushedAt;
+  }
+  if (_.isFunction(inheritedSettings.updatedAt)) {
+    WrapperClass.prototype._decorateUpdatedAt = inheritedSettings.updatedAt;
   }
 
   // add get,set,update,add,delete accessors
@@ -422,15 +444,16 @@ function createWrapperFunc(parent, RefClass, getPath) {
     const ref = db.ref(path);
     const refWrapper = new RefClass();
     refWrapper.parent = parent;
-    refWrapper.__init(getData, ref, props);
+    refWrapper.__init(db, getData, ref, props);
     return refWrapper;
   };
 }
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    __init(getData, ref, props) {
+    __init(db, getData, ref, props) {
       //this._clazz = clazz;
+      this._db = db;
       this._ref = ref;
 
       // getData(path) function returns data at given database path
@@ -471,29 +494,53 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
-    onBeforeWrite() {
+    onBeforeWrite(val) {
       // Firebase.ServerValue.TIMESTAMP
       return true;
     }
 
+    onPush(val) {
+      if (val && this._decoratePushedAt) {
+        val.pushedAt = this._decoratePushedAt(val);
+      }
+      return true;
+    }
+
+    onUpdate(val) {
+      if (val && this._decorateUpdatedAt) {
+        debugger;
+        val.updatedAt = this._decorateUpdatedAt(val);
+      }
+      return true;
+    }
+
     set(val) {
-      return this.onBeforeWrite() &&
-        this._ref.set(val);
+      const ref = this._ref;
+      return this.onBeforeWrite(val) &&
+        this.onUpdate(val) &&
+        ref.set(val);
     }
 
-    setChild(path, newChild) {
-      return this.onBeforeWrite() &&
-        this.getRef(path).set(newChild);
+    setChild(path, childValue) {
+      // TODO: use proper decorators for descendant paths
+      const ref = this.getRef(path);
+      return this.onBeforeWrite(childValue) &&
+        this.onUpdate(childValue) &&
+        ref.set(childValue);
     }
 
-    update(values) {
-      return this.onBeforeWrite() && 
-        this._ref.update(values);
+    update(val) {
+      return this.onBeforeWrite(val) &&
+        this.onUpdate(val) &&
+        this._ref.update(val);
     }
 
     updateChild(path, childValues) {
-      return this.onBeforeWrite() && 
-        this.getRef(path).update(childValues);
+      // TODO: use proper decorators for descendant paths
+      const ref = this.getRef(path);
+      return this.onBeforeWrite(val) &&
+        this.onUpdate(childValues) &&
+        ref.update(childValues);
     }
 
 
@@ -510,11 +557,14 @@ function createRefWrapperBase() {
 
     push(newChild) {
       return this.onBeforeWrite() && 
+        this.onPush(newChild) &&
         this._ref.push(newChild);
     }
 
     pushChild(path, newChild) {
+      // TODO: use proper decorators for descendant paths
       return this.onBeforeWrite() && 
+        this.onPush(newChild) &&
         this.getRef(path).push(newChild);
     }
   }
