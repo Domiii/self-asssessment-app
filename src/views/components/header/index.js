@@ -25,9 +25,9 @@ export default class Header extends Component {
     const { openURL, signOut } = this.props;
 
     const isLoading = !userInfoRef || !userInfoRef.isLoaded;
-    const user = userInfoRef.val;
-    const userData = userInfoRef.data();
-    const lang = userInfoRef.locale() || 'en';
+    const user = userInfoRef && userInfoRef.val;
+    const userData = userInfoRef && userInfoRef.data();
+    const lang = userInfoRef && userInfoRef.locale() || 'en';
 
     // actions
     const gotoProfile = () => router.replace('/user');
@@ -36,7 +36,7 @@ export default class Header extends Component {
     const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
 
     // elements
-    const adminToolsEL = !user.isAdmin ? null : (
+    const adminToolsEL = (!user || !user.isAdmin) ? null : (
       <NavItem className='header-right'>
         <Button onClick={toggleAdminView} bsStyle={userInfoRef.adminDisplayMode() && 'success' || 'danger'}
           className="header-gavel-button"
@@ -47,7 +47,20 @@ export default class Header extends Component {
       </NavItem>
     );
 
-    const profileEl = (user && 
+    const userToolsEl = !user ? null : (
+      <NavItem className='header-right'>
+        <ButtonGroup>
+          <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
+            EN
+          </Button>
+          <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
+            中文
+          </Button>
+        </ButtonGroup>
+      </NavItem>
+    );
+
+    const profileEl = (userData && 
       <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
         <span>
           {
@@ -76,16 +89,7 @@ export default class Header extends Component {
           <Navbar.Collapse>
             <Nav pullRight className="header-right-container">
               { adminToolsEL }
-              <NavItem className='header-right'>
-                <ButtonGroup>
-                  <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
-                    EN
-                  </Button>
-                  <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
-                    中文
-                  </Button>
-                </ButtonGroup>
-              </NavItem>
+              { userToolsEl }
               <NavDropdown eventKey="more-drop" id="user-dropdown" title={
                    <FAIcon name="cog" />
                 }>

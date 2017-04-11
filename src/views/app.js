@@ -15,6 +15,8 @@ import { LoadOverlay } from 'src/views/components/overlays';
 
 const { pathToJS } = helpers;
 
+console.log('starting app...');
+
 @firebase((props, Firebase) => {
   const uid = Firebase._.authUid;
   const paths = [
@@ -40,10 +42,15 @@ const { pathToJS } = helpers;
 
       if (props.userInfoRef.isLoaded && !props.userInfoRef.val) {
         // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
-        const userData = auth.providerData && auth.providerData.length && auth.providerData[0];
-        if (userData) {
-          props.userInfoRef.setUserData(userData);
+        let userData = auth.providerData && auth.providerData.length && 
+          auth.providerData[0];
+        if (!userData) {
+          userData = {
+            displayName: auth.displayName || 'unknown',
+            email: auth.email
+          };
         }
+        props.userInfoRef.setUserData(userData);
       }
       //console.log(props.userInfoRef.val);
     }
@@ -58,7 +65,7 @@ export class App extends Component {
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object.isRequired,
+    userInfoRef: PropTypes.object,
     dBStatusRef: PropTypes.object.isRequired,
 
     children: PropTypes.object
@@ -89,7 +96,13 @@ export class App extends Component {
   render() {
     const { userInfoRef, dBStatusRef, firebase, children } = this.props;
     const { router } = this.context;
-    const isStillLoading = userInfoRef && (!userInfoRef.val);
+
+    //const notYetLoaded = !dBStatusRef.isLoaded;
+
+    // if (notYetLoaded) {
+    //   // still loading
+    //   return (<LoadOverlay />);
+    // }
 
     const signOut = () => {
       try {
@@ -103,11 +116,6 @@ export class App extends Component {
     if (!userInfoRef && router.location.pathname !== '/sign-in') {
       setTimeout(() => router.replace('/sign-in'), 50);
       return (<FAIcon name="cog" spinning={true} />);
-    }
-
-    if (isStillLoading) {
-      // still loading
-      return (<LoadOverlay />);
     }
 
     return (
