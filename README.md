@@ -37,22 +37,6 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 logUserActions (hooks into all server actions; can be used to log all DB writes?)
 
 
-logUIActivities
-
-```json
-[
-    uid,
-    from,
-    duration,
-
-    nCharactersTyped,
-    nClicks,
-    hadOtherInteractions,
-
-    currentPage,
-    currentPageArgs,
-    currentPageStateInfo,
-]
 
 logUIEvents
 
