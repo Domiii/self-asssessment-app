@@ -80,7 +80,7 @@ if (ENV_DEVELOPMENT || ENV_PRODUCTION) {
 
   config.output = {
     filename: '[name].js',
-    path: path.resolve('./dist'),
+    path: path.resolve('./public'),
     publicPath: '/'
   };
 
