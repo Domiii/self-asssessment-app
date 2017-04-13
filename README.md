@@ -17,6 +17,8 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
+* Bug: Ordering by multi-digit numbers does not work as expected
+* Feature: Add "move up" + "move down" buttons to child concepts edit tools
 * Submission by students:
 ** Offer text/markdown-based replies by users for every concept
 
