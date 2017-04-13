@@ -18,11 +18,13 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 ## TODO
 * Bug: Ordering by multi-digit numbers does not work as expected
-* Feature: Add "move up" + "move down" buttons to child concepts edit tools
+* Navigation: Add "<<<" + ">>>" buttons to navigate between siblings (and go up at first and last sibling)
+* Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
+** When not all checks are checked, "Done!" button is actually "Skip" button, and triggers special confirmation modal
+* Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
 * Submission by students:
 ** Offer text/markdown-based replies by users for every concept
-
-* Versioning system (disable most of client functionality when client and DB version don't match)
+* Hide stuff, make the interface more exploratory
 * Log all kinds of user interactions
 ** logUserActions
 ** logUIActivities
@@ -51,7 +53,7 @@ logUIEvents
 ```
 
 ## More TODO
-
+* Versioning system (disable most of client functionality when client and DB version don't match)
 * Show orphaned concepts, checks and other orphaned data
 * Notifications
 * Groups + Grouping
