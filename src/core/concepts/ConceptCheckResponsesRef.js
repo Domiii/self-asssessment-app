@@ -1,5 +1,4 @@
 import { refWrapper } from 'src/util/firebaseUtil';
-import 
 
 
 // TODO: Likes + maybe some more responses toward entire concepts
@@ -21,7 +20,7 @@ const ConceptCheckResponsesRef = refWrapper({
     conceptId_updatedAt: ['conceptId', 'updatedAt']
   },
 
-  queryString(query) {
+  queryString(ownerId) {
     // uid
 
     if (ownerId) {
@@ -65,7 +64,11 @@ const ConceptCheckResponsesRef = refWrapper({
       children: {
         progress: 'progress'
       }
-    }
+    },
+
+    ofUser: 'ofUser',
+
+    ofConcept: 'ofConcept'
   }
 });
 

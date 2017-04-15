@@ -57,7 +57,7 @@ const EmptyObject = Object.freeze({});
     queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
 
     const uid = Firebase._.authUid;
-    queries.push(ConceptCheckResponsesRef.ofUser.makeQuery({uid}));
+    queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
   }
 
   return queries;
@@ -72,7 +72,7 @@ const EmptyObject = Object.freeze({});
         conceptsRef: ConceptsRef(firebase),
         //UserInfoRef.user(firebase, {auth, uid: auth.uid});
         conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-        conceptCheckResponsesRef: ConceptCheckResponsesRef.ofUser(firebase, responsesRefArgs)
+        conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs)
       };
   }
 )

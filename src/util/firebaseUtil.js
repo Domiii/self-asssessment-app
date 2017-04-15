@@ -549,7 +549,6 @@ function createRefWrapperBase() {
 
     onUpdate(val) {
       if (val && this._decorateUpdatedAt) {
-        debugger;
         val.updatedAt = this._decorateUpdatedAt(val);
       }
       return true;
@@ -571,15 +570,16 @@ function createRefWrapperBase() {
     }
 
     update(val) {
+      const ref = this._ref;
       return this.onBeforeWrite(val) &&
         this.onUpdate(val) &&
-        this._ref.update(val);
+        ref.update(val);
     }
 
     updateChild(path, childValues) {
       // TODO: use proper decorators for descendant paths
       const ref = this.getRef(path);
-      return this.onBeforeWrite(val) &&
+      return this.onBeforeWrite(childValues) &&
         this.onUpdate(childValues) &&
         ref.update(childValues);
     }
@@ -587,26 +587,30 @@ function createRefWrapperBase() {
 
     // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
     transaction(cb) {
+      const ref = this._ref;
       return this.onBeforeWrite() && 
-        this._ref.transaction(cb);
+        ref.transaction(cb);
     }
 
     transactionChild(path, cb) {
+      const ref = this.getRef(path);
       return this.onBeforeWrite() && 
-        this.getRef(path).transaction(cb);
+        ref.transaction(cb);
     }
 
     push(newChild) {
+      const ref = this._ref;
       return this.onBeforeWrite() && 
         this.onPush(newChild) &&
-        this._ref.push(newChild);
+        ref.push(newChild);
     }
 
     pushChild(path, newChild) {
+      const ref = this.getRef(path);
       // TODO: use proper decorators for descendant paths
       return this.onBeforeWrite() && 
         this.onPush(newChild) &&
-        this.getRef(path).push(newChild);
+        ref.push(newChild);
     }
   }
 
