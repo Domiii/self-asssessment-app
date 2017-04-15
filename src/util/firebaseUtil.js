@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
-import querybase from 'querybase';
+import { Querybase, ref as qref } from 'querybase';
 import { helpers } from 'redux-react-firebase';
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
 
@@ -491,7 +491,8 @@ function createRefWrapperBase() {
     __init(db, getData, ref, props) {
       //this._clazz = clazz;
       this._db = db;
-      this._ref = ref;
+      //this._ref = ref;
+      this._ref = qref(ref, this.indices.keys);
 
       // getData(path) function returns data at given database path
       this._getData = getData;
@@ -531,9 +532,9 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
-    getQRef(path) {
-      return querybase.ref(this.getRef(path), this.indices.keys);
-    }
+    // getQRef(path) {
+    //   return qref(this.getRef(path), this.indices.keys);
+    // }
 
     onBeforeWrite(newVal) {
       

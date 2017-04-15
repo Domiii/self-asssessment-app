@@ -14,7 +14,7 @@ export default class ConceptChecksPanel extends Component {
   static propTypes = {
     conceptId: PropTypes.string,
     conceptChecks: PropTypes.object,
-    conceptCheckResponses: PropTypes.object,
+    conceptCheckResponses: PropTypes.array.isRequired,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
@@ -41,7 +41,7 @@ export default class ConceptChecksPanel extends Component {
     ));
 
     const deletedCheckResponses = _.filter(
-      _.keys(conceptCheckResponses || EmptyObject), 
+      _.keys(conceptCheckResponses), 
       checkId => !conceptChecks[checkId]);
 
     const deletedCheckResponsesEls = _.map(deletedCheckResponses, (checkId) => (

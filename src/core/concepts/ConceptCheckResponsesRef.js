@@ -1,5 +1,6 @@
 import { refWrapper } from 'src/util/firebaseUtil';
-
+import _ from 'lodash';
+import { EmptyObject, EmptyArray } from 'src/util';
 
 // TODO: Likes + maybe some more responses toward entire concepts
 /*
@@ -20,39 +21,48 @@ const ConceptCheckResponsesRef = refWrapper({
     conceptId_updatedAt: ['conceptId', 'updatedAt']
   },
 
-  queryString(ownerId) {
-    // uid
-
-    if (ownerId) {
-      // get all entries of given parent
-      return {
-        orderByChild: 'ownerId',
-        equalTo: ownerId
-      };
-    }
-    else {
-      // get root entries
-      return {
-        orderByChild: 'parentId',
-        equalTo: null
-      };
-    }
+  queryString(uid) {
+    // get all responses by given uid
+    return {
+      orderByChild: 'uid',
+      equalTo: uid
+    };
   },
 
   methods: {
-    updateResponse(uid, conceptId, checkId, checkStillExists, responseName, response) {
-      const currentResponse = this.response(conceptId, checkId);
+    ofConcept(conceptId) {
+      const { uid } = this.props;
+      const q = {
+        uid,
+        conceptId
+      };
+      return this.val && _.find(this.val, q) || EmptyArray;
+    },
+
+    updateResponse(conceptId, checkId, checkStillExists, responseName, response) {
+      const { uid } = this.props;
+      const responseId = this.val && _.findKey(this.val, {
+        uid,
+        conceptId,
+        checkId
+      });
+      const currentResponse = !!responseId && this.val[responseId];
       const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
 
       if (checkStillExists) {
+        // check is still there
         //return this.update_response(conceptId, checkId, {
-          return this.set_response(conceptId, checkId, {
+        return this.setChild(responseId, {
+          uid,
+          conceptId,
+          checkId,
           [responseName]: newStatus,
           progress: newStatus && response.progress || 0
         });
       }
       else if (!newStatus) {
-        return this.delete_response(conceptId, checkId);
+        // check object is gone -> delete response
+        return this.setChild(responseId, null);
       }
     }
   },
@@ -64,11 +74,7 @@ const ConceptCheckResponsesRef = refWrapper({
       children: {
         progress: 'progress'
       }
-    },
-
-    ofUser: 'ofUser',
-
-    ofConcept: 'ofConcept'
+    }
   }
 });
 

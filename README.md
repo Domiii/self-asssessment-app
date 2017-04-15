@@ -17,6 +17,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
+* Bug: Fix conceptCheckResponses and ConceptProgressTools
 * Bug: Users cannot write progress data
 * Bug: Ordering by multi-digit numbers does not work as expected
 * Navigation: Add "<<<" + ">>>" buttons to navigate between siblings (and go up at first and last sibling)

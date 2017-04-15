@@ -44,7 +44,7 @@ import {
 
 import _ from 'lodash';
 
-const EmptyObject = Object.freeze({});
+import { EmptyObject, EmptyArray } from 'src/util';
 
 @firebase((props, firebase) => {
   const { params } = props;
@@ -163,7 +163,7 @@ export default class ConceptsPage extends Component {
     const { conceptCheckResponsesRef } = this.props;
     return this.currentConceptId &&
       conceptCheckResponsesRef.ofConcept(this.currentConceptId) ||
-      EmptyObject;
+      EmptyArray;
   }
 
   computeCurrentConceptProgress() {
@@ -171,7 +171,7 @@ export default class ConceptsPage extends Component {
 
     return computeAllChecksProgress(
       this.currentLoadedConcepts,
-      conceptCheckResponsesRef.val) || EmptyObject;
+      conceptCheckResponsesRef.val || EmptyObject) || EmptyObject;
   }
 
 

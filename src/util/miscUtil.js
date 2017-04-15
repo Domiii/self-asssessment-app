@@ -11,3 +11,4 @@ export function asArray(collection) {
 
 
 export const EmptyObject = Object.freeze({});
+export const EmptyArray = Object.freeze([]);
