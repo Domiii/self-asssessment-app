@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
+import querybase from 'querybase';
 import { helpers } from 'redux-react-firebase';
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
 
@@ -75,8 +76,14 @@ export function refWrapper(cfgOrPath) {
   return _refWrapper(defaultConfig, null, cfgOrPath);
 }
 
+
+// converts query objects into propriotory `redux-react-firebase` query syntax
+// see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
 function _makeMakeQuery(getPath, queryString) {
-  // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
+  // TODO: Add querybase queries
+  // TODO: Use querybaseRef.encodeKeys to build query key
+  // see: https://github.com/davideast/Querybase/blob/master/src/querybase.ts#L377
+
   let querySuffixFunc = queryString instanceof Function && queryString;
   let querySuffixConst = !(queryString instanceof Function) && queryString;
   let getQuerySuffix = (...allArgs) => {
@@ -102,6 +109,33 @@ function _makeMakeQuery(getPath, queryString) {
   return getPath.hasVariables && _defaultMakeQueryWithVariables || _defaultMakeQueryNoVariables;
 }
 
+function _makeIndices(indicesCfg) {
+  if (!indicesCfg) return {};
+
+  const byField = {};
+  for (const indexName in indicesCfg) {
+    const fields = indicesCfg[indexName];
+    fields.forEach(field => 
+      byField[field] && byField[field].push(indexName) || [indexName]);
+  }
+
+  return {
+    cfg: indicesCfg,
+    keys: _.keys(byField),
+    byField,
+    getIndexNameByField(fieldName) {
+      return this.byField[fieldName];
+    },
+    getIndexCfgByField(fieldName) {
+      const indexName = this.getIndexNameByField(fieldName);
+      return indexName && this.cfg[indexName];
+    },
+    updateIndices(val) {
+      // '\uffff'
+    }
+  };
+}
+
 function _refWrapper(inheritedSettings, parent, cfgOrPath) {
   let cfg;
   if (_.isString(cfgOrPath)) {
@@ -114,7 +148,7 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
 
   inheritedSettings = Object.assign({}, inheritedSettings, cfg);
 
-  let { pathTemplate, children, queryString, makeQuery } = cfg;
+  let { pathTemplate, children, queryString, makeQuery, indices } = cfg;
   pathTemplate = parent && 
     pathJoin(parent.pathTemplate, pathTemplate) || 
     pathTemplate;
@@ -149,6 +183,9 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
       }
     }
   }
+
+  // work out indices
+  WrapperClass.prototype.indices = _makeIndices(indices || []);
 
   // add pushedAt + updatedAt to prototype
   if (_.isFunction(inheritedSettings.pushedAt)) {
@@ -494,8 +531,12 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
-    onBeforeWrite(val) {
-      // Firebase.ServerValue.TIMESTAMP
+    getQRef(path) {
+      return querybase.ref(this.getRef(path), this.indices.keys);
+    }
+
+    onBeforeWrite(newVal) {
+      
       return true;
     }
 

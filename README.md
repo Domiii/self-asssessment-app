@@ -17,6 +17,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
+* Bug: Users cannot write progress data
 * Bug: Ordering by multi-digit numbers does not work as expected
 * Navigation: Add "<<<" + ">>>" buttons to navigate between siblings (and go up at first and last sibling)
 * Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
@@ -24,13 +25,14 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
 * Submission by students:
 ** Offer text/markdown-based replies by users for every concept
-* Hide stuff, make the interface more exploratory
+* make the interface more exploratory
+** Hide advanced concepts
+** Boss level unlocks advanced concepts
 * Log all kinds of user interactions
 ** logUserActions
 ** logUIActivities
 ** logUIEvents
 * Add system for check progress caching
-* Add Google Slides to markdown
 * Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
 * Store updatedAt + createdAt data on all kinds of data?
 * Test new user + un-privileged users
@@ -53,6 +55,7 @@ logUIEvents
 ```
 
 ## More TODO
+* Add Google Slides to markdown
 * Versioning system (disable most of client functionality when client and DB version don't match)
 * Show orphaned concepts, checks and other orphaned data
 * Notifications
