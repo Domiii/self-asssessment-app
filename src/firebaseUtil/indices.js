@@ -121,8 +121,8 @@ class IndexSet {
   }
 
   // TODO: Properly handle scenarios:
-  //    "index needs updating during set"
-  //    "index needs updating during update and only partial value is given"
+  //    "index already exists but needs updating during set"
+  //    "index already exists but needs updating during update and key values are not given"
   updateIndices(val) {
     for (var indexName in this.keysByIndexName) {
       if (!val[indexName]) {
