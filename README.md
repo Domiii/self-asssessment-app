@@ -17,26 +17,25 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
-* Bug: Fix conceptCheckResponses and ConceptProgressTools
-* Bug: Users cannot write progress data
+* Bug: Fix ConceptProgressTools
 * Bug: Ordering by multi-digit numbers does not work as expected
 * Navigation: Add "<<<" + ">>>" buttons to navigate between siblings (and go up at first and last sibling)
-* Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
-** When not all checks are checked, "Done!" button is actually "Skip" button, and triggers special confirmation modal
 * Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
-* Submission by students:
-** Offer text/markdown-based replies by users for every concept
-* make the interface more exploratory
-** Hide advanced concepts
-** Boss level unlocks advanced concepts
 * Log all kinds of user interactions
 ** logUserActions
 ** logUIActivities
 ** logUIEvents
+* Submission by students:
+** Offer text/markdown-based replies by users for every concept
+
+* make the interface more exploratory
+** Hide advanced concepts
+** Boss level unlocks advanced concepts
 * Add system for check progress caching
 * Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
-* Store updatedAt + createdAt data on all kinds of data?
 * Test new user + un-privileged users
+* Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
+** When not all checks are checked, "Done!" button is actually "Skip" button, and triggers special confirmation modal
 
 
 ## TODO: logging
