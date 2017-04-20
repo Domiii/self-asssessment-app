@@ -1,6 +1,6 @@
+import _ from 'lodash';
 
-
-function addConceptProgress(allProgress, concepts, checkResponses, dstConceptId, srcConceptId) {
+function addConceptProgress(allProgress, concepts, checkResponsesByConceptId, dstConceptId, srcConceptId) {
   let conceptProgress = allProgress[dstConceptId];
   if (!conceptProgress) {
     allProgress[dstConceptId] = conceptProgress = { nTotal: 0, nCurrent: 0 };
@@ -14,8 +14,8 @@ function addConceptProgress(allProgress, concepts, checkResponses, dstConceptId,
   }
 
   conceptProgress.nTotal += srcConcept.nChecks || 0;
-  conceptProgress.nCurrent += (checkResponses && checkResponses[srcConceptId] && 
-    _.sum(_.map(checkResponses[srcConceptId], response => response.progress || 0))) ||
+  conceptProgress.nCurrent += (checkResponsesByConceptId && checkResponsesByConceptId[srcConceptId] && 
+    _.sum(_.map(checkResponsesByConceptId[srcConceptId], response => response.progress || 0))) ||
     0;
 
   conceptProgress.progress = conceptProgress.nCurrent / conceptProgress.nTotal;
@@ -26,6 +26,9 @@ function addConceptProgress(allProgress, concepts, checkResponses, dstConceptId,
 }
 
 export function computeAllChecksProgress(concepts, checkResponses) {
+
+  // TODO: prep checkResponsesByConceptId
+
   const allProgress = {};
   const childCounts = _.countBy(concepts, 'parentId');
   let queue = _.filter(_.keys(concepts), 
