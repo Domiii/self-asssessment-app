@@ -13,13 +13,14 @@ import {
 
 import ProgressBar from 'src/views/components/ProgressBar';
 
+
 export class ConceptPlayView extends Component {
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
     userPrefs: PropTypes.object.isRequired,
     conceptChecks: PropTypes.object,
-    conceptCheckResponses: PropTypes.object,
+    conceptCheckResponses: PropTypes.array.isRequired,
     conceptProgress: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };

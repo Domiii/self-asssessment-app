@@ -4,7 +4,7 @@ import {
   signInWithGithub,
   signInWithGoogle,
   signInWithTwitter
-} from 'src/util/firebaseUtil';
+} from 'src/firebaseUtil';
 
 import { firebase, helpers } from 'redux-react-firebase'
 const { pathToJS } = helpers;

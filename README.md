@@ -82,7 +82,7 @@ logUIEvents
 ### Done
 * CRUD concepts + concept questions
 * Implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
-* Implement generalized Firebase interface and corresponding utilities (see `src/util/firebaseUtil`)
+* Implement generalized Firebase interface and corresponding utilities (see `src/firebaseUtil`)
 * Add bootstrap + react-bootstrap
 * Implement redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
 

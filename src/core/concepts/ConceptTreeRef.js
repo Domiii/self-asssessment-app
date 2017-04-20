@@ -1,4 +1,4 @@
-import { refWrapper } from 'src/util/firebaseUtil';
+import { refWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
 const ConceptTreeRef = refWrapper({

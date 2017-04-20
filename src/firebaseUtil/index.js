@@ -2,8 +2,9 @@ import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
-import { Querybase, ref as qref } from 'querybase';
 import { helpers } from 'redux-react-firebase';
+import { makeIndices } from './indices';
+
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
 
 const defaultConfig = {
@@ -80,14 +81,10 @@ export function refWrapper(cfgOrPath) {
 // converts query objects into propriotory `redux-react-firebase` query syntax
 // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
 function _makeMakeQuery(getPath, queryString) {
-  // TODO: Add querybase queries
-  // TODO: Use querybaseRef.encodeKeys to build query key
-  // see: https://github.com/davideast/Querybase/blob/master/src/querybase.ts#L377
-
   let querySuffixFunc = queryString instanceof Function && queryString;
   let querySuffixConst = !(queryString instanceof Function) && queryString;
   let getQuerySuffix = (...allArgs) => {
-    let res = querySuffixFunc && querySuffixFunc(...allArgs) || querySuffixConst;
+    let res = querySuffixFunc && querySuffixFunc.apply(self, allArgs) || querySuffixConst;
     if (_.isObject(res) && !_.isString(res)) {
       res = _.map(res, (value, key) => key + '=' + value).join('&');
     }
@@ -106,34 +103,8 @@ function _makeMakeQuery(getPath, queryString) {
     return basePath + (querySuffix && ('#' + querySuffix) || '');
   }
 
-  return getPath.hasVariables && _defaultMakeQueryWithVariables || _defaultMakeQueryNoVariables;
-}
-
-function _makeIndices(indicesCfg) {
-  if (!indicesCfg) return {};
-
-  const byField = {};
-  for (const indexName in indicesCfg) {
-    const fields = indicesCfg[indexName];
-    fields.forEach(field => 
-      byField[field] && byField[field].push(indexName) || [indexName]);
-  }
-
-  return {
-    cfg: indicesCfg,
-    keys: _.keys(byField),
-    byField,
-    getIndexNameByField(fieldName) {
-      return this.byField[fieldName];
-    },
-    getIndexCfgByField(fieldName) {
-      const indexName = this.getIndexNameByField(fieldName);
-      return indexName && this.cfg[indexName];
-    },
-    updateIndices(val) {
-      // '\uffff'
-    }
-  };
+  return getPath.hasVariables && _defaultMakeQueryWithVariables || 
+    _defaultMakeQueryNoVariables;
 }
 
 function _refWrapper(inheritedSettings, parent, cfgOrPath) {
@@ -155,6 +126,7 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
 
   const getPath = createPathGetterFromTemplateProps(pathTemplate);
   const WrapperClass = createRefWrapperBase();
+  indices = indices && makeIndices(indices);
 
   // create the factory function
   const func = createWrapperFunc(parent, WrapperClass, getPath);
@@ -165,7 +137,8 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
   func.getPath = getPath;
   func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
-  func.makeQuery = makeQuery || _makeMakeQuery(getPath, queryString);
+  func.indices = indices;
+  func.makeQuery = makeQuery || _makeMakeQuery(getPath, queryString && queryString.bind(func));
 
   // recurse and add all children
   cfg.cascadingMethods = cfg.cascadingMethods || {};
@@ -185,7 +158,7 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
   }
 
   // work out indices
-  WrapperClass.prototype.indices = _makeIndices(indices || []);
+  WrapperClass.prototype.indices = indices;
 
   // add pushedAt + updatedAt to prototype
   if (_.isFunction(inheritedSettings.pushedAt)) {
@@ -492,7 +465,8 @@ function createRefWrapperBase() {
       //this._clazz = clazz;
       this._db = db;
       //this._ref = ref;
-      this._ref = qref(ref, this.indices.keys);
+
+      this._ref = ref;
 
       // getData(path) function returns data at given database path
       this._getData = getData;
@@ -516,7 +490,7 @@ function createRefWrapperBase() {
         path = '';
       }
       else if (path.startsWith('/')) {
-        console.warning('invalid path: should not start with slash (/)');
+        console.warn('invalid path: should not start with slash (/)');
       }
 
       const ancestor = this._getData();
@@ -532,18 +506,20 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
-    // getQRef(path) {
-    //   return qref(this.getRef(path), this.indices.keys);
-    // }
-
     onBeforeWrite(newVal) {
-      
+      return true;
+    }
+
+    onFinalizeWrite(newVal) {
+      if (this.indices) {
+        this.indices.updateIndices(newVal);
+      }
       return true;
     }
 
     onPush(val) {
       if (val && this._decoratePushedAt) {
-        val.pushedAt = this._decoratePushedAt(val);
+        val.updatedAt = this._decoratePushedAt(val);
       }
       return true;
     }
@@ -559,6 +535,7 @@ function createRefWrapperBase() {
       const ref = this._ref;
       return this.onBeforeWrite(val) &&
         this.onUpdate(val) &&
+        this.onFinalizeWrite(val) &&
         ref.set(val);
     }
 
@@ -567,6 +544,7 @@ function createRefWrapperBase() {
       const ref = this.getRef(path);
       return this.onBeforeWrite(childValue) &&
         this.onUpdate(childValue) &&
+        this.onFinalizeWrite(childValue) &&
         ref.set(childValue);
     }
 
@@ -574,6 +552,7 @@ function createRefWrapperBase() {
       const ref = this._ref;
       return this.onBeforeWrite(val) &&
         this.onUpdate(val) &&
+        this.onFinalizeWrite(val) &&
         ref.update(val);
     }
 
@@ -582,18 +561,21 @@ function createRefWrapperBase() {
       const ref = this.getRef(path);
       return this.onBeforeWrite(childValues) &&
         this.onUpdate(childValues) &&
+        this.onFinalizeWrite(childValue) &&
         ref.update(childValues);
     }
 
 
     // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
     transaction(cb) {
+      // TODO: add write hooks!!!
       const ref = this._ref;
       return this.onBeforeWrite() && 
         ref.transaction(cb);
     }
 
     transactionChild(path, cb) {
+      // TODO: add write hooks!!!
       const ref = this.getRef(path);
       return this.onBeforeWrite() && 
         ref.transaction(cb);
@@ -603,6 +585,7 @@ function createRefWrapperBase() {
       const ref = this._ref;
       return this.onBeforeWrite() && 
         this.onPush(newChild) &&
+        this.onFinalizeWrite(newChild) &&
         ref.push(newChild);
     }
 
@@ -611,6 +594,7 @@ function createRefWrapperBase() {
       // TODO: use proper decorators for descendant paths
       return this.onBeforeWrite() && 
         this.onPush(newChild) &&
+        this.onFinalizeWrite(newChild) &&
         ref.push(newChild);
     }
   }

@@ -1,4 +1,4 @@
-import { refWrapper } from 'src/util/firebaseUtil';
+import { refWrapper } from 'src/firebaseUtil';
 import { lookupLocalized } from 'src/util/localizeUtil';
 
 // access to the current user's info

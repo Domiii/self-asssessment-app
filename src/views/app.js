@@ -1,6 +1,6 @@
 import DBStatusRef from 'src/core/DBStatusRef';
 import { UserInfoRef } from 'src/core/users';
-import { isInitialized } from 'src/util/firebaseUtil';
+import { isInitialized } from 'src/firebaseUtil';
 import { createSelector } from 'reselect';
 
 import React, { Component, PropTypes } from 'react';

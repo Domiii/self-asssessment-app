@@ -1,5 +1,5 @@
 import React from 'react';
-import { isInitialized, isAuthenticated } from 'src/util/firebaseUtil';
+import { isInitialized, isAuthenticated } from 'src/firebaseUtil';
 
 import { routeNames, routeTemplates } from './routes';
 

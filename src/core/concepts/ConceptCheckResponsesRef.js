@@ -1,4 +1,4 @@
-import { refWrapper } from 'src/util/firebaseUtil';
+import { refWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 import { EmptyObject, EmptyArray } from 'src/util';
 
@@ -18,15 +18,23 @@ const ConceptCheckResponsesRef = refWrapper({
   indices: {
     uid: ['uid'],
     conceptId: ['conceptId'],
-    conceptId_updatedAt: ['conceptId', 'updatedAt']
+    uid_conceptId: ['uid', 'conceptId'],
+
+    // cannot currently use updatedAt, since it is only set after query returns
+    //conceptId_updatedAt: ['conceptId', 'updatedAt']
   },
 
-  queryString(uid) {
+  queryString({uid}) {
     // get all responses by given uid
-    return {
-      orderByChild: 'uid',
-      equalTo: uid
-    };
+    return this.indices.where({uid});
+    // return this.indices.where({
+    //   uid,
+    //   conceptId
+    // });
+    // {
+    //   orderByChild: 'uid',
+    //   equalTo: uid
+    // };
   },
 
   methods: {
@@ -36,7 +44,7 @@ const ConceptCheckResponsesRef = refWrapper({
         uid,
         conceptId
       };
-      return this.val && _.find(this.val, q) || EmptyArray;
+      return this.val && _.filter(this.val, q) || EmptyArray;
     },
 
     updateResponse(conceptId, checkId, checkStillExists, responseName, response) {
@@ -46,19 +54,27 @@ const ConceptCheckResponsesRef = refWrapper({
         conceptId,
         checkId
       });
-      const currentResponse = !!responseId && this.val[responseId];
-      const newStatus = !!currentResponse ? !currentResponse[responseName] : true;
+      const previousResponse = !!responseId && this.val[responseId];
+      const newStatus = !!previousResponse ? !previousResponse[responseName] : true;
 
       if (checkStillExists) {
-        // check is still there
-        //return this.update_response(conceptId, checkId, {
-        return this.setChild(responseId, {
+        // check still exists
+        const child = {
           uid,
           conceptId,
           checkId,
           [responseName]: newStatus,
           progress: newStatus && response.progress || 0
-        });
+        };
+
+        if (responseId) {
+          //console.log(responseId, child);
+          return this.setChild(responseId, child);
+        }
+        else {
+          return this.push(child);
+        }
+        //return Promise.resolve(1);
       }
       else if (!newStatus) {
         // check object is gone -> delete response
