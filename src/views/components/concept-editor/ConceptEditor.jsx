@@ -202,8 +202,6 @@ class ConceptChecksSection extends FormSection {
       (check, checkId) => ({check, checkId, num: check.num})
     ),  'num');
 
-    console.log(conceptChecks);
-
     const checkEls = _.map(checkArr, ({check, checkId}) => (
       //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
       <ListGroupItem key={checkId}>

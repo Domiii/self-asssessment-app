@@ -446,8 +446,6 @@ export default class ConceptsPage extends Component {
       }
     }
 
-    console.log(this.currentConceptChecks);
-
     const errEl = this.state.error && (
       <Alert bsStyle="danger"><pre>
         {this.state.error.message || this.state.error}

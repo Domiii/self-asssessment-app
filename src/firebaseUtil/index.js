@@ -515,13 +515,13 @@ function createRefWrapperBase() {
       return path && this._ref.child(path) || this._ref;
     }
 
-    onBeforeWrite(newVal) {
+    onBeforeWrite(val) {
       return true;
     }
 
-    onFinalizeWrite(newVal) {
-      if (this.indices) {
-        this.indices.updateIndices(newVal);
+    onFinalizeWrite(val) {
+      if (val && this.indices) {
+        this.indices.updateIndices(val);
       }
       return true;
     }
@@ -570,7 +570,7 @@ function createRefWrapperBase() {
       const ref = this.getRef(path);
       return this.onBeforeWrite(childValues) &&
         this.onUpdate(childValues) &&
-        this.onFinalizeWrite(childValue) &&
+        this.onFinalizeWrite(childValues) &&
         ref.update(childValues);
     }
 

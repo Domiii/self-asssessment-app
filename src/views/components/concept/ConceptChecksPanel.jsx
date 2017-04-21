@@ -33,17 +33,16 @@ export default class ConceptChecksPanel extends Component {
       (check, checkId) => ({check, checkId, num: check.num})
     ),  'num');
 
-    const checkEls = _.map(checkArr, ({checkId, check}) => (
-      <ConceptCheckItem
+    const checkEls = _.map(checkArr, ({checkId, check}) => (<ConceptCheckItem
         key={checkId} conceptId={conceptId} {...{checkId, check}} 
         selectedResponse={conceptCheckResponses && _.find(conceptCheckResponses, {checkId})}
         updateCheckResponse={updateCheckResponse} />
     ));
 
-    const deletedCheckResponses = _.filter(conceptCheckResponses, 
-      response => !conceptChecks[response.checkId]);
+    const deletedCheckResponseIds = _.filter(_.map(conceptCheckResponses, 'checkId'), 
+      checkId => !conceptChecks[checkId]);
 
-    const deletedCheckResponsesEls = _.map(deletedCheckResponses, (checkId) => (
+    const deletedCheckResponsesEls = _.map(deletedCheckResponseIds, (checkId) => (
       <ConceptCheckItem
         key={checkId} conceptId={conceptId} {...{checkId, check: null}} 
         selectedResponse={conceptCheckResponses && _.find(conceptCheckResponses, {checkId})}
