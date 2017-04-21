@@ -8,13 +8,19 @@ import { makeIndices } from './indices';
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
 
 const defaultConfig = {
-  pushedAt(obj) {
-    return Firebase.database.ServerValue.TIMESTAMP;
+  pushedAt(val) {
+    val.updatedAt = Firebase.database.ServerValue.TIMESTAMP;
   },
-  updatedAt(obj) {
-    return Firebase.database.ServerValue.TIMESTAMP;
+  updatedAt(val) {
+    val.updatedAt = Firebase.database.ServerValue.TIMESTAMP;
   }
 };
+
+function makeUpdatedAt(propName) {
+  return function updatedAt(val) {
+    val[propName] = Firebase.database.ServerValue.TIMESTAMP;
+  };
+}
 
 
 export function authenticate(provider) {
@@ -161,11 +167,14 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
   WrapperClass.prototype.indices = indices;
 
   // add pushedAt + updatedAt to prototype
-  if (_.isFunction(inheritedSettings.pushedAt)) {
-    WrapperClass.prototype._decoratePushedAt = inheritedSettings.pushedAt;
-  }
+  // if (_.isFunction(inheritedSettings.pushedAt)) {
+  //   WrapperClass.prototype._decoratePushedAt = inheritedSettings.pushedAt;
+  // }
   if (_.isFunction(inheritedSettings.updatedAt)) {
     WrapperClass.prototype._decorateUpdatedAt = inheritedSettings.updatedAt;
+  }
+  else if (_.isString(inheritedSettings.updatedAt)) {
+    WrapperClass.prototype._decorateUpdatedAt = makeUpdatedAt(inheritedSettings.updatedAt);
   }
 
   // add get,set,update,add,delete accessors
@@ -518,15 +527,15 @@ function createRefWrapperBase() {
     }
 
     onPush(val) {
-      if (val && this._decoratePushedAt) {
-        val.updatedAt = this._decoratePushedAt(val);
+      if (val && _.isFunction(this._decorateUpdatedAt)) {
+        this._decorateUpdatedAt(val);
       }
       return true;
     }
 
     onUpdate(val) {
-      if (val && this._decorateUpdatedAt) {
-        val.updatedAt = this._decorateUpdatedAt(val);
+      if (val && _.isFunction(this._decorateUpdatedAt)) {
+        this._decorateUpdatedAt(val);
       }
       return true;
     }

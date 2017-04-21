@@ -8,8 +8,7 @@ function addConceptProgress(allProgress, concepts, checkResponsesByConceptId, ds
 
   const srcConcept = concepts[srcConceptId];
   if (!srcConcept) {
-    console.error('referenced concept does not exist: ' + srcConceptId);
-    debugger;
+    // orphaned concept
     return;
   }
 
@@ -26,9 +25,7 @@ function addConceptProgress(allProgress, concepts, checkResponsesByConceptId, ds
 }
 
 export function computeAllChecksProgress(concepts, checkResponses) {
-
-  // TODO: prep checkResponsesByConceptId
-
+  const checkResponsesByConceptId = _.groupBy(checkResponses, 'conceptId');
   const allProgress = {};
   const childCounts = _.countBy(concepts, 'parentId');
   let queue = _.filter(_.keys(concepts), 
@@ -39,12 +36,13 @@ export function computeAllChecksProgress(concepts, checkResponses) {
     for (let i = 0; i < queue.length; ++i) {
       const conceptId = queue[i];
       const concept = concepts[conceptId];
+      if (!concept) continue;
 
       // compute own stats
-      addConceptProgress(allProgress, concepts, checkResponses, conceptId, conceptId);
+      addConceptProgress(allProgress, concepts, checkResponsesByConceptId, conceptId, conceptId);
       if (concept.parentId) {
         // add to parent stats
-        addConceptProgress(allProgress, concepts, checkResponses, concept.parentId, conceptId);
+        addConceptProgress(allProgress, concepts, checkResponsesByConceptId, concept.parentId, conceptId);
       }
     }
     queue = _.filter(_.uniq(_.map(queue, 

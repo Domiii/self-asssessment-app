@@ -295,6 +295,7 @@ export default class ConceptsPage extends Component {
   }
 
   addConceptCheck(conceptId) {
+    console.log('addConceptCheck');
     const { conceptsRef, conceptChecksRef } = this.props;
     const conceptChecks = conceptChecksRef.val;
 
@@ -444,6 +445,8 @@ export default class ConceptsPage extends Component {
         );
       }
     }
+
+    console.log(this.currentConceptChecks);
 
     const errEl = this.state.error && (
       <Alert bsStyle="danger"><pre>

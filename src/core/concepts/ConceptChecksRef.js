@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 const ConceptChecksRef = refWrapper({
   pathTemplate: '/conceptChecks',
+  updatedAt: null,
 
   children: {
     ofConcept: {
@@ -11,6 +12,7 @@ const ConceptChecksRef = refWrapper({
       children: {
         conceptCheck: {
           pathTemplate: '$(conceptCheckId)',
+          updatedAt: 'updatedAt',
 
           children: {
             title_en: 'title_en',
