@@ -17,24 +17,46 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
-* Add optional written feedback option to concept check response (automatically opens up when selecting report-type checks)
-* Add preview to concept display
-* Move editor save button to the top
-* Navigation: Add "left" , "right" + "up" buttons to quickly navigate to previous and next siblings, and parent
-* Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
+
+* submission system
+** allow users to submit outcomes to concepts/missions
+** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 
+** simple YSIWYG MD editor
+
+* submission review page route
+** feedback system
+
 * Log all kinds of user interactions
 ** logUserActions
 ** logUIActivities
 ** logUIEvents
-* Submission by students:
-** Offer text/markdown-based replies by users for every concept
-* Add buttons to evaluate a concept
-* User overview
 
+* stats + "evaluation system"
+** Visualize data and evaluate first results, after Wed class
+** See stats/comparisons related to every concept/conceptCheck?
+
+* User "groups"
+** Used to limit what activity other users see
+
+* all kinds of small things
+** Navigation: Add "left" , "right" + "up" buttons to quickly navigate to previous and next siblings, and parent
+** Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
+** Add preview to concept display + editor
+** Move editor save button to the top
+
+* User overview
+** See all users
+
+* notification system
+
+* firebase rule replacer utility: make it nice and easy to write aliases for rule checks
+
+* Add buttons to evaluate a concept: good/bad/requests/"add to short list"?
+
+* Add optional written feedback option to concept check response (automatically opens up when selecting report-type checks)
 * make the interface more exploratory
 ** Hide advanced concepts
 ** Boss level unlocks advanced concepts
-* Add system for check progress caching
 * Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
 * Test new user + un-privileged users
 * Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
@@ -58,6 +80,7 @@ logUIEvents
 ```
 
 ## More TODO
+* Add system for "check progress caching", reduce load requirements
 * Add auto-screenshot preview feature (use [html2canvas](http://html2canvas.hertzen.com/examples.html))
 * Show orphaned concepts, checks and other orphaned data
 * Add Google Slides to markdown
@@ -81,13 +104,6 @@ logUIEvents
 * Estimate size of a question in the "learning space" relative to one another (broader, more general questions are bigger than more specific questions)
 * Estimate size of entire "learning space"
 
-
-### Done
-* CRUD concepts + concept questions
-* Implement original prototype: http://codepen.io/Domiii/pen/MbGLxJ
-* Implement generalized Firebase interface and corresponding utilities (see `src/firebaseUtil`)
-* Add bootstrap + react-bootstrap
-* Implement redux-act: https://github.com/pauldijou/redux-act/blob/master/examples/todomvc/reducers/todos.js
 
 
 # More References
