@@ -21,6 +21,7 @@ export class ConceptPlayView extends Component {
     userPrefs: PropTypes.object.isRequired,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.array.isRequired,
+    conceptCheckResponseDetails: PropTypes.object,
     conceptProgress: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };
@@ -39,6 +40,7 @@ export class ConceptPlayView extends Component {
     const {
       conceptId, concept, conceptChecks, userPrefs, 
       conceptCheckResponses,
+      conceptCheckResponseDetails,
       updateCheckResponse
     } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
@@ -58,9 +60,13 @@ export class ConceptPlayView extends Component {
             <ConceptDescriptionFull concept={concept} />
           </Item>
           <Item {...itemProps}>
-            <ConceptChecksPanel conceptId={conceptId} conceptChecks={conceptChecks}
-              conceptCheckResponses={conceptCheckResponses}
-              updateCheckResponse={updateCheckResponse} />
+            <ConceptChecksPanel {...{
+              conceptId,
+              conceptChecks,
+              conceptCheckResponses,
+              conceptCheckResponseDetails,
+              updateCheckResponse
+            }} />
           </Item>
         </Flex>
       </div>

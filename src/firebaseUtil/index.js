@@ -421,7 +421,7 @@ function createPathGetterFromTemplateProps(path) {
 // 
 function createPathGetterFromTemplateArray(path) {
   const varLookup = (args, varName, iArg) => {
-    if (!args || args[iArg] === undefined) {
+    if (!args || iArg >= args.length) {
       throw new Error(`invalid arguments: ${varName} was not provided for path ${path}`);
     }
     return args[iArg];
@@ -498,9 +498,9 @@ function createRefWrapperBase() {
       if (!path) {
         path = '';
       }
-      else if (path.startsWith('/')) {
-        console.warn('invalid path: should not start with slash (/)');
-      }
+      // else if (path.startsWith('/')) {
+      //   console.warn('invalid path: should not start with slash (/): ' + path);
+      // }
 
       const ancestor = this._getData();
       if (!path) {

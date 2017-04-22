@@ -40,43 +40,60 @@ const ConceptCheckResponsesRef = refWrapper({
   methods: {
     ofConcept(conceptId) {
       const { uid } = this.props;
-      const q = {
+      const selector = {
         uid,
         conceptId
       };
-      return this.val && _.filter(this.val, q) || EmptyArray;
+      return this.val && _.filter(this.val, selector) || EmptyArray;
     },
 
-    updateResponse(conceptId, checkId, checkStillExists, responseName, response) {
+    updateResponse(conceptId, checkId, checkStillExists, response) {
       const { uid } = this.props;
       const responseId = this.val && _.findKey(this.val, {
         uid,
         conceptId,
         checkId
       });
-      const previousResponse = !!responseId && this.val[responseId];
-      const newStatus = !!previousResponse ? !previousResponse[responseName] : true;
+      const responseName = response.name;
+      const categoryName = response.category;
+
+      if (!this[categoryName]) {
+        console.error(`Invalid categoryName "${categoryName}" in response "${responseName}"`);
+        return Promise.resolve(null);
+      }
+
+      const currentSelection = responseId && this[categoryName](responseId);
+      const isNowActive = !currentSelection || currentSelection !== responseName;
 
       if (checkStillExists) {
         // check still exists
-        const child = {
-          uid,
-          conceptId,
-          checkId,
-          [responseName]: newStatus,
-          progress: newStatus && response.progress || 0
-        };
+        const newStatus = isNowActive ? responseName : null;
+        const update = {};
+
+        if (response.category === 'statusUpdate') {
+          update.progress = isNowActive && response.progress || 0;
+        }
 
         if (responseId) {
-          //console.log(responseId, child);
-          return this.setChild(responseId, child);
+          // stupid -> update + push semantics are different.
+          update[`selected/${categoryName}`] = newStatus;
+          //console.log(responseId, update);
+          return this.updateChild(responseId, update);
         }
         else {
-          return this.push(child);
+          return this.push(Object.assign(update, {
+            uid,
+            conceptId,
+            checkId,
+            selected: {
+              [categoryName]: newStatus
+            }
+          }));
         }
         //return Promise.resolve(1);
       }
-      else if (!newStatus) {
+      //else if (!isNowActive) {
+      else {
         // check object is gone -> delete response
         return this.setChild(responseId, null);
       }
@@ -88,7 +105,19 @@ const ConceptCheckResponsesRef = refWrapper({
       pathTemplate: '$(responseId)',
 
       children: {
-        progress: 'progress'
+        uid: 'uid',
+        conceptId: 'conceptId',
+        checkId: 'checkId',
+        progress: 'progress',
+        selected: {
+          pathTemplate: 'selected',
+
+          children: {
+            statusUpdate: 'statusUpdate',
+            feedback: 'feedback',
+            request: 'request',
+          }
+        }
       }
     }
   }

@@ -15,17 +15,22 @@ export default class ConceptChecksPanel extends Component {
     conceptId: PropTypes.string,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.array.isRequired,
+    conceptCheckResponseDetails: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
   render() {
     const { 
-      conceptId, conceptChecks, conceptCheckResponses, updateCheckResponse
+      conceptId,
+      conceptChecks, 
+      conceptCheckResponses,
+      conceptCheckResponseDetails,
+      updateCheckResponse
     } = this.props;
 
     if (!conceptChecks) {
       return (
-        <Well />
+        <span />
       );
     }
 
@@ -34,19 +39,28 @@ export default class ConceptChecksPanel extends Component {
     ),  'num');
 
     const checkEls = _.map(checkArr, ({checkId, check}) => (<ConceptCheckItem
-        key={checkId} conceptId={conceptId} {...{checkId, check}} 
-        selectedResponse={conceptCheckResponses && _.find(conceptCheckResponses, {checkId})}
-        updateCheckResponse={updateCheckResponse} />
+        key={checkId} {...{
+          conceptId, checkId, 
+          check,
+          selectedResponse: conceptCheckResponses && _.find(conceptCheckResponses, {checkId}),
+          responseDetails: conceptCheckResponseDetails,
+          updateCheckResponse
+        }} 
+      />
     ));
 
     const deletedCheckResponseIds = _.filter(_.map(conceptCheckResponses, 'checkId'), 
       checkId => !conceptChecks[checkId]);
 
     const deletedCheckResponsesEls = _.map(deletedCheckResponseIds, (checkId) => (
-      <ConceptCheckItem
-        key={checkId} conceptId={conceptId} {...{checkId, check: null}} 
-        selectedResponse={conceptCheckResponses && _.find(conceptCheckResponses, {checkId})}
-        updateCheckResponse={updateCheckResponse} />
+      <ConceptCheckItem {...{
+        key: checkId,
+        conceptId, checkId, 
+        check: null,
+        selectedResponse: conceptCheckResponses && _.find(conceptCheckResponses, {checkId}),
+        responseDetails: conceptCheckResponseDetails,
+        updateCheckResponse
+      }} />
     ));
 
     return (

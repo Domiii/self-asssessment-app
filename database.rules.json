@@ -23,12 +23,12 @@
     "conceptCheckResponses": {
       ".indexOn": ["uid"],
       ".read": "auth !== null",
-      ".write": "auth !== null && (
-                  (root.child('users').child(auth.uid).child('isAdmin').val() == true) ||
-                  (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || 
-                  (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||
-                  (newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val())
-                )"
+      ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val()))"
+    },
+    "conceptCheckResponseDetails": {      
+      ".indexOn": ["uid", "conceptId", "uid_conceptId"],
+      ".read": "auth !== null",
+      ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val()))"
     },
     "users": {
       "$uid" : {

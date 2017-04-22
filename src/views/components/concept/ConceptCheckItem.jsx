@@ -20,6 +20,7 @@ export default class ConceptCheckItem extends Component {
     checkId: PropTypes.string.isRequired,
     check: PropTypes.object,
     selectedResponse: PropTypes.object,
+    responseDetails: PropTypes.object,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
@@ -27,15 +28,15 @@ export default class ConceptCheckItem extends Component {
     super(...args);
   }
 
-  onCheckReponse(responseName) {
+  onCheckReponseClick(responseName) {
     // store result
     const { conceptId, checkId, check, updateCheckResponse } = this.props;
-    const responses = ConceptCheckResponseTypes.default;
+    const responses = ConceptCheckResponseTypes.default.byName;
 
     const response = responses[responseName];
     if (response) {
       // store response!
-      updateCheckResponse(conceptId, checkId, !!check, responseName, response);
+      updateCheckResponse(conceptId, checkId, !!check, response);
     }
 
     ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it
@@ -43,34 +44,51 @@ export default class ConceptCheckItem extends Component {
 
   get ResponsesEl() {
     const { lookupLocalized } = this.context;
-    const { selectedResponse } = this.props;
+    const { 
+      selectedResponse,
+      responseDetails
+    } = this.props;
 
-    const responses = ConceptCheckResponseTypes.default;
-    const responseEls = _.map(responses, (response, name) => {
-      const tooltip = (
-        <Tooltip className="in" id="tooltip">
-          { lookupLocalized(response, 'title') || '' }
-        </Tooltip>
-      );
-      return (
-        <OverlayTrigger key={name} placement="bottom" overlay={tooltip}>
-          <Button 
-            bsSize="large"
-            active={ selectedResponse && selectedResponse[name] }
-            bsStyle={response.bsStyle || 'default'}
-            ref={'check-'+name}
-            onClick={ this.onCheckReponse.bind(this, name) }
-            className={'concept-check-response-button no-padding ' + (response.className || '')}>
-            {response.icon && <FAIcon name={response.icon} /> }
-          </Button>
-        </OverlayTrigger>
-      );
+    const responseCategories = ConceptCheckResponseTypes.default.list;
+
+    const responseEls = _.map(responseCategories, ({category, responses}, iCategory) => {
+      const buttonEls = _.map(responses, (response) => {
+        const responseName = response.name;
+
+        const tooltip = (
+          <Tooltip className="in" id="tooltip">
+            { lookupLocalized(response, 'title') || '' }
+          </Tooltip>
+        );
+
+        const selections = selectedResponse && selectedResponse.selected;
+        return (
+          <OverlayTrigger key={responseName} placement="bottom" overlay={tooltip}>
+            <Button 
+              bsSize="large"
+              active={ selections && selections[category] === responseName }
+              bsStyle={ response.bsStyle || 'default' }
+              ref={ 'check-'+responseName }
+              onClick={ this.onCheckReponseClick.bind(this, responseName) }
+              className={'concept-check-response-button no-padding ' + (response.className || '')}>
+              { response.icon && <FAIcon name={response.icon} /> }
+            </Button>
+          </OverlayTrigger>
+        );
+      });
+
+      return (<span key={ category }>
+        <ButtonGroup
+          className="concept-check-response-buttons">
+          { buttonEls }
+        </ButtonGroup>
+        { iCategory < responseCategories.length-1 && <span className="margin-half" /> }
+      </span>);
     });
-    return (
-      <ButtonGroup className="max-width concept-check-response-buttons">
-        {responseEls}
-      </ButtonGroup>
-    );
+
+    return (<div className="max-width inline-hcentered">
+      { responseEls }
+    </div>);
 /*
         <Flex>
           <Item flexGrow="1" key={name}>

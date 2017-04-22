@@ -1,35 +1,86 @@
 const ConceptCheckResponseTypes = {
   default: {
-    done: {
-      progress: 1,
-      title_en: 'Played around with it. Figured it out. Works for me! Got it!',
-      title_zh: '我玩過，已經會用了。沒問題的！',
-      icon: 'check',
-      className: 'color-green',
-      bsStyle: 'success'
-    },
-    addToList: {
-      title_en: 'I want to learn this! Add to my short-list.',
-      title_zh: '我喜歡這題目。加到我的快捷學習清單～',
-      icon: 'plus',
-      bsStyle: 'success'
-    },
-    helpMe: {
-      title_en: 'I would like some help with this.',
-      title_zh: '我需要一點幫忙～',
-      icon: 'ambulance',
-      className: 'color-red',
-      bsStyle: 'success'
-    },
+    // list of category groups of responses
+    list: [
+      {
+        category: 'statusUpdate',
+        responses: [
+          {
+            name: 'done',
+            progress: 1,
+            title_en: 'Played around with it. Figured it out. Works for me! Got it!',
+            title_zh: '我玩過，已經會用了。沒問題的！',
+            icon: 'check',
+            className: 'color-green',
+            bsStyle: 'success'
+          }
+        ]
+      },
+      {
+        category: 'feedback',
+        responses: [
+          {
+            name: 'good',
+            title_en: 'This helped me discover something new!',
+            title_zh: '這項幫我發現新東西了！',
+            icon: 'smile-o',
+            bsStyle: 'primary',
+          },
+          {
+            name: 'confusing',
+            title_en: 'This is more confusing than helpful',
+            title_zh: '這項讓我覺得糊塗，沒有幫助我',
+            icon: 'frown-o',
+            bsStyle: 'primary'
+          }
+        ]
+      },
+      {
+        category: 'request',
+        responses: [
+          {
+            name: 'helpMe',
+            title_en: 'I would like some help with this.',
+            title_zh: '我需要一點幫忙～',
+            icon: 'ambulance',
+            className: 'color-red',
+            bsStyle: 'warning'
+          },
+          {
+            name: 'reportProblem',
+            title_en: 'I think, there is something wrong with this.',
+            title_zh: '我覺得這項有問題',
+            icon: 'exclamation-circle',
+            className: 'color-yellow',
+            bsStyle: 'warning'
+          },
+          {
+            name: 'comment',
+            title_en: 'I would like to give some other feedback or comment on this.',
+            title_zh: '我有其他類型的意見想分享',
+            icon: 'commenting-o',
+            bsStyle: 'warning'
+          }
+        ]
+      }
+    ]
+  }
+};
 
-    reportProblem: {
-      title_en: 'I think, there is something wrong with this.',
-      title_zh: '我覺得這題目有問題',
-      icon: 'exclamation-circle',
-      className: 'color-yellow',
-      bsStyle: 'danger'
-    }
-  },
+_.forEach(ConceptCheckResponseTypes, (set, setName) => {
+  // set category property on all response objects
+  set.list.forEach(({category, responses}) => responses.forEach(response => response.category = category));
+
+  // single array of all responses
+  set.flatList = _.flatMap(set.list, cat => cat.responses);
+
+  // index by name
+  set.byName = _.zipObject(_.map(set.flatList, 'name'), set.flatList);
+
+  // index by category
+  set.byCategory = _.groupBy(set.flatList, 'category');
+});
+
   // yesNo: {
   //   yes: {
   //     title_en: 'yes',
@@ -55,6 +106,5 @@ const ConceptCheckResponseTypes = {
   //     className: 'color-red'
   //   }
   // },
-};
 
 export default ConceptCheckResponseTypes;

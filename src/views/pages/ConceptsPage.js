@@ -3,6 +3,7 @@ import {
   ConceptChecksRef,
   ConceptResponsesRef,
   ConceptCheckResponsesRef,
+  ConceptCheckResponseDetailsRef,
 
   computeAllChecksProgress
 } from 'src/core/concepts/';
@@ -58,6 +59,8 @@ import { EmptyObject, EmptyArray } from 'src/util';
 
     const uid = Firebase._.authUid;
     queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
+
+    queries.push(ConceptCheckResponseDetailsRef.makeQuery({uid, conceptId}));
   }
 
   return queries;
@@ -65,15 +68,26 @@ import { EmptyObject, EmptyArray } from 'src/util';
 @connect(
     ({ firebase }, props) => {
       const { params } = props;
-      const checkArgs = { conceptId: params.conceptId || 0 };
-      const responsesRefArgs = { uid: Firebase._.authUid };
+      const uid = Firebase._.authUid;
+      const conceptId = params.conceptId;
 
-      return {
+      let refs = {
         conceptsRef: ConceptsRef(firebase),
-        //UserInfoRef.user(firebase, {auth, uid: auth.uid});
-        conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-        conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs)
       };
+
+      if (conceptId) {
+        const checkArgs = { conceptId: conceptId || 0 };
+        const responsesRefArgs = { uid };
+        const responseDetailsArgs = {uid, conceptId};
+
+        refs = Object.assign(refs, {
+          //UserInfoRef.user(firebase, {auth, uid: auth.uid});
+          conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
+          conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
+          conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
+        });
+      }
+      return refs;
   }
 )
 export default class ConceptsPage extends Component {
@@ -86,8 +100,9 @@ export default class ConceptsPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    conceptChecksRef: PropTypes.object.isRequired,
-    conceptCheckResponsesRef: PropTypes.object.isRequired
+    conceptChecksRef: PropTypes.object,
+    conceptCheckResponsesRef: PropTypes.object,
+    conceptCheckResponseDetailsRef: PropTypes.object
   };
 
   constructor(...args) {
@@ -159,11 +174,20 @@ export default class ConceptsPage extends Component {
     return conceptChecksRef.val;
   }
 
+  // all relevant responses by current user
   get currentCheckResponses() {
     const { conceptCheckResponsesRef } = this.props;
     return this.currentConceptId &&
       conceptCheckResponsesRef.ofConcept(this.currentConceptId) ||
       EmptyArray;
+  }
+
+  // response details of the currently selected conceptId, by current user
+  get currentCheckResponseDetails() {
+    const { conceptCheckResponseDetailsRef } = this.props;
+    return this.currentConceptId &&
+      conceptCheckResponseDetailsRef.val ||
+      EmptyObject;
   }
 
   computeCurrentConceptProgress() {
@@ -295,7 +319,6 @@ export default class ConceptsPage extends Component {
   }
 
   addConceptCheck(conceptId) {
-    console.log('addConceptCheck');
     const { conceptsRef, conceptChecksRef } = this.props;
     const conceptChecks = conceptChecksRef.val;
 
@@ -336,12 +359,12 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
   }
 
-  updateCheckResponse(conceptId, checkId, checkStillExists, responseName, response) {
+  updateCheckResponse(conceptId, checkId, checkStillExists, response) {
     const { conceptCheckResponsesRef } = this.props;
 
     return this.wrapPromise(
       conceptCheckResponsesRef.updateResponse(
-        conceptId, checkId, checkStillExists, responseName, response));
+        conceptId, checkId, checkStillExists, response));
   }
   
 
@@ -496,6 +519,7 @@ export default class ConceptsPage extends Component {
             userPrefs: this.userPrefs,
             conceptChecks: this.currentConceptChecks,
             conceptCheckResponses: this.currentCheckResponses,
+            conceptCheckResponseDetails: this.currentCheckResponseDetails,
             conceptProgress,
             updateCheckResponse: this.updateCheckResponse
           }} /> }

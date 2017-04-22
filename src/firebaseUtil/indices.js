@@ -1,18 +1,61 @@
 import _ from 'lodash';
 
 
+const defaultConfig = {
+  keys: [],
+
+  // Whether to update the index on every write operation (given it's keys are present).
+  // If this is set to false, it will only try to write the index when it has not previously been written.
+  writeAlways: false,
+
+  // Whether to show a warning when an index cannot be updated due to missing key data.
+  // You only want to set this to true when you are sure that all required key data will be written for every possible index update.
+  isRequired: false
+};
+
 export function makeIndices(cfg) {
   return new IndexSet(cfg);
 }
 
 var IndexUtils = {
+  sanitizeConfig(cfg) {
+    return _.zipObject(_.keys(cfg), _.map(cfg, (indexCfg, indexName) => {
+      let cfgEntry;
+      if (_.isArray(indexCfg)) {
+        // only provide array of keys
+        cfgEntry = { 
+          keys: indexCfg
+        };
+      }
+      else if (_.isString(indexCfg)) {
+        // only provide name of single key
+        cfgEntry = {
+          keys: [indexCfg]
+        };
+      }
+      else if (_.isObject(indexCfg)) {
+        // provide full configuration for index
+        if (!_.isArray(indexCfg.keys)) {
+          console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
+        }
+        cfgEntry = indexCfg;
+      }
+      else {
+        console.warn('Invalid index config has invalid entry: ' + indexName);
+        cfgEntry = {};
+      }
+
+      return Object.assign({}, defaultConfig, cfgEntry);
+    }));
+  },
+
   convertToSortedValueSet(val) {
     if (_.isArray(val)) {
       return _.map(val, this.convertToSortedValueSet.bind(this));
     }
     else if (_.isObject(val)) {
       const converted = _.flatten(_.map(val, (v, k) => [k, this.convertToSortedValueSet(v)]));
-      return _.sortBy(converted, tuple => tuple[0]);
+      return _.sortBy(converted, ([k, v]) => k);
     }
     return val;
   },
@@ -39,17 +82,26 @@ class IndexSet {
    * {cfg} Index definitions: Each index name is assigned an array of all keys that participate in it.
    */
   constructor(cfg) {
+    // the cfg object supports some short-hands, which are unrolled in completeCfg
+    const completeCfg = IndexUtils.sanitizeConfig(cfg);
+
+    // create object of type { indexName => [ key1, key2...] }
+    const keysByIndexName = _.zipObject(_.keys(completeCfg), _.map(completeCfg, 'keys'));
+
+    // create object of type { key => [indexName1, indexName2...] }
     const indexNamesByKey = {};
-    for (const indexName in cfg) {
-      const keys = cfg[indexName];
+    for (const indexName in keysByIndexName) {
+      const keys = keysByIndexName[indexName];
       keys.forEach(key => 
         indexNamesByKey[key] = indexNamesByKey[key] && indexNamesByKey[key].push(indexName) || [indexName]);
     }
 
-    this.cfg = cfg;
-    this.keysByIndexName = cfg;
-    this.indexNames = _.keys(cfg);
+    this.cfg = completeCfg;
+
+    this.indexNames = _.keys(keysByIndexName);
     this.keys = _.keys(indexNamesByKey);
+
+    this.keysByIndexName = keysByIndexName;
     this.indexNamesByKey = indexNamesByKey;
   }
 
@@ -120,18 +172,24 @@ class IndexSet {
     return IndexUtils.encodeValueDeep(values);
   }
 
+  getCfg(indexName) {
+    return this.cfg[indexName];
+  }
+
   // TODO: Properly handle scenarios:
   //    "index already exists but needs updating during set"
   //    "index already exists but needs updating during update and key values are not given"
   updateIndices(val) {
     for (var indexName in this.keysByIndexName) {
-      if (!val[indexName]) {
+      if (this.getCfg(indexName).writeAlways || !val[indexName]) {
         const keys = this.keysByIndexName[indexName];
         if (keys.length < 2) continue;
 
         if (_.some(keys, key => !_.has(val, key))) {
-          console.error(`Updated value did not define index "${indexName}", and is also missing some of its keys: 
-            [${keys}]\n${JSON.stringify(val)}`);
+          if (this.cfg[indexName].isRequired) {
+            console.warn(`Updated value did not define index "${indexName}", and is also missing some of its keys: 
+              [${keys}]\n${JSON.stringify(val)}`);
+          }
           continue;
         }
 

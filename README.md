@@ -17,9 +17,10 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase deploy`
 
 ## TODO
-* Bug: Fix ConceptProgressTools
-* Bug: Ordering by multi-digit numbers does not work as expected
-* Navigation: Add "<<<" + ">>>" buttons to navigate between siblings (and go up at first and last sibling)
+* Add optional written feedback option to concept check response (automatically opens up when selecting report-type checks)
+* Add preview to concept display
+* Move editor save button to the top
+* Navigation: Add "left" , "right" + "up" buttons to quickly navigate to previous and next siblings, and parent
 * Editor: Add "move up" + "move down" buttons to child concepts edit tools (changes order)
 * Log all kinds of user interactions
 ** logUserActions
@@ -27,6 +28,8 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** logUIEvents
 * Submission by students:
 ** Offer text/markdown-based replies by users for every concept
+* Add buttons to evaluate a concept
+* User overview
 
 * make the interface more exploratory
 ** Hide advanced concepts
@@ -55,9 +58,10 @@ logUIEvents
 ```
 
 ## More TODO
+* Add auto-screenshot preview feature (use [html2canvas](http://html2canvas.hertzen.com/examples.html))
+* Show orphaned concepts, checks and other orphaned data
 * Add Google Slides to markdown
 * Versioning system (disable most of client functionality when client and DB version don't match)
-* Show orphaned concepts, checks and other orphaned data
 * Notifications
 * Groups + Grouping
 * More Submission features
