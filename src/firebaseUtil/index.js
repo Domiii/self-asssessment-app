@@ -574,22 +574,6 @@ function createRefWrapperBase() {
         ref.update(childValues);
     }
 
-
-    // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
-    transaction(cb) {
-      // TODO: add write hooks!!!
-      const ref = this._ref;
-      return this.onBeforeWrite() && 
-        ref.transaction(cb);
-    }
-
-    transactionChild(path, cb) {
-      // TODO: add write hooks!!!
-      const ref = this.getRef(path);
-      return this.onBeforeWrite() && 
-        ref.transaction(cb);
-    }
-
     push(newChild) {
       const ref = this._ref;
       return this.onBeforeWrite() && 
@@ -605,6 +589,22 @@ function createRefWrapperBase() {
         this.onPush(newChild) &&
         this.onFinalizeWrite(newChild) &&
         ref.push(newChild);
+    }
+
+
+    // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
+    transaction(cb) {
+      // TODO: add write hooks!!!
+      const ref = this._ref;
+      return this.onBeforeWrite() && 
+        ref.transaction(cb);
+    }
+
+    transactionChild(path, cb) {
+      // TODO: add write hooks!!!
+      const ref = this.getRef(path);
+      return this.onBeforeWrite() && 
+        ref.transaction(cb);
     }
   }
 

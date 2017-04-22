@@ -32,7 +32,7 @@ Every `ref wrapper` created from the `makeRefWrapper` factory comes equipped wit
 * `set(val)`
 * `update(val)`
 * `push(val)`
-* `transaction` (INCOMPLETE: is not affected by other configuration the way it should (e.g. `indices`))
+* `transaction(cb)` (INCOMPLETE: is not affected by other configuration the way it should (e.g. `indices`))
 
 Some more methods (but you will/should not need these usually, because of automatically configured `children` (see below)):
 
@@ -41,7 +41,7 @@ Some more methods (but you will/should not need these usually, because of automa
 * `setChild(path, val)`
 * `updateChild(path, val)`
 * `pushChild(path, val)`
-* `transactionChild(path, val)`
+* `transactionChild(path, cb)`
 
 TODO
 
