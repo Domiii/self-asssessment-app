@@ -45,7 +45,7 @@ export default class ProgressBar extends Component {
             position:'absolute', left: 0, top: 0, bottom: 0,
             color: 'white',
             width: '100%'}}>
-              <span>{ progressPct } %</span>
+              <span>{ !isNaN(progressPct) && (progressPct + '%') || '' }</span>
         </div>
         </Well>
     );

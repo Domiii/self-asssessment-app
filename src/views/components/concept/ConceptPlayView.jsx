@@ -28,10 +28,12 @@ export class ConceptPlayView extends Component {
 
   get ProgressBar() {
     const { conceptId, conceptProgress } = this.props;
-    const progressPct = Math.round((conceptProgress && 
+
+    const progressPct = (conceptProgress && 
       conceptProgress[conceptId] && 
-      conceptProgress[conceptId].progress 
-      || 0) * 100);
+      !isNaN(conceptProgress[conceptId].progress)) ?
+      Math.round(conceptProgress[conceptId].progress * 100) :
+      NaN;
 
     return (<ProgressBar progressPct={progressPct} />);
   }

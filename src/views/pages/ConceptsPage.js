@@ -185,7 +185,7 @@ export default class ConceptsPage extends Component {
   // response details of the currently selected conceptId, by current user
   get currentCheckResponseDetails() {
     const { conceptCheckResponseDetailsRef } = this.props;
-    return this.currentConceptId &&
+    return conceptCheckResponseDetailsRef && 
       conceptCheckResponseDetailsRef.val ||
       EmptyObject;
   }
@@ -193,7 +193,7 @@ export default class ConceptsPage extends Component {
   computeCurrentConceptProgress() {
     const { conceptCheckResponsesRef } = this.props;
 
-    return computeAllChecksProgress(
+    return conceptCheckResponsesRef && computeAllChecksProgress(
       this.currentLoadedConcepts,
       conceptCheckResponsesRef.val || EmptyObject) || EmptyObject;
   }
@@ -345,7 +345,7 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(
       conceptChecksRef.delete_conceptCheck(conceptCheckId)
       .then(conceptsRef.update_concept(conceptId, 
-        {nChecks: conceptChecks && _.size(conceptChecks) || 0}))
+        {nChecks: conceptChecks && _.size(conceptChecks)-1 || 0}))
     );
   }
 

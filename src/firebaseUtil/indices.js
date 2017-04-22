@@ -180,6 +180,8 @@ class IndexSet {
   //    "index already exists but needs updating during set"
   //    "index already exists but needs updating during update and key values are not given"
   updateIndices(val) {
+    if (!_.isObject(val)) return;
+    
     for (var indexName in this.keysByIndexName) {
       if (this.getCfg(indexName).writeAlways || !val[indexName]) {
         const keys = this.keysByIndexName[indexName];

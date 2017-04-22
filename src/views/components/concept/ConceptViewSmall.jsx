@@ -76,9 +76,11 @@ export default class ConceptViewSmall extends Component {
     const conceptArgs = { ownerId, parentId, conceptId, concept };
     const title = lookupLocalized(concept, 'title');
 
-    const progressPct = Math.round((conceptProgress && 
+    const progressPct = (conceptProgress && 
       conceptProgress[conceptId] && 
-      conceptProgress[conceptId].progress) * 100);
+      !isNaN(conceptProgress[conceptId].progress)) ?
+      Math.round(conceptProgress[conceptId].progress * 100) :
+      NaN;
     const progressColor = getProgressColor(progressPct);
 
     // element: title line

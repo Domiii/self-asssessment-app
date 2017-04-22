@@ -520,21 +520,21 @@ function createRefWrapperBase() {
     }
 
     onFinalizeWrite(val) {
-      if (val && this.indices) {
+      if (_.isObject(val) && this.indices) {
         this.indices.updateIndices(val);
       }
       return true;
     }
 
     onPush(val) {
-      if (val && _.isFunction(this._decorateUpdatedAt)) {
+      if (_.isObject(val) && _.isFunction(this._decorateUpdatedAt)) {
         this._decorateUpdatedAt(val);
       }
       return true;
     }
 
     onUpdate(val) {
-      if (val && _.isFunction(this._decorateUpdatedAt)) {
+      if (_.isObject(val) && _.isFunction(this._decorateUpdatedAt)) {
         this._decorateUpdatedAt(val);
       }
       return true;
