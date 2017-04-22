@@ -59,7 +59,7 @@ export function makeGetDataDefault(firebaseDataRoot, path) {
 /**
  * Provide path, relative to parent (root) path, given user-provided props object.
  * MUST be provided for all children. OPTIONAL in root.
- * @callback refWrapper~getPathFunc
+ * @callback makeRefWrapper~getPathFunc
  * @param {object} props
  */
 
@@ -79,8 +79,8 @@ export function makeGetDataDefault(firebaseDataRoot, path) {
  *
  * TODO: Use reselect + internal caching so we can reduce re-creation of wrappers
  */
-export function refWrapper(cfgOrPath) {
-  return _refWrapper(defaultConfig, null, cfgOrPath);
+export function makeRefWrapper(cfgOrPath) {
+  return _makeRefWrapper(defaultConfig, null, cfgOrPath);
 }
 
 
@@ -113,7 +113,7 @@ function _makeMakeQuery(getPath, queryString) {
     _defaultMakeQueryNoVariables;
 }
 
-function _refWrapper(inheritedSettings, parent, cfgOrPath) {
+function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   let cfg;
   if (_.isString(cfgOrPath)) {
     cfg = { pathTemplate: cfgOrPath };
@@ -154,7 +154,7 @@ function _refWrapper(inheritedSettings, parent, cfgOrPath) {
       const childCfg = cfg.children[wrapperName];
 
       WrapperClass._ChildWrappers = func[wrapperName] = 
-        _refWrapper(inheritedSettings, func, childCfg);
+        _makeRefWrapper(inheritedSettings, func, childCfg);
 
       if (childCfg.cascadingMethods) {
         // add all descendant cascading methods as well
@@ -238,7 +238,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
 
     // add
     const addGetPath = createPathGetterFromTemplateArray(parentPath);
-    prototype['add_' + wrapperName] = createChildDataPush(addGetPath);
+    prototype['push_' + wrapperName] = createChildDataPush(addGetPath);
 
     // set
     prototype['set_' + wrapperName] = createChildDataSet(getPath);
@@ -449,7 +449,7 @@ function createPathGetterFromTemplate(path, varLookup, substituter) {
   return getPath;
 }
 
-function createWrapperFunc(parent, RefClass, getPath) {
+function createWrapperFunc(parent, WrapperClass, getPath) {
   return function wrapper(firebaseDataRoot, props) {
     props = props || {};
     let path = getPath(props);
@@ -461,7 +461,7 @@ function createWrapperFunc(parent, RefClass, getPath) {
 
     const db = props && props.db || Firebase.database();
     const ref = db.ref(path);
-    const refWrapper = new RefClass();
+    const refWrapper = new WrapperClass();
     refWrapper.parent = parent;
     refWrapper.__init(db, getData, ref, props);
     return refWrapper;

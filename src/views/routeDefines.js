@@ -4,9 +4,11 @@ import { isInitialized, isAuthenticated } from 'src/firebaseUtil';
 import { routeNames, routeTemplates } from './routes';
 
 import App from './app';
+
 import SignIn from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ConceptsPage from './pages/ConceptsPage';
+import TestPage from './pages/TestPage';
 //import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
 // const requireLoading = getState => {
@@ -89,16 +91,15 @@ export const getRoutes = getState => {
           component: ConceptsPage,
           onEnter: requireAuth(getState)
         }
-      }
+      },
       // {
-      //   name: routeNames.CONCEPT_PLAY,
-      //   path: routeTemplates.CONCEPT_PLAY,
-      //   component: ConceptPlayPage,
+      //   name: routeNames.TEST,
+      //   path: routeTemplates.TEST,
       //   onEnter: requireAuth(getState),
       //   childRoutes: [
       //     {
-      //       path: routeTemplates.CONCEPT_PROBLEM,
-      //       component: ConceptPlayPage
+      //       component: TestPage,
+      //       onEnter: requireAuth(getState)
       //     }
       //   ]
       // }

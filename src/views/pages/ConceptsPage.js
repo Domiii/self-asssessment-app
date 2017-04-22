@@ -277,7 +277,7 @@ export default class ConceptsPage extends Component {
     concept.parentId = parentId;
 
     // create new concept entry
-    const newRef = conceptsRef.add_concept(concept);
+    const newRef = conceptsRef.push_concept(concept);
 
     // update ownerId
     const ownerId = this.currentOwnerId || 
@@ -333,7 +333,7 @@ export default class ConceptsPage extends Component {
     const nChecks = 1 + (conceptChecks && _.size(conceptChecks) || 0);
 
     return this.wrapPromise(
-      conceptChecksRef.add_conceptCheck(newCheck)
+      conceptChecksRef.push_conceptCheck(newCheck)
       .then(conceptsRef.update_concept(conceptId, {nChecks}))
     );
   }

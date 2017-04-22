@@ -1,8 +1,8 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 import { lookupLocalized } from 'src/util/localizeUtil';
 
 // access to the current user's info
-const UserInfoRef = refWrapper({
+const UserInfoRef = makeRefWrapper({
   pathTemplate: '/users',
 
   children: {
@@ -39,6 +39,7 @@ const UserInfoRef = refWrapper({
         email: 'data/email',
         locale: 'data/locale',
 
+        // TODO: Put this into a different path. Personal user settings don't belong with account data.
         prefs: {    // some UI user preferences
           pathTemplate: 'prefs',
           children: {

@@ -1,7 +1,7 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 
 
-const ConceptProgressRef = refWrapper({
+const ConceptProgressRef = makeRefWrapper({
   pathTemplate: '/conceptProgress',
 
   children: {

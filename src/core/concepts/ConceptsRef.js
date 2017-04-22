@@ -1,7 +1,7 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
-const ConceptsRef = refWrapper({
+const ConceptsRef = makeRefWrapper({
   pathTemplate: '/concepts',
 
   queryString(ownerId) {

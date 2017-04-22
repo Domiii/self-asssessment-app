@@ -1,7 +1,7 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
-const ConceptTreeRef = refWrapper({
+const ConceptTreeRef = makeRefWrapper({
   pathTemplate: '/conceptTree',
 
   methods: {

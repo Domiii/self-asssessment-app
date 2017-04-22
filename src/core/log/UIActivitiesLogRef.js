@@ -1,8 +1,8 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
 
-const UIActivitiesLogRef = refWrapper({
+const UIActivitiesLogRef = makeRefWrapper({
   pathTemplate: '/logs/uiActivities',
 
   children: {

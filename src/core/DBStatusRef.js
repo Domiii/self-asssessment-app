@@ -1,6 +1,6 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 
-const DBStatusRef  = refWrapper({
+const DBStatusRef  = makeRefWrapper({
   pathTemplate: '/dbState',
 
   methods: {

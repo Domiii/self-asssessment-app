@@ -5,7 +5,7 @@ export const routeNames = {
   CONCEPTS: '',
   CONCEPT_VIEW: 'concept',
   CONCEPT_PLAY: 'play',
-  CONCEPT_PROBLEM: 'problem'
+  TEST: 'test'
 };
 
 export const routePaths = {
@@ -15,6 +15,7 @@ export const routePaths = {
   CONCEPTS: `/${routeNames.CONCEPTS}`,
   CONCEPT_VIEW: `/${routeNames.CONCEPT_VIEW}`,
   CONCEPT_PLAY: `/${routeNames.CONCEPT_PLAY}`,
+  TEST: `/${routeNames.TEST}`
 };
 
 export const routeTemplates = {
@@ -26,4 +27,5 @@ export const routeTemplates = {
   CONCEPT_VIEW: `${routeNames.CONCEPT_VIEW}/:ownerId/:conceptId`,
   CONCEPT_VIEW_MODE: `${routeNames.CONCEPT_VIEW}/:ownerId/:conceptId/:mode`,
   CONCEPT_PLAY: `${routeNames.CONCEPT_PLAY}/:ownerId/:conceptId`,
+  TEST: `/${routeNames.TEST}`
 };

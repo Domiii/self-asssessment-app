@@ -1,4 +1,4 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 import { EmptyObject, EmptyArray } from 'src/util';
 
@@ -12,7 +12,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
   },
 */
 
-const ConceptCheckResponsesRef = refWrapper({
+const ConceptCheckResponsesRef = makeRefWrapper({
   pathTemplate: '/conceptCheckResponses',
 
   indices: {

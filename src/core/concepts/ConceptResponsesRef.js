@@ -1,4 +1,4 @@
-import { refWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper } from 'src/firebaseUtil';
 
 
 // TODO: Likes + maybe some more responses toward entire concepts
@@ -11,7 +11,7 @@ import { refWrapper } from 'src/firebaseUtil';
   },
 */
 
-const ConceptResponsesRef = refWrapper({
+const ConceptResponsesRef = makeRefWrapper({
   pathTemplate: '/conceptResponses',
 
   // children: {
