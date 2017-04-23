@@ -14,6 +14,7 @@ const DBStatusRef  = makeRefWrapper({
       pathTemplate: 'current',
 
       children: {
+        isLocked: 'isLocked',
         version: 'version',
         updatedAt: 'updatedAt'
       }

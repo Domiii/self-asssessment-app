@@ -1,23 +1,26 @@
 import DBStatusRef from 'src/core/DBStatusRef';
 import { UserInfoRef } from 'src/core/users';
+import { startLogging } from 'src/core/users';
 import { isInitialized } from 'src/firebaseUtil';
 import { createSelector } from 'reselect';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Firebase from 'firebase';
-import { firebase, helpers } from 'redux-react-firebase'
+import { firebase as firebaseConnect, helpers } from 'redux-react-firebase'
 import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 import { lookupLocalized } from 'src/util/localizeUtil';
 
-import { LoadOverlay } from 'src/views/components/overlays';
+import { Overlay, LoadOverlay } from 'src/views/components/overlays';
 
 const { pathToJS } = helpers;
 
 console.log('starting app...');
 
-@firebase((props, Firebase) => {
+
+// our firebase utility needs a set of all paths
+const mapPropsToPaths = (props, Firebase) => {
   const uid = Firebase._.authUid;
   const paths = [
     DBStatusRef.makeQuery()
@@ -26,38 +29,37 @@ console.log('starting app...');
     paths.push(UserInfoRef.user.makeQuery({uid}));
   }
   return paths;
-})
-@connect(
-  ({ firebase }, ownProps) => {
-    const auth = pathToJS(firebase, 'auth');
-    const dBStatusRef = DBStatusRef(firebase);
+};
 
-    const props = {
-      dBStatusRef,
-      clientVersion: dBStatusRef.version()
-    };
+const mapStateToProps = ({ firebase }, ownProps) => {
+  const auth = pathToJS(firebase, 'auth');
+  const dBStatusRef = DBStatusRef(firebase);
 
-    if (auth && auth.uid) {
-      props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
-
-      if (props.userInfoRef.isLoaded && !props.userInfoRef.val) {
-        // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
-        let userData = auth.providerData && auth.providerData.length && 
-          auth.providerData[0];
-        if (!userData) {
-          userData = {
-            displayName: auth.displayName || 'unknown',
-            email: auth.email
-          };
-        }
-        props.userInfoRef.setUserData(userData);
+  const props = {
+    signOut() {
+      try {
+        firebase.logout();
       }
-      //console.log(props.userInfoRef.val);
-    }
+      catch (err) {
+        console.error(err.stack);
+      }
+    },
+    dBStatusRef,
+    clientVersion: dBStatusRef.version()
+  };
 
-    return props;
+  if (auth && auth.uid) {
+    props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
   }
-)
+
+  return props;
+};
+
+const mapDispatchToProps = dispatch => ({});
+
+
+@firebaseConnect(mapPropsToPaths)
+@connect(mapStateToProps, mapDispatchToProps)
 export class App extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired
@@ -93,8 +95,21 @@ export class App extends Component {
     const { router } = this.context;
   }
 
+  componentDidMount() {
+    const { userInfoRef } = this.props;
+
+    userInfoRef.ensureUserInitialized();
+
+    // TODO: Remember whether we added the logging hook already, and only add one if not done yet
+    // TODO: log new visit
+    // TODO: add hook to browserhistory
+    // browserHistory.listen( location =>  {
+      
+    // });
+  }
+
   render() {
-    const { userInfoRef, dBStatusRef, firebase, children } = this.props;
+    const { userInfoRef, dBStatusRef, signOut, children } = this.props;
     const { router } = this.context;
 
     //const notYetLoaded = !dBStatusRef.isLoaded;
@@ -104,19 +119,10 @@ export class App extends Component {
     //   return (<LoadOverlay />);
     // }
 
-    const signOut = () => {
-      try {
-        firebase.logout();
-      }
-      catch (err) {
-        console.error(err.stack);
-      }
-    };
-
-    if (!userInfoRef && router.location.pathname !== '/sign-in') {
-      setTimeout(() => router.replace('/sign-in'), 50);
-      return (<FAIcon name="cog" spinning={true} />);
-    }
+    // if (!userInfoRef && router.location.pathname !== '/sign-in') {
+    //   setTimeout(() => router.replace('/sign-in'), 50);
+    //   return (<FAIcon name="cog" spinning={true} />);
+    // }
 
     return (
       <div className="app container max-height">
@@ -138,11 +144,4 @@ export class App extends Component {
 //  CONNECT
 //-------------------------------------
 
-const mapStateToProps = state => ({});
-
-const mapDispatchToProps = dispatch => ({});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+export default App;

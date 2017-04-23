@@ -55,41 +55,38 @@ import { EmptyObject, EmptyArray } from 'src/util';
 
   if (params.conceptId) {
     const conceptId = params.conceptId;
-    queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
-
     const uid = Firebase._.authUid;
-    queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
 
+    queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
+    queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
     queries.push(ConceptCheckResponseDetailsRef.makeQuery({uid, conceptId}));
   }
 
   return queries;
 })
-@connect(
-    ({ firebase }, props) => {
-      const { params } = props;
-      const uid = Firebase._.authUid;
-      const conceptId = params.conceptId;
+@connect(({ firebase }, props) => {
+  const { params } = props;
+  const uid = Firebase._.authUid;
+  const conceptId = params.conceptId;
 
-      let refs = {
-        conceptsRef: ConceptsRef(firebase),
-      };
+  const refs = {
+    conceptsRef: ConceptsRef(firebase),
+  };
 
-      if (conceptId) {
-        const checkArgs = { conceptId: conceptId || 0 };
-        const responsesRefArgs = { uid };
-        const responseDetailsArgs = {uid, conceptId};
+  if (conceptId) {
+    const checkArgs = { conceptId: conceptId || 0 };
+    const responsesRefArgs = { uid };
+    const responseDetailsArgs = {uid, conceptId};
 
-        refs = Object.assign(refs, {
-          //UserInfoRef.user(firebase, {auth, uid: auth.uid});
-          conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-          conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
-          conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
-        });
-      }
-      return refs;
+    Object.assign(refs, {
+      //UserInfoRef.user(firebase, {auth, uid: auth.uid});
+      conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
+      conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
+      conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
+    });
   }
-)
+  return refs;
+})
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,

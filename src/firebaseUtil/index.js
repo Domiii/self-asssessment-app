@@ -83,6 +83,38 @@ export function makeRefWrapper(cfgOrPath) {
   return _makeRefWrapper(defaultConfig, null, cfgOrPath);
 }
 
+function logDBAction(pathTemplate, actionName, args) {
+  try {
+    if (_.isObject(args) && _.has(args, 'updatedAt')) {
+      // TODO: hack-around to get rid of firebase TIMESTAMP placeholder
+      args = _.omitBy(args, (v, k) => k === 'updatedAt');
+    }
+    const argsString = JSON.stringify(args);
+    console.debug(`[LOG] Action: ${actionName}("${pathTemplate}", ${argsString})`);
+  }
+  catch (err) {
+    console.error(`Failed to log action: "${actionName}" at "${pathTemplate}"`);
+    console.error(err.stack);
+  }
+}
+
+// function logWrapper(pathTemplate, actionName, fn) {
+//   return function logWrapped(...args) {
+//     logDBAction(pathTemplate, actionName, args);
+//     return fn.apply(this, args);
+//   };
+// }
+
+// function logDecoratePrototype(pathTemplate, proto) {
+//   for (const prop in proto) {
+//     const val = proto[prop];
+
+//     if (_.isFunction(val)) {
+//       proto[prop] = logWrapper(pathTemplate, prop, val);
+//     }
+//   }
+// }
+
 
 // converts query objects into propriotory `redux-react-firebase` query syntax
 // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
@@ -204,6 +236,9 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
     Object.assign(WrapperClass.prototype, cfg.methods);
   }
 
+  // log all possible DB actions (that we are aware of)
+  //logDecoratePrototype(pathTemplate, WrapperClass.prototype);
+
   return func;
 }
 
@@ -212,7 +247,7 @@ function createDataAccessors(prototype, children) {
   createChildDataAccessors(prototype, children, '');
 }
 
-function createChildDataAccessors(prototype, children, parentPath) {
+function createChildDataAccessors(prototype, children, parentPathTemplate) {
   if (!children) {
     return;
   }
@@ -221,23 +256,23 @@ function createChildDataAccessors(prototype, children, parentPath) {
     const childCfgOrPath = children[wrapperName];
     const childPath = _.isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.pathTemplate || '');
     if (!childPath) {
-      throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPath}'`);
+      throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPathTemplate}'`);
     }
 
     // the path is the relative path from the node of given prototype to current child
     // NOTE: The path is NOT the full path.
-    const path = pathJoin(parentPath, childPath);
-    const getPath = createPathGetterFromTemplateArray(path);
+    const pathTemplate = pathJoin(parentPathTemplate, childPath);
+    const getPath = createPathGetterFromTemplateArray(pathTemplate);
 
     if (prototype[wrapperName]) {
-      throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPath}'`);
+      throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPathTemplate}'`);
     }
 
     // get
     prototype[wrapperName] = createChildDataGet(getPath);
 
     // add
-    const addGetPath = createPathGetterFromTemplateArray(parentPath);
+    const addGetPath = createPathGetterFromTemplateArray(parentPathTemplate);
     prototype['push_' + wrapperName] = createChildDataPush(addGetPath);
 
     // set
@@ -253,7 +288,7 @@ function createChildDataAccessors(prototype, children, parentPath) {
     prototype['delete_' + wrapperName] = createChildDataDelete(getPath);
 
     // keep going
-    createChildDataAccessors(prototype, childCfgOrPath.children, path);
+    createChildDataAccessors(prototype, childCfgOrPath.children, pathTemplate);
   }
 }
 
@@ -404,10 +439,10 @@ function parseTemplateString(text, varLookup) {
   };
 }
 
-function createPathGetterFromTemplateProps(path) {
+function createPathGetterFromTemplateProps(pathTemplate) {
   const varLookup = (props, varName, iArg) => {
     if (!props || props[varName] === undefined) {
-      throw new Error(`invalid arguments: ${varName} was not provided for path ${path}`);
+      throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
     return props[varName];
   }
@@ -415,25 +450,25 @@ function createPathGetterFromTemplateProps(path) {
     return substituter.pathInfo.nodes.map(node => node(props)).join('');
   };
 
-  return createPathGetterFromTemplate(path, varLookup, substituter);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, substituter);
 }
 
 // 
-function createPathGetterFromTemplateArray(path) {
+function createPathGetterFromTemplateArray(pathTemplate) {
   const varLookup = (args, varName, iArg) => {
     if (!args || iArg >= args.length) {
-      throw new Error(`invalid arguments: ${varName} was not provided for path ${path}`);
+      throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
     return args[iArg];
   };
   const substituter = function getPath(...args) {
     return substituter.pathInfo.nodes.map(node => node(args)).join('');
   };
-  return createPathGetterFromTemplate(path, varLookup, substituter);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, substituter);
 }
 
-function createPathGetterFromTemplate(path, varLookup, substituter) {
-  const pathInfo = parseTemplateString(path, varLookup);
+function createPathGetterFromTemplate(pathTemplate, varLookup, substituter) {
+  const pathInfo = parseTemplateString(pathTemplate, varLookup);
   let getPath;
   if (pathInfo.nVars > 0) {
     // template substitution from array
@@ -443,9 +478,10 @@ function createPathGetterFromTemplate(path, varLookup, substituter) {
   }
   else {
     // no variable substitution necessary
-    getPath = function getPath() { return path; };
+    getPath = function getPath() { return pathTemplate; };
     getPath.hasVariables = false;
   }
+  getPath.pathTemplate = pathTemplate;
   return getPath;
 }
 
@@ -462,15 +498,17 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
     const db = props && props.db || Firebase.database();
     const ref = db.ref(path);
     const refWrapper = new WrapperClass();
-    refWrapper.parent = parent;
-    refWrapper.__init(db, getData, ref, props);
+    refWrapper.__init(parent, getPath.pathTemplate, db, getData, ref, props);
     return refWrapper;
   };
 }
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    __init(db, getData, ref, props) {
+    __init(parent, pathTemplate, db, getData, ref, props) {
+      this.parent = parent;
+      this.pathTemplate = pathTemplate;
+
       //this._clazz = clazz;
       this._db = db;
       //this._ref = ref;
@@ -484,6 +522,9 @@ function createRefWrapperBase() {
         this.updateProps(props);
       }
       this.props = props;
+
+      this.onAfterWrite = this.onAfterWrite.bind(this);
+      this.onAfterWritePath = this.onAfterWritePath.bind(this);
     }
 
     get val() {
@@ -494,7 +535,12 @@ function createRefWrapperBase() {
       return isLoaded(this.val);
     }
 
-    getData(path, defaultValue) {
+    getDataIn(obj, path, defaultValue = null) {
+      path = path.replace(/\//g, '.');    // lodash uses dot notation for path access
+      return _.get(obj, path, defaultValue);
+    }
+
+    getData(path, defaultValue = null) {
       if (!path) {
         path = '';
       }
@@ -502,13 +548,12 @@ function createRefWrapperBase() {
       //   console.warn('invalid path: should not start with slash (/): ' + path);
       // }
 
-      const ancestor = this._getData();
+      const obj = this._getData();
       if (!path) {
-        return ancestor === undefined ? defaultValue : ancestor;
+        return obj === undefined ? defaultValue : obj;
       }
 
-      path = path.replace(/\//g, '.');    // lodash uses dot notation for path access
-      return _.get(ancestor, path, defaultValue);
+      return this.getDataIn(obj, path, defaultValue);
     }
 
     getRef(path) {
@@ -526,6 +571,14 @@ function createRefWrapperBase() {
       return true;
     }
 
+    onAfterWrite(actionName, val) {
+      this.onAfterWritePath(actionName, val, '');
+    }
+
+    onAfterWritePath(actionName, val, relPath) {
+      //logDBAction(pathJoin(this.pathTemplate, relPath), actionName, val);
+    }
+
     onPush(val) {
       if (_.isObject(val) && _.isFunction(this._decorateUpdatedAt)) {
         this._decorateUpdatedAt(val);
@@ -540,71 +593,114 @@ function createRefWrapperBase() {
       return true;
     }
 
-    set(val) {
-      const ref = this._ref;
-      return this.onBeforeWrite(val) &&
-        this.onUpdate(val) &&
-        this.onFinalizeWrite(val) &&
-        ref.set(val);
-    }
-
-    setChild(path, childValue) {
-      // TODO: use proper decorators for descendant paths
-      const ref = this.getRef(path);
-      return this.onBeforeWrite(childValue) &&
-        this.onUpdate(childValue) &&
-        this.onFinalizeWrite(childValue) &&
-        ref.set(childValue);
-    }
-
-    update(val) {
-      const ref = this._ref;
-      return this.onBeforeWrite(val) &&
-        this.onUpdate(val) &&
-        this.onFinalizeWrite(val) &&
-        ref.update(val);
-    }
-
-    updateChild(path, childValues) {
-      // TODO: use proper decorators for descendant paths
-      const ref = this.getRef(path);
-      return this.onBeforeWrite(childValues) &&
-        this.onUpdate(childValues) &&
-        this.onFinalizeWrite(childValues) &&
-        ref.update(childValues);
-    }
-
     push(newChild) {
       const ref = this._ref;
-      return this.onBeforeWrite() && 
+      return (
+        this.onBeforeWrite() && 
         this.onPush(newChild) &&
         this.onFinalizeWrite(newChild) &&
-        ref.push(newChild);
+        ref.push(newChild)
+        .then(() => this.onAfterWrite('push', newChild))
+      );
     }
 
     pushChild(path, newChild) {
       const ref = this.getRef(path);
       // TODO: use proper decorators for descendant paths
-      return this.onBeforeWrite() && 
+      return (
+        this.onBeforeWrite() && 
         this.onPush(newChild) &&
         this.onFinalizeWrite(newChild) &&
-        ref.push(newChild);
+        ref.push(newChild)
+        .then(() => this.onAfterWritePath('push', newChild, path))
+      );
     }
 
+
+
+    set(val) {
+      const ref = this._ref;
+      return (
+        this.onBeforeWrite(val) &&
+        this.onUpdate(val) &&
+        this.onFinalizeWrite(val) &&
+        ref.set(val)
+        .then(() => this.onAfterWrite('set', this.val))
+      );
+    }
+
+    setChild(path, childValue) {
+      // TODO: use proper decorators for descendant paths
+      const ref = this.getRef(path);
+      return (
+        this.onBeforeWrite(childValue) &&
+        this.onUpdate(childValue) &&
+        this.onFinalizeWrite(childValue) &&
+        ref.set(childValue)
+        .then(() => this.onAfterWritePath('set', childValue, path))
+      );
+    }
+
+    update(val) {
+      const ref = this._ref;
+      return (
+        this.onBeforeWrite(val) &&
+        this.onUpdate(val) &&
+        this.onFinalizeWrite(val) &&
+
+        ref.update(val)
+        .then(() => {
+          // TODO: sadly, value is not yet updated in local repository
+          const newVal = val;
+          return this.onAfterWrite('update', 
+            newVal
+            //_.zipObject(_.keys(val), _.map(val, (v,k) => _.get(newVal, k)))
+          );
+        })
+      );
+    }
+
+    updateChild(path, childValues) {
+      // TODO: use proper decorators for descendant paths
+      const ref = this.getRef(path);
+      return (
+        this.onBeforeWrite(childValues) &&
+        this.onUpdate(childValues) &&
+        this.onFinalizeWrite(childValues) &&
+
+        ref.update(childValues)
+        .then(() => {
+          const newVal = childValues;
+          return this.onAfterWritePath('update', 
+            newVal
+            // _.zipObject(
+            //   _.keys(childValues), 
+            //   _.map(childValues, (v, k) => this.getDataIn(childValues, k))
+            // )
+          , path);
+        })
+      );
+    }
 
     // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
     transaction(cb) {
       // TODO: add write hooks!!!
       const ref = this._ref;
-      return this.onBeforeWrite() && 
-        ref.transaction(cb);
+      return (
+        this.onBeforeWrite() && 
+        ref.transaction(cb)
+        .then(() => this.onAfterWrite('transaction', '?'))
+      );
     }
 
     transactionChild(path, cb) {
       // TODO: add write hooks!!!
       const ref = this.getRef(path);
-      return this.onBeforeWrite() && 
-        ref.transaction(cb);
+      return (
+        this.onBeforeWrite() && 
+        ref.transaction(cb)
+        .then(() => this.onAfterWritePath('transaction', '?', path))
+      );
     }
   }
 

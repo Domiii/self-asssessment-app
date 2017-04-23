@@ -67,10 +67,12 @@ export default class ConceptViewSmall extends Component {
   render() {
     // data
     const { userInfoRef, lookupLocalized } = this.context;
-    const { busy, parentId, conceptId, 
+    const {
+      busy, parentId, conceptId,
       concept, conceptProgress,
       toggleConceptPublic, deleteConcept, updateConcept, 
-      mayEdit } = this.props;
+      mayEdit
+    } = this.props;
     
     const ownerId = concept.ownerId;
     const conceptArgs = { ownerId, parentId, conceptId, concept };

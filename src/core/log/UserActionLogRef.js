@@ -2,8 +2,8 @@ import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
 
-const UIActivitiesLogRef = makeRefWrapper({
-  pathTemplate: '/logs/uiActivities',
+export const UserActionLogRef = makeRefWrapper({
+  pathTemplate: '/logs/userActions',
 
   updatedAt: null,
 
@@ -12,11 +12,9 @@ const UIActivitiesLogRef = makeRefWrapper({
       pathTemplate: '$(uid)/$(updatedAt)',
 
       children: {
-        page: 'page',
+        action: 'action',
         args: 'args'
       }
     }
   }
 });
-
-export default UIActivitiesLogRef;

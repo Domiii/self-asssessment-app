@@ -8,13 +8,38 @@ const UserInfoRef = makeRefWrapper({
   children: {
     user: {
       pathTemplate: '$(uid)',
+
       methods: {
+        isLoggedIn() {
+          return !!this.props.auth && !!this.props.auth.uid;
+        },
+
         getLocalized(obj, entry) {
           return lookupLocalized(this.locale(), obj, entry);
         },
 
         setUserData(userData) {
           this.set_data(userData);
+        },
+
+        ensureUserInitialized() {
+          const { auth } = this.props;
+
+          if (this.isLoggedIn() && this.isLoaded && !this.val) {
+            // user logged in and but no record of user data
+            // -> get user data and add to userInfo DB
+            // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
+            let userData = auth.providerData && auth.providerData.length && 
+              auth.providerData[0];
+            if (!userData) {
+              userData = {
+                displayName: auth.displayName || 'unknown',
+                email: auth.email
+              };
+            }
+            console.log("Writing user data: " + JSON.stringify(userData));
+            this.setUserData(userData);
+          }
         },
 
         updateUser(userFormData) {

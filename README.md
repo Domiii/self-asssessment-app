@@ -23,10 +23,11 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 
 ** simple YSIWYG MD editor
 
-* submission review page route
-** feedback system
+* User "groups"
+** Used to limit what activity other users see
 
 * Log all kinds of user interactions
+** -> Establish aliases for DB actions (pathTemplate + write action, pathTemplate + method)
 ** logUserActions
 ** logUIActivities
 ** logUIEvents
@@ -35,8 +36,12 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** Visualize data and evaluate first results, after Wed class
 ** See stats/comparisons related to every concept/conceptCheck?
 
-* User "groups"
-** Used to limit what activity other users see
+* add submission review page route
+** feedback system
+** user must see all pending feedback on one screen!!!
+
+* submission progress bar
+** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
 
 * all kinds of small things
 ** Navigation: Add "left" , "right" + "up" buttons to quickly navigate to previous and next siblings, and parent
@@ -49,18 +54,15 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 * notification system
 
-* firebase rule replacer utility: make it nice and easy to write aliases for rule checks
-
 * Add buttons to evaluate a concept: good/bad/requests/"add to short list"?
 
 * Add optional written feedback option to concept check response (automatically opens up when selecting report-type checks)
 * make the interface more exploratory
 ** Hide advanced concepts
 ** Boss level unlocks advanced concepts
-* Content: Add a whole lot more checks - https://docs.google.com/presentation/d/1Bt_ARtiApPVIdeTOl_CjIbxRGi3Qn3LBHztJYS2QY9c/edit#slide=id.g16414f4e50_0_51
-* Test new user + un-privileged users
-* Checks: Add "Done!" (or "Skip") check + "Like!" reply options to concepts
-** When not all checks are checked, "Done!" button is actually "Skip" button, and triggers special confirmation modal
+
+* Test new users + un-privileged users
+
 
 
 ## TODO: logging
@@ -80,6 +82,9 @@ logUIEvents
 ```
 
 ## More TODO
+* firebase rule replacer utility: make it nice and easy to write aliases for rule checks
+* firebase index validation utility: make it nice and easy to check/verify/update all indices through commandline
+* firebase cache validation utility: make it nice and easy to check/verify/update all kinds of cached info through commandline
 * Add system for "check progress caching", reduce load requirements
 * Add auto-screenshot preview feature (use [html2canvas](http://html2canvas.hertzen.com/examples.html))
 * Show orphaned concepts, checks and other orphaned data
