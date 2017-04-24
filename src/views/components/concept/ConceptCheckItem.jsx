@@ -106,8 +106,8 @@ export default class ConceptCheckItem extends Component {
 
     return (
       <ListGroupItem className="no-padding">
-        <ListGroup className="no-margin">
-          <ListGroupItem style={styleOverride}>
+        <ListGroup className="no-margin concept-check">
+          <ListGroupItem style={styleOverride} className="concept-check-description">
             { check && lookupLocalized(check, 'title') || '' }
             { !check && '<deleted check>' }
           </ListGroupItem>

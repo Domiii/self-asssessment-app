@@ -32,7 +32,7 @@ export default class ConceptDescriptionFull extends Component {
 
     // render!
     return (
-      <Well className="concept-description">
+      <Well className="concept-description concept-description-full">
         { !!description &&
           (<Markdown source={description} />) ||
           (<span className="color-gray">no description</span>)

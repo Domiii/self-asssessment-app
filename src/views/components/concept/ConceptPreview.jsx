@@ -30,8 +30,8 @@ export default class ConceptPreview extends Component {
     // actions
 
     // render!
-    return (
+    return (<div className="concept-description concept-description-preview">
       <Markdown source={description} />
-    );
+    </div>);
   }
 }
