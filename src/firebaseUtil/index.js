@@ -593,30 +593,24 @@ function createRefWrapperBase() {
       return true;
     }
 
-    push(newChild) {
-      const ref = this._ref;
-      return (
-        this.onBeforeWrite() && 
+    _doPush(ref, newChild) {
+      const newRef = this.onBeforeWrite() && 
         this.onPush(newChild) &&
         this.onFinalizeWrite(newChild) &&
-        ref.push(newChild)
-        .then(() => this.onAfterWrite('push', newChild))
-      );
+        ref.push(newChild);
+
+      newRef.then(() => this.onAfterWrite('push', newChild));
+      return newRef;
+    }
+
+    push(newChild) {
+      return this._doPush(this._ref, newChild);
     }
 
     pushChild(path, newChild) {
-      const ref = this.getRef(path);
       // TODO: use proper decorators for descendant paths
-      return (
-        this.onBeforeWrite() && 
-        this.onPush(newChild) &&
-        this.onFinalizeWrite(newChild) &&
-        ref.push(newChild)
-        .then(() => this.onAfterWritePath('push', newChild, path))
-      );
+      return this._doPush(this.getRef(path), newChild);
     }
-
-
 
     set(val) {
       const ref = this._ref;

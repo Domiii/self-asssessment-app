@@ -274,6 +274,8 @@ export default class ConceptsPage extends Component {
     concept.parentId = parentId;
 
     // create new concept entry
+    
+    // TODO: push_concept's then does not return the original reference
     const newRef = conceptsRef.push_concept(concept);
 
     // update ownerId
