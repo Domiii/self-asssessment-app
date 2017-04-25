@@ -8,6 +8,11 @@ import {
   computeAllChecksProgress
 } from 'src/core/concepts/';
 
+import {
+  NotificationsRef
+}
+from 'src/core/log';
+
 import autoBind from 'react-autobind';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
@@ -71,6 +76,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
 
   const refs = {
     conceptsRef: ConceptsRef(firebase),
+    notificationsRef: NotificationsRef(firebase, { uid })
   };
 
   if (conceptId) {
@@ -99,7 +105,9 @@ export default class ConceptsPage extends Component {
     conceptsRef: PropTypes.object.isRequired,
     conceptChecksRef: PropTypes.object,
     conceptCheckResponsesRef: PropTypes.object,
-    conceptCheckResponseDetailsRef: PropTypes.object
+    conceptCheckResponseDetailsRef: PropTypes.object,
+
+    notificationsRef: PropTypes.object
   };
 
   constructor(...args) {
@@ -274,7 +282,7 @@ export default class ConceptsPage extends Component {
     concept.parentId = parentId;
 
     // create new concept entry
-    
+
     // TODO: push_concept's then does not return the original reference
     const newRef = conceptsRef.push_concept(concept);
 
@@ -359,11 +367,21 @@ export default class ConceptsPage extends Component {
   }
 
   updateCheckResponse(conceptId, checkId, checkStillExists, response) {
-    const { conceptCheckResponsesRef } = this.props;
+    const { 
+      conceptCheckResponsesRef,
+      notificationsRef
+    } = this.props;
 
     return this.wrapPromise(
       conceptCheckResponsesRef.updateResponse(
-        conceptId, checkId, checkStillExists, response));
+        conceptId, checkId, checkStillExists, response)
+      .then(() => {
+        return notificationsRef.addNotification('checkReponse', response.name, {
+          conceptId,
+          checkId,
+          status: conceptCheckResponsesRef.isNowActive(conceptId, checkId, response)
+        });
+      }));
   }
   
 

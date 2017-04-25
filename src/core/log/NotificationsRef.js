@@ -1,24 +1,6 @@
 import { makeRefWrapper } from 'src/firebaseUtil';
 import _ from 'lodash';
 
-export const ConceptUpdateTypes = {
-  public: {
-    // concept made public
-  },
-
-  unpublic: {
-    // concept made unpublic
-  },
-
-  edit: {
-    // concept contents (or checks) have been edited
-  },
-
-  delete: {
-    // concept has been deleted
-  }
-};
-
 // TODO: Define dataProvider settings, 
 //    so we can easily batch/add requests for all the context data?
 
@@ -28,9 +10,25 @@ export const NotificationTypeSettings = {
       // there has been a change to any sort of concept data
       name: 'conceptUpdate',
       parameters: {
-        uid: 'uid',
-        conceptId: 'conceptId',
-        updateType: 'type'
+        conceptId: 'conceptId'
+      },
+
+      subtypeSettings: {
+        public: {
+          // concept made public
+        },
+
+        unpublic: {
+          // concept made unpublic
+        },
+
+        edit: {
+          // concept contents (or checks) have been edited
+        },
+
+        delete: {
+          // concept has been deleted
+        }
       },
 
       // get URL to the given concept
@@ -42,9 +40,12 @@ export const NotificationTypeSettings = {
     {
       name: 'checkReponse',
       parameters: {
-        uid: 'uid',
         conceptId: 'conceptId',
+        checkId: 'checkId',
+        status: 'status'
       },
+
+      subtypeSettings: null,  // TODO: settings per response type
 
       // get URL to the given concept
       getUrl(notification) {
@@ -56,57 +57,42 @@ export const NotificationTypeSettings = {
 
 NotificationTypeSettings.byName = _.keyBy(NotificationTypeSettings.list, 'name');
 
-export const NotificationsRef = makeRefWrapper({
+const NotificationsRef = makeRefWrapper({
   pathTemplate: '/notifications',
 
+  makeQuery(args) {
+    // TODO: get some notifications
+    return {
+      orderByChild: 'null',
+      equalTo: 1
+    };
+  },
+
   methods: {
-    serializeArgs(args) {
-      try {
-        args = args || {};
-        return JSON.stringify(args);
-      }
-      catch (err) {
-        console.error('[ERROR]', err, 'Could not serialize Notification args: ' + args);
-      }
-    },
-
-    deserializeArgs(argsString) {
-      try {
-        argsString = argsString || '';
-        return JSON.parse(argsString);
-      }
-      catch (err) {
-        console.error('[ERROR]', err, 'Could not parse Notification args: ' + argsString);
-      }
-    },
-
-    addNotification(entry) {
+    addNotification(type, subtype, args) {
       // start notification verification process
-      if (!entry || !entry.args || !entry.type || !NotificationTypeSettings.byName[entry.type]) {
-        console.error(`[ERROR] Invalid notification: ` + JSON.stringify(entry));
+      if (!type || !args || !NotificationTypeSettings.byName[type]) {
+        console.error(`[ERROR] Invalid notification type: ` + type);
         return null;
       }
-      const settings = NotificationTypeSettings.byName[entry.type];
+      const settings = NotificationTypeSettings.byName[type];
 
       // check args against parameters
       var parameters = settings.parameters;
-      var args = entry.args;
       for (var parameterName in parameters) {
-          var param = parameters[i];
-          var arg = args[parameterName];
-          if (arg === undefined) {
-              console.error(`[ERROR] Notification of type ${entry.type} missing argument: ` + parameterName);
+          //var param = parameters[i];
+          if (!_.has(args, parameterName)) {
+              console.error(`[ERROR] Notification of type "${type}" missing argument: ` + parameterName);
               return null;
           }
       };
 
-      // serialize arguments
-      var serializedArgs = this.serializeArgs(args);
-      if (!serializedArgs) return;
-
-      console.log('new log entry: ' + entry.type);
-
-      return true;
+      return this.push({
+        uid: this.props.uid,
+        type,
+        subtype,
+        args
+      });
     }
   },
 
@@ -116,10 +102,13 @@ export const NotificationsRef = makeRefWrapper({
 
       children: {
         uid: 'uid',
+        type: 'type',
+        subtype: 'subtype',
+        args: 'args',
         updatedAt: 'updatedAt',
-        actionType: 'action',
-        args: 'args'
       }
     }
   }
 });
+
+export default NotificationsRef;

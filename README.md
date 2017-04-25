@@ -18,6 +18,10 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 ## TODO
 
+* bug: Safari layouting is broken!!!!
+* bug: language buttons appear only after user is updated the first time?
+* bug: Scratch embed craps out?
+
 * submission system
 ** allow users to submit outcomes to concepts/missions
 ** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 

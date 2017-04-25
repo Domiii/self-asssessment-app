@@ -48,23 +48,41 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       return this.val && _.filter(this.val, selector) || EmptyArray;
     },
 
-    updateResponse(conceptId, checkId, checkStillExists, response) {
+    getResponseByName(name) {
+      // TODO: Change below methods to take responseName instead of response object
+      // TODO: Get response object from default type settings
+    },
+
+    getResponseId(conceptId, checkId) {
       const { uid } = this.props;
-      const responseId = this.val && _.findKey(this.val, {
+      return this.val && _.findKey(this.val, {
         uid,
         conceptId,
         checkId
       });
+    },
+
+    isNowActive(conceptId, checkId, response) {
+      const responseId = this.getResponseId(conceptId, checkId);
       const responseName = response.name;
       const categoryName = response.category;
 
       if (!this[categoryName]) {
+        // NOTE: "this[categoryName]" is a the getter method for that specific category
         console.error(`Invalid categoryName "${categoryName}" in response "${responseName}"`);
         return Promise.resolve(null);
       }
 
       const currentSelection = responseId && this[categoryName](responseId);
-      const isNowActive = !currentSelection || currentSelection !== responseName;
+      return !currentSelection || currentSelection !== responseName;
+    },
+
+    updateResponse(conceptId, checkId, checkStillExists, response) {
+      const { uid } = this.props;
+      const responseId = this.getResponseId(conceptId, checkId);
+      const responseName = response.name;
+      const categoryName = response.category;
+      const isNowActive = this.isNowActive(conceptId, checkId, response);
 
       if (checkStillExists) {
         // check still exists

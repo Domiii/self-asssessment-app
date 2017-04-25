@@ -1,10 +1,12 @@
 // adapted from: https://github.com/rexxars/react-markdown/blob/master/demo/src/code-block.js
 
+// TODO: play around with themes (https://github.com/isagalaev/highlight.js/tree/master/src/styles)
+
 'use strict';
 
 import React, { PureComponent } from 'react';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/default.css';
+import 'highlight.js/styles/ocean.css';
 import InlineScratchWorkspace from 'src/views/components/scratch/InlineScratchWorkspace';
 
 let init = false;

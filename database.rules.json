@@ -30,6 +30,13 @@
       ".read": "auth !== null",
       ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val()))"
     },
+    "notifications": {
+      ".read": "auth !== null",
+      
+      "$notificationId" : {
+        ".write": "auth !== null && !data.exists() && newData.exists() && newData.child('uid').val() === auth.uid"
+      }
+    },
     "users": {
       "$uid" : {
         ".read": "auth !== null",
