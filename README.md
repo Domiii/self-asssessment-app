@@ -2,19 +2,21 @@
 Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
 ## Install instructions
-  1. `npm install`
   1. `cd local_modules/redux-react-firebase`
-  1. `npm install --prefix ../..`
+  1. `npm i --only=dev --ignore-scripts # (see [NPM issue #9707](https://github.com/npm/npm/issues/9707))`
   1. `cd ../..`
+  1. `npm install`
+  1. `npm install -g firebase-tools`
 
 ## Get Started
-  1. `npm install -g firebase-tools`
   1. `firebase login`
   1. `firebase init` (with default settings)
 
 ## Deployment
   1. `npm run build`
   1. `firebase deploy`
+
+
 
 ## TODO
 
