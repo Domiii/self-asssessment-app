@@ -8,7 +8,8 @@ import { FAIcon } from 'src/views/components/util';
 
 import {
   ConceptDescriptionFull,
-  ConceptChecksPanel
+  ConceptChecksPanel,
+  ConceptResponse
 } from 'src/views/components/concept';
 
 import ProgressBar from 'src/views/components/ProgressBar';
@@ -16,13 +17,16 @@ import ProgressBar from 'src/views/components/ProgressBar';
 
 export class ConceptPlayView extends Component {
   static propTypes = {
+    userPrefs: PropTypes.object.isRequired,
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
-    userPrefs: PropTypes.object.isRequired,
+    conceptResponse: PropTypes.object,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.array.isRequired,
     conceptCheckResponseDetails: PropTypes.object,
     conceptProgress: PropTypes.object,
+
+    updateConceptResponse: PropTypes.func,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
@@ -40,9 +44,14 @@ export class ConceptPlayView extends Component {
 
   render() {
     const {
-      conceptId, concept, conceptChecks, userPrefs, 
+      userPrefs,
+      conceptId, concept, 
+      conceptResponse,
+      conceptChecks,
       conceptCheckResponses,
       conceptCheckResponseDetails,
+
+      updateConceptResponse,
       updateCheckResponse
     } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
@@ -71,6 +80,12 @@ export class ConceptPlayView extends Component {
             }} />
           </Item>
         </Flex>
+        <div>
+          <ConceptResponse {...{
+            conceptResponse,
+            updateConceptResponse
+          }} />
+        </div>
       </div>
     );
   }

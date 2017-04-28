@@ -18,7 +18,10 @@ const ConceptCheckResponseDetailsRef = makeRefWrapper({
   indices: {
     uid: ['uid'],
     conceptId: ['conceptId'],
-    uid_conceptId: ['uid', 'conceptId']
+    uid_conceptId: {
+      keys: ['uid', 'conceptId'],
+      autoUpdate: false
+    }
   },
 
   queryString({uid, conceptId}) {
@@ -27,6 +30,19 @@ const ConceptCheckResponseDetailsRef = makeRefWrapper({
   },
 
   methods: {
+    updateTextResponse(text) {
+      const { uid, conceptId } = this.props;
+      if (!uid || !conceptId) {
+        console.error("[ERROR] Missing `uid` or `conceptId` props in ConceptCheckResponseDetailsRef.");
+        return Promise.resolve(null);
+      }
+
+      return this.setByIndex({uid, conceptId}, {
+        uid,
+        conceptId,
+        text
+      });
+    }
   },
 
   children: {
@@ -36,7 +52,6 @@ const ConceptCheckResponseDetailsRef = makeRefWrapper({
       children: {
         uid: 'uid',
         conceptId: 'conceptId',
-        checkId: 'checkId',
         text: 'text'
       }
     }

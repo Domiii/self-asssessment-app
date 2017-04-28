@@ -4,6 +4,8 @@ import _ from 'lodash';
 const defaultConfig = {
   keys: [],
 
+  autoUpdate: true,
+
   // Whether to update the index on every write operation (given it's keys are present).
   // If this is set to false, it will only try to write the index when it has not previously been written.
   writeAlways: false,
@@ -17,7 +19,7 @@ export function makeIndices(cfg) {
   return new IndexSet(cfg);
 }
 
-var IndexUtils = {
+const IndexUtils = {
   sanitizeConfig(cfg) {
     return _.zipObject(_.keys(cfg), _.map(cfg, (indexCfg, indexName) => {
       let cfgEntry;
@@ -36,12 +38,12 @@ var IndexUtils = {
       else if (_.isObject(indexCfg)) {
         // provide full configuration for index
         if (!_.isArray(indexCfg.keys)) {
-          console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
+          //console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
         }
         cfgEntry = indexCfg;
       }
       else {
-        console.warn('Invalid index config has invalid entry: ' + indexName);
+        //console.warn('Invalid index config has invalid entry: ' + indexName);
         cfgEntry = {};
       }
 
@@ -54,6 +56,7 @@ var IndexUtils = {
       return _.map(val, this.convertToSortedValueSet.bind(this));
     }
     else if (_.isObject(val)) {
+      // make sure, entries in resulting string representation are sorted by key
       const converted = _.flatten(_.map(val, (v, k) => [k, this.convertToSortedValueSet(v)]));
       return _.sortBy(converted, ([k, v]) => k);
     }
@@ -127,7 +130,7 @@ class IndexSet {
     return name;
   }
 
-  // 
+  // whether the given key (or: child property) participates in any index
   isIndexedKey(key) {
     return !!this.indexNamesByKey[key];
   }
@@ -145,25 +148,29 @@ class IndexSet {
   }
 
   where(query) {
-    const keys = _.keys(query);
-    const indexName = this.getIndexNameByKeys(keys);
-    if (!indexName) {
-      throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
-    }
-    const queryValue = this.encodeQueryValue(query, keys);
     // console.log({
     //   orderByChild: indexName,
     //   equalTo: queryValue
     // });
     return {
       orderByChild: indexName,
-      equalTo: queryValue
+      equalTo: this.encodeQueryValueAll(query)
     };
+  }
+
+  encodeQueryValueAll(query) {
+    const keys = _.keys(query);
+    const indexName = this.getIndexNameByKeys(keys);
+    if (!indexName) {
+      throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
+    }
+    return this.encodeQueryValue(query, keys);
   }
 
   encodeQueryValue(val, keys) {
     if (!keys || !keys.length) {
-      console.error('Invalid query: Empty keys given.');
+      console.error('Invalid query: keys are empty.');
+      return null;
     }
     if (keys.length == 1) {
       return IndexUtils.encodeValueDeep(val[keys[0]]);
@@ -176,16 +183,16 @@ class IndexSet {
     return this.cfg[indexName];
   }
 
-  // TODO: Properly handle scenarios:
-  //    "index already exists but needs updating during set"
-  //    "index already exists but needs updating during update and key values are not given"
+  // update indices in given val before writing
   updateIndices(val) {
     if (!_.isObject(val)) return;
     
     for (var indexName in this.keysByIndexName) {
-      if (this.getCfg(indexName).writeAlways || !val[indexName]) {
+      const cfg = this.getCfg(indexName);
+      if (cfg.writeAlways || !val[indexName]) {
         const keys = this.keysByIndexName[indexName];
-        if (keys.length < 2) continue;
+        if (!cfg.autoUpdate) continue;
+        if (keys.length < 2) continue;  // only need to handle composed keys
 
         if (_.some(keys, key => !_.has(val, key))) {
           if (this.cfg[indexName].isRequired) {

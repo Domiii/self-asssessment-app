@@ -623,6 +623,11 @@ function createRefWrapperBase() {
       );
     }
 
+    setByIndex(indexData, childValue) {
+      const key = this.indices.encodeQueryValueAll(indexData);
+      return this.setChild(key, childValue);
+    }
+
     setChild(path, childValue) {
       // TODO: use proper decorators for descendant paths
       const ref = this.getRef(path);
@@ -654,22 +659,22 @@ function createRefWrapperBase() {
       );
     }
 
-    updateChild(path, childValues) {
+    updateChild(path, childValue) {
       // TODO: use proper decorators for descendant paths
       const ref = this.getRef(path);
       return (
-        this.onBeforeWrite(childValues) &&
-        this.onUpdate(childValues) &&
-        this.onFinalizeWrite(childValues) &&
+        this.onBeforeWrite(childValue) &&
+        this.onUpdate(childValue) &&
+        this.onFinalizeWrite(childValue) &&
 
-        ref.update(childValues)
+        ref.update(childValue)
         .then(() => {
-          const newVal = childValues;
+          const newVal = childValue;
           return this.onAfterWritePath('update', 
             newVal
             // _.zipObject(
-            //   _.keys(childValues), 
-            //   _.map(childValues, (v, k) => this.getDataIn(childValues, k))
+            //   _.keys(childValue), 
+            //   _.map(childValue, (v, k) => this.getDataIn(childValue, k))
             // )
           , path);
         })
