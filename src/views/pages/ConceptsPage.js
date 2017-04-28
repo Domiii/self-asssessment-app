@@ -96,7 +96,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object.isRequired
+    userInfoRef: PropTypes.object
   };
 
   static propTypes = {
@@ -363,6 +363,10 @@ export default class ConceptsPage extends Component {
 
   updateUserPrefs(prefs){
     const { userInfoRef } = this.context;
+    if (!userInfoRef) {
+      console.error(new Error("tried to update prefs before login"));
+      return;
+    }
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
   }
 
@@ -379,7 +383,7 @@ export default class ConceptsPage extends Component {
         return notificationsRef.addNotification('checkReponse', response.name, {
           conceptId,
           checkId,
-          status: conceptCheckResponsesRef.isNowActive(conceptId, checkId, response)
+          status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
         });
       }));
   }
@@ -510,6 +514,9 @@ export default class ConceptsPage extends Component {
         updateConcept: this.updateConcept
       }} />
     );
+
+    if (this.props.conceptCheckResponsesRef)
+      console.log(this.currentCheckResponses, this.props.conceptCheckResponsesRef.val);
 
     // render!
     return (

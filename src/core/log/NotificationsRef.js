@@ -80,11 +80,11 @@ const NotificationsRef = makeRefWrapper({
       // check args against parameters
       var parameters = settings.parameters;
       for (var parameterName in parameters) {
-          //var param = parameters[i];
-          if (!_.has(args, parameterName)) {
-              console.error(`[ERROR] Notification of type "${type}" missing argument: ` + parameterName);
-              return null;
-          }
+        //var param = parameters[i];
+        if (args[parameterName] === undefined) {
+          console.error(`[ERROR] Notification of type "${type}" missing argument: ` + parameterName);
+          return null;
+        }
       };
 
       return this.push({

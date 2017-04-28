@@ -572,7 +572,7 @@ function createRefWrapperBase() {
     }
 
     onAfterWrite(actionName, val) {
-      this.onAfterWritePath(actionName, val, '');
+      return this.onAfterWritePath(actionName, val, '');
     }
 
     onAfterWritePath(actionName, val, relPath) {
@@ -599,7 +599,7 @@ function createRefWrapperBase() {
         this.onFinalizeWrite(newChild) &&
         ref.push(newChild);
 
-      newRef.then(() => this.onAfterWrite('push', newChild));
+      //newRef.then(() => this.onAfterWrite('push', newChild));
       return newRef;
     }
 

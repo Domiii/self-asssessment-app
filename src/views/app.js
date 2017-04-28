@@ -38,7 +38,7 @@ const mapStateToProps = ({ firebase }, ownProps) => {
   const props = {
     signOut() {
       try {
-        firebase.logout();
+        ownProps.firebase.logout();
       }
       catch (err) {
         console.error(err.stack);
@@ -49,7 +49,10 @@ const mapStateToProps = ({ firebase }, ownProps) => {
   };
 
   if (auth && auth.uid) {
+    // TODO: Move this to componentWillMount
+    //    see: https://firebase.google.com/docs/reference/node/firebase.auth.Auth#onAuthStateChanged
     props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
+    props.userInfoRef.ensureUserInitialized();
   }
 
   return props;
@@ -96,9 +99,7 @@ export class App extends Component {
   }
 
   componentDidMount() {
-    const { userInfoRef } = this.props;
-
-    userInfoRef.ensureUserInitialized();
+    //const { userInfoRef } = this.props;
 
     // TODO: Remember whether we added the logging hook already, and only add one if not done yet
     // TODO: log new visit

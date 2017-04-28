@@ -3,7 +3,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 ## Install instructions
   1. `npm install`
-  1. `cd third_party/redux-react-firebase`
+  1. `cd local_modules/redux-react-firebase`
   1. `npm install --prefix ../..`
   1. `cd ../..`
 
@@ -18,9 +18,11 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 ## TODO
 
+* bug: move ensureUserInitialized to componentWillMount, use onAuthStateChanged event
 * bug: Safari layouting is broken!!!!
 * bug: language buttons appear only after user is updated the first time?
 * bug: Scratch embed craps out?
+* Data cleaning + verification: Add methods to easily remove duplicate children on pre-defined indices
 
 * submission system
 ** allow users to submit outcomes to concepts/missions
