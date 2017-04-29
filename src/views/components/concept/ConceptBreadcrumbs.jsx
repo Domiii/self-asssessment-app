@@ -4,6 +4,11 @@ import { Breadcrumb } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { hrefConceptView } from 'src/views/href';
 
+const rootEntry = {
+  name_en: 'Buffet',
+  name_zh: '自主餐'
+};
+
 export default class ConceptBreadcrumbs extends Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func.isRequired
@@ -46,7 +51,7 @@ export default class ConceptBreadcrumbs extends Component {
         key={1}
         active={ true }>
         <Link to="/" >
-          All
+          { lookupLocalized(rootEntry, 'name') }
         </Link>
       </Breadcrumb.Item>
     );

@@ -9,7 +9,7 @@ import { FAIcon } from 'src/views/components/util';
 import {
   ConceptDescriptionFull,
   ConceptChecksPanel,
-  ConceptResponse
+  ConceptResponseForm
 } from 'src/views/components/concept';
 
 import ProgressBar from 'src/views/components/ProgressBar';
@@ -80,12 +80,16 @@ export class ConceptPlayView extends Component {
             }} />
           </Item>
         </Flex>
-        <div>
-          <ConceptResponse {...{
-            conceptResponse,
-            updateConceptResponse
-          }} />
-        </div>
+        {
+          (!!conceptResponse || concept.expectsSubmission) && 
+            (<div>
+              <ConceptResponseForm {...{
+                conceptId,
+                conceptResponse,
+                onSubmit: updateConceptResponse
+              }} />
+            </div>)
+        }
       </div>
     );
   }

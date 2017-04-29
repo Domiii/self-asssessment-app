@@ -118,6 +118,14 @@ class ConceptSection extends FormSection {
     return (<div>
       <Field name="parentId" value={parentId} component="input" type="hidden" />
       <Field name="ownerId" value={ownerId} component="input" type="hidden" />
+      <FormInputField name="expectsSubmission" label="Expects Submissions"
+        inputProps={{
+          type: 'checkbox',
+          component: 'input'
+        }}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
       <FormInputField name="title_en" label="Title (English)"
         type="text" component="input"
         labelProps={{xs: 2, className: 'no-padding'}}

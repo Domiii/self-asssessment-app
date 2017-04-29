@@ -196,7 +196,8 @@ const ConceptsRef = makeRefWrapper({
         title_en: 'title_en',
         title_zh: 'title_zh',
         description_en: 'description_en',
-        description_zh: 'description_zh'
+        description_zh: 'description_zh',
+        expectsSubmission: 'expectsSubmission'
       }
     }
   }

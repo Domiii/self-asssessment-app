@@ -2,8 +2,10 @@
 Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
 ## Install instructions
+  1. `git submodule update --init --recursive`
   1. `cd local_modules/redux-react-firebase`
-  1. `npm i --only=dev --ignore-scripts # (see [NPM issue #9707](https://github.com/npm/npm/issues/9707))`
+  1. `git remote set-url --push origin git@github.com:Domiii/redux-react-firebase.git`
+  1. `npm i --only=dev --ignore-scripts` # (see [NPM issue #9707](https://github.com/npm/npm/issues/9707))
   1. `cd ../..`
   1. `npm install`
   1. `npm install -g firebase-tools`
@@ -19,13 +21,15 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
+* Where statement on indices buggy, probably ignoring "simply encoding" parameter
+
 * bug: Safari layouting is broken!!!!
 * bug: child ordering is not by number but lexicographically
 * safety switch: Don't be able to delete concepts that have children
 * safety switch: Don't display trash can when adding stuff
 
 * submission system
-** allow users to submit outcomes to concepts/missions
+** Make submission form prettier and better
 ** add new option to Concept + ConceptEditor: hasSubmission
 ** add notification when submission is submitted
 ** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 
@@ -39,6 +43,8 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** add submission feedback page route
 ** add notification for feedback entry
 ** can see all feedback given to self on one page
+
+* Will need test database anytime soon...
 
 * User "groups"
 ** Used to limit what activity other users see

@@ -76,7 +76,11 @@ export class FormInputFieldArray extends FormInputFieldBase {
       name, inputProps, component
     } = this.props;
 
-    return this.createField(<FieldArray className="form-control" 
+    const classes = "form-control " + (inputProps && inputProps.className || '');
+    if (inputProps && inputProps.className)
+      delete inputProps.className;
+
+    return this.createField(<FieldArray className={classes}
       key={name} id={name} name={name}
       component={component}
       {...(inputProps || {})}>
@@ -103,7 +107,11 @@ export class FormInputField extends FormInputFieldBase {
     } = this.props;
     placeholder = placeholder || label;
 
-    return this.createField(<Field className="form-control" 
+    const classes = "form-control " + (inputProps && inputProps.className || '');
+    if (inputProps && inputProps.className)
+      delete inputProps.className;
+
+    return this.createField(<Field className={classes}
       key={name} id={name} name={name} 
       component={component}
       label={placeholder}

@@ -38,11 +38,11 @@ export const NotificationTypeSettings = {
     },
 
     {
-      name: 'checkReponse',
+      name: 'conceptResponse',
       parameters: {
         conceptId: 'conceptId',
-        checkId: 'checkId',
-        status: 'status'
+        text: 'text',
+        hasSubmitted: 'hasSubmitted'
       },
 
       subtypeSettings: null,  // TODO: settings per response type

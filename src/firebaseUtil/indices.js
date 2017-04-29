@@ -4,6 +4,9 @@ import _ from 'lodash';
 const defaultConfig = {
   keys: [],
 
+  // Whether to automatically update the index at all.
+  // Difference to `writeAlways` is that if `autoUpdate` is set to `false`, the index will never be written,
+  //    if `writeAlways` is set to `false`, it will at least be written initially.
   autoUpdate: true,
 
   // Whether to update the index on every write operation (given it's keys are present).
@@ -12,7 +15,11 @@ const defaultConfig = {
 
   // Whether to show a warning when an index cannot be updated due to missing key data.
   // You only want to set this to true when you are sure that all required key data will be written for every possible index update.
-  isRequired: false
+  isRequired: false,
+
+  // Whether the encoded values should be simplified.
+  // This makes them simpler but also might risk chances of ambiguity (different values encoded to the same result).
+  forceSimpleEncoding: false
 };
 
 export function makeIndices(cfg) {
@@ -35,7 +42,7 @@ const IndexUtils = {
           keys: [indexCfg]
         };
       }
-      else if (_.isObject(indexCfg)) {
+      else if (_.isPlainObject(indexCfg)) {
         // provide full configuration for index
         if (!_.isArray(indexCfg.keys)) {
           //console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
@@ -51,11 +58,23 @@ const IndexUtils = {
     }));
   },
 
-  convertToSortedValueSet(val) {
-    if (_.isArray(val)) {
-      return _.map(val, this.convertToSortedValueSet.bind(this));
+  convertToSortedValueSet(val, nDepth) {
+    nDepth = nDepth || 0;
+    if (nDepth > 10) {
+      console.error('[ERROR] Could not encode value; possible recursive values: ' + val);
+      return null;
     }
-    else if (_.isObject(val)) {
+
+    if (_.isUndefined(val)) {
+      val = null;
+    }
+    if (_.isString(val)) {
+      return val;
+    }
+    else if (_.isArrayLike(val)) {
+      return _.map(val, child => this.convertToSortedValueSet(child, nDepth+1));
+    }
+    else if (_.isPlainObject(val)) {
       // make sure, entries in resulting string representation are sorted by key
       const converted = _.flatten(_.map(val, (v, k) => [k, this.convertToSortedValueSet(v)]));
       return _.sortBy(converted, ([k, v]) => k);
@@ -63,19 +82,40 @@ const IndexUtils = {
     return val;
   },
 
-  // makes sure that two vals will always convert to the same string
-  // given that the structure of any two different vals of the same set does not change too much.
-  encodeValueDeep(val) {
-    if (val === undefined) {
-      val = null;
+  encodeValue(val, forceSimple) {
+    if (_.isFunction(val) || _.isElement(val) || _.isError(val)) {
+      throw new Error("[ERROR] Cannot encode element or function values - " + val);
     }
-
-    if (_.isObject(val) || _.isArray(val)) {
-      return JSON.stringify(this.convertToSortedValueSet(val));
-    }
-    else {
+    if (_.isString(val) || _.isBoolean(val) || _.isNumber(val) || _.isNull(val)) {
       return val + "";
     }
+    if (forceSimple) {
+      if (_.isArrayLike(val)) {
+        return _.join(val, '\uFFFF');
+      }
+      else if (_.isDate(val)) {
+        return val.getTime() + "";
+      }
+      else if (_.isPlainObject(val)) {
+        // object should already have be converted to a sorted array
+        throw new Error('[ERROR] Something went wrong... object could not be encoded: ' + JSON.stringify(val));
+      }
+      else if (_.isMap(val) || _.isSet(val) || _.isBuffer(val) || _.isSymbol(val) || _.isRegExp(val)) {
+        throw new Error('[ERROR] NYI - cannot yet encode values of this type: ' + val);
+      }
+      else {
+        throw new Error('[ERROR] Could not encode value (unknown type): ' + val);
+      }
+    }
+    else {
+      return JSON.stringify(val);
+    }
+  },
+
+  // makes sure that two vals will always convert to the same string
+  // given that the structure of any two different vals of the same set does not change too much.
+  encodeValueDeep(val, forceSimple) {
+    return this.encodeValue(this.convertToSortedValueSet(val), forceSimple);
   }
 };
 
@@ -152,9 +192,14 @@ class IndexSet {
     //   orderByChild: indexName,
     //   equalTo: queryValue
     // });
+    const keys = _.keys(query);
+    const indexName = this.getIndexNameByKeys(keys);
+    if (!indexName) {
+      throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
+    }
     return {
       orderByChild: indexName,
-      equalTo: this.encodeQueryValueAll(query)
+      equalTo: this.encodeQueryValue(query, keys)
     };
   }
 
@@ -172,11 +217,15 @@ class IndexSet {
       console.error('Invalid query: keys are empty.');
       return null;
     }
+
+    const indexName = this.getIndexNameByKeys(keys);
+    const settings = this.getCfg(indexName)
+
     if (keys.length == 1) {
-      return IndexUtils.encodeValueDeep(val[keys[0]]);
+      return IndexUtils.encodeValueDeep(val[keys[0]], settings.forceSimpleEncoding);
     }
     const values = _.map(keys, key => val[key]);
-    return IndexUtils.encodeValueDeep(values);
+    return IndexUtils.encodeValueDeep(values, settings.forceSimpleEncoding);
   }
 
   getCfg(indexName) {
@@ -189,9 +238,8 @@ class IndexSet {
     
     for (var indexName in this.keysByIndexName) {
       const cfg = this.getCfg(indexName);
-      if (cfg.writeAlways || !val[indexName]) {
+      if (cfg.autoUpdate && (cfg.writeAlways || !val[indexName])) {
         const keys = this.keysByIndexName[indexName];
-        if (!cfg.autoUpdate) continue;
         if (keys.length < 2) continue;  // only need to handle composed keys
 
         if (_.some(keys, key => !_.has(val, key))) {

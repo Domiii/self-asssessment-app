@@ -88,7 +88,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
     Object.assign(refs, {
       //UserInfoRef.user(firebase, {auth, uid: auth.uid});
       conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-      conceptResponsesRef: ConceptResponsesRef(firebase, responseDetailsArgs)
+      conceptResponsesRef: ConceptResponsesRef(firebase, responseDetailsArgs),
       conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
       conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
     });
@@ -185,8 +185,7 @@ export default class ConceptsPage extends Component {
   get currentConceptResponse() {
     const { conceptResponsesRef } = this.props;
     return conceptResponsesRef && 
-      conceptResponsesRef.val || 
-      EmptyObject;
+      conceptResponsesRef.val;
   }
 
   // all relevant responses by current user
@@ -390,12 +389,31 @@ export default class ConceptsPage extends Component {
       conceptCheckResponsesRef.updateResponse(
         conceptId, checkId, checkStillExists, response)
       .then(() => {
-        return notificationsRef.addNotification('checkReponse', response.name, {
+        return notificationsRef.addNotification('checkResponse', response.name, {
           conceptId,
           checkId,
           status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
         });
-      }));
+      })
+    );
+  }
+
+  updateConceptResponse({conceptId, conceptResponse}) {
+    const { 
+      conceptResponsesRef,
+      notificationsRef
+    } = this.props;
+
+    return this.wrapPromise(
+      conceptResponsesRef.updateTextResponse(conceptId, conceptResponse)
+      .then(() => {
+        return notificationsRef.addNotification('conceptResponse', null, {
+          conceptId,
+          text: conceptResponse.text,
+          hasSubmitted: conceptResponse.hasSubmitted
+        });
+      })
+    );
   }
   
 
@@ -525,9 +543,6 @@ export default class ConceptsPage extends Component {
       }} />
     );
 
-    if (this.props.conceptCheckResponsesRef)
-      console.log(this.currentCheckResponses, this.props.conceptCheckResponsesRef.val);
-
     // render!
     return (
       <div>
@@ -556,6 +571,8 @@ export default class ConceptsPage extends Component {
             conceptCheckResponses: this.currentCheckResponses,
             conceptCheckResponseDetails: this.currentCheckResponseDetails,
             conceptProgress,
+
+            updateConceptResponse: this.updateConceptResponse,
             updateCheckResponse: this.updateCheckResponse
           }} /> }
         { childConceptsEl }

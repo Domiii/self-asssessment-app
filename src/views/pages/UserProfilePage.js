@@ -28,9 +28,10 @@ class _UserForm extends Component {
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
         {(isAdmin && <FormInputField name="adminDisplayMode" label="admin view"
+          component="input"
           inputProps={{
             type: 'checkbox',
-            component: 'input'
+            className: 'no-box-shadow'
           }}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />)}

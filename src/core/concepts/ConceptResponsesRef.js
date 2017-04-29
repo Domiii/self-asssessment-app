@@ -19,7 +19,8 @@ const ConceptResponsesRef = makeRefWrapper({
     conceptId: ['conceptId'],
     uid_conceptId: {
       keys: ['uid', 'conceptId'],
-      autoUpdate: false
+      autoUpdate: false,
+      forceSimpleEncoding: true
     }
   },
 
@@ -29,17 +30,22 @@ const ConceptResponsesRef = makeRefWrapper({
   },
 
   methods: {
-    updateTextResponse(text) {
+    updateTextResponse(givenConceptId, response) {
       const { uid, conceptId } = this.props;
+
+      // sanity checks
       if (!uid || !conceptId) {
-        console.error("[ERROR] Missing `uid` or `conceptId` props in ConceptResponsesRef.");
-        return Promise.resolve(null);
+        return Promise.reject(new Error("[ERROR] Missing `uid` or `conceptId` props in ConceptResponsesRef."));
+      }
+
+      if (givenConceptId != conceptId) {
+        return Promise.reject(new Error(`[ERROR] Invalid "conceptId" given in ConceptResponsesRef: ${givenConceptId} - expected: ${conceptId}`));
       }
 
       return this.setByIndex({uid, conceptId}, {
         uid,
         conceptId,
-        text
+        ...response
       });
     }
   },
@@ -51,7 +57,10 @@ const ConceptResponsesRef = makeRefWrapper({
       children: {
         uid: 'uid',
         conceptId: 'conceptId',
-        text: 'text'
+        text: 'text',
+
+        // whether the user has already clicked the "submit" button
+        hasSubmitted: 'hasSubmitted'
       }
     }
   }

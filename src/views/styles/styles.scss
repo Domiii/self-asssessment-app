@@ -105,6 +105,9 @@ button:active { outline:none !important; }
 .no-border {
   border: 0 !important;
 }
+.no-box-shadow {
+  box-shadow: none !important;
+}
 
 .margin-half {
   margin: 0.5em;
@@ -125,6 +128,7 @@ button:active { outline:none !important; }
 .padding2 {
   padding: 2em;
 }
+
 
 
 .color-green {
