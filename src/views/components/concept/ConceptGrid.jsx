@@ -37,7 +37,7 @@ export default class ConceptGrid extends Component {
     } = this.props;
 
     // actions
-    const keyOrder = key => concepts[key] && concepts[key].num;
+    const keyOrder = key => concepts[key] && parseFloat(concepts[key].num);
 
     // prepare props
     const conceptProps = _.mapValues(concepts, 

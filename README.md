@@ -19,11 +19,13 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ## TODO
 
 * bug: Safari layouting is broken!!!!
-* bug: language buttons appear only after user is updated the first time?
-* bug: Scratch embed craps out?
+* bug: child ordering is not by number but lexicographically
+* safety switch: Don't be able to delete concepts that have children
+* safety switch: Don't display trash can when adding stuff
 
 * submission system
 ** allow users to submit outcomes to concepts/missions
+** add new option to Concept + ConceptEditor: hasSubmission
 ** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 
 ** simple YSIWYG MD editor
 

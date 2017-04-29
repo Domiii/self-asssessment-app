@@ -35,7 +35,7 @@ export default class ConceptChecksPanel extends Component {
     }
 
     const checkArr = _.sortBy(_.map(conceptChecks,
-      (check, checkId) => ({check, checkId, num: check.num})
+      (check, checkId) => ({check, checkId, num: parseFloat(check.num)})
     ),  'num');
 
     const checkEls = _.map(checkArr, ({checkId, check}) => (<ConceptCheckItem
