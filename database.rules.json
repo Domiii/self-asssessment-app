@@ -16,19 +16,29 @@
       ".read": "auth !== null",
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
-    "conceptProgress": {
+    "conceptResponses": {      
+      ".indexOn": ["uid", "conceptId", "uid_conceptId"],
       ".read": "auth !== null",
-      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+
+      "$responseDetailId" : {
+        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && data.child('uid').val() === auth.uid))"
+      }
     },
     "conceptCheckResponses": {
       ".indexOn": ["uid"],
       ".read": "auth !== null",
-      ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val()))"
+      
+      "$responseId" : {
+        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
+      }
     },
     "conceptCheckResponseDetails": {      
       ".indexOn": ["uid", "conceptId", "uid_conceptId"],
       ".read": "auth !== null",
-      ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() == auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() == auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() == newData.child('uid').val()))"
+
+      "$responseDetailId" : {
+        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && data.child('uid').val() === auth.uid))"
+      }
     },
     "notifications": {
       ".read": "auth !== null",

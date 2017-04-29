@@ -2,13 +2,13 @@
 Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
 ## Install instructions
-  1. `npm install`
-  1. `cd third_party/redux-react-firebase`
-  1. `npm install --prefix ../..`
+  1. `cd local_modules/redux-react-firebase`
+  1. `npm i --only=dev --ignore-scripts # (see [NPM issue #9707](https://github.com/npm/npm/issues/9707))`
   1. `cd ../..`
+  1. `npm install`
+  1. `npm install -g firebase-tools`
 
 ## Get Started
-  1. `npm install -g firebase-tools`
   1. `firebase login`
   1. `firebase init` (with default settings)
 
@@ -16,8 +16,9 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `npm run build`
   1. `firebase deploy`
 
-## TODO
 
+
+## TODO
 * bug: Safari layouting is broken!!!!
 * bug: child ordering is not by number but lexicographically
 * safety switch: Don't be able to delete concepts that have children
@@ -26,25 +27,25 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * submission system
 ** allow users to submit outcomes to concepts/missions
 ** add new option to Concept + ConceptEditor: hasSubmission
+** add notification when submission is submitted
 ** add new symbols to markdown: google drive/slides, youtube video, scratch embed, (scratch w/ code?) 
 ** simple YSIWYG MD editor
+
+* Notification page
+** can see all recent activity on one page
+
+* feedback system
+** teacher/admin can give written feedback on all submissions
+** add submission feedback page route
+** add notification for feedback entry
+** can see all feedback given to self on one page
 
 * User "groups"
 ** Used to limit what activity other users see
 
-* Log all kinds of user interactions
-** -> Establish aliases for DB actions (pathTemplate + write action, pathTemplate + method)
-** logUserActions
-** logUIActivities
-** logUIEvents
-
 * stats + "evaluation system"
 ** Visualize data and evaluate first results, after Wed class
 ** See stats/comparisons related to every concept/conceptCheck?
-
-* add submission review page route
-** feedback system
-** user must see all pending feedback on one screen!!!
 
 * submission progress bar
 ** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
@@ -68,26 +69,15 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** Boss level unlocks advanced concepts
 
 * Test new users + un-privileged users
+* bug: Safari layouting is broken!!!!
 
+* Data cleaning + verification: Add methods to view + easily remove duplicate children on pre-defined indices
 
-
-## TODO: logging
-
-logUserActions (hooks into all server actions; can be used to log all DB writes?)
-
-
-
-logUIEvents
-
-```json
-[
-  uid,
-  uiActionName,     // [UserIsBack, UserIdle, ApplicationFocusLost]
-  args
-]
-```
 
 ## More TODO
+* bug: move ensureUserInitialized to componentWillMount, use onAuthStateChanged event
+* bug: language buttons appear only after user is updated the first time?
+* bug: Scratch embed craps out?
 * firebase rule replacer utility: make it nice and easy to write aliases for rule checks
 * firebase index validation utility: make it nice and easy to check/verify/update all indices through commandline
 * firebase cache validation utility: make it nice and easy to check/verify/update all kinds of cached info through commandline

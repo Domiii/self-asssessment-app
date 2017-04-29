@@ -32,7 +32,6 @@ export default class ConceptCheckItem extends Component {
     // store result
     const { conceptId, checkId, check, updateCheckResponse } = this.props;
     const responses = ConceptCheckResponseTypes.default.byName;
-
     const response = responses[responseName];
     if (response) {
       // store response!

@@ -25,7 +25,7 @@ const UserInfoRef = makeRefWrapper({
         ensureUserInitialized() {
           const { auth } = this.props;
 
-          if (this.isLoggedIn() && this.isLoaded && !this.val) {
+          if (this.isLoggedIn() && this.isLoaded && !this.data()) {
             // user logged in and but no record of user data
             // -> get user data and add to userInfo DB
             // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo

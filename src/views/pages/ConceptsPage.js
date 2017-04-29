@@ -63,6 +63,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
     const uid = Firebase._.authUid;
 
     queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
+    queries.push(ConceptResponsesRef.makeQuery({uid, conceptId}));
     queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
     queries.push(ConceptCheckResponseDetailsRef.makeQuery({uid, conceptId}));
   }
@@ -87,6 +88,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
     Object.assign(refs, {
       //UserInfoRef.user(firebase, {auth, uid: auth.uid});
       conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
+      conceptResponsesRef: ConceptResponsesRef(firebase, responseDetailsArgs)
       conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
       conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
     });
@@ -96,13 +98,14 @@ import { EmptyObject, EmptyArray } from 'src/util';
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object.isRequired
+    userInfoRef: PropTypes.object
   };
 
   static propTypes = {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
+    conceptResponsesRef: PropTypes.object,
     conceptChecksRef: PropTypes.object,
     conceptCheckResponsesRef: PropTypes.object,
     conceptCheckResponseDetailsRef: PropTypes.object,
@@ -177,6 +180,13 @@ export default class ConceptsPage extends Component {
   get currentConceptChecks() {
     const { conceptChecksRef } = this.props;
     return conceptChecksRef.val;
+  }
+
+  get currentConceptResponse() {
+    const { conceptResponsesRef } = this.props;
+    return conceptResponsesRef && 
+      conceptResponsesRef.val || 
+      EmptyObject;
   }
 
   // all relevant responses by current user
@@ -363,6 +373,10 @@ export default class ConceptsPage extends Component {
 
   updateUserPrefs(prefs){
     const { userInfoRef } = this.context;
+    if (!userInfoRef) {
+      console.error(new Error("tried to update prefs before login"));
+      return;
+    }
     return this.wrapPromise(userInfoRef.update_prefs(prefs));
   }
 
@@ -379,7 +393,7 @@ export default class ConceptsPage extends Component {
         return notificationsRef.addNotification('checkReponse', response.name, {
           conceptId,
           checkId,
-          status: conceptCheckResponsesRef.isNowActive(conceptId, checkId, response)
+          status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
         });
       }));
   }
@@ -511,6 +525,9 @@ export default class ConceptsPage extends Component {
       }} />
     );
 
+    if (this.props.conceptCheckResponsesRef)
+      console.log(this.currentCheckResponses, this.props.conceptCheckResponsesRef.val);
+
     // render!
     return (
       <div>
@@ -531,9 +548,10 @@ export default class ConceptsPage extends Component {
         { conceptEditorEl }
         { this.currentConcept && <ConceptPlayView 
           {...{
+            userPrefs: this.userPrefs,
             conceptId: this.currentConceptId,
             concept: this.currentConcept,
-            userPrefs: this.userPrefs,
+            conceptResponse: this.currentConceptResponse,
             conceptChecks: this.currentConceptChecks,
             conceptCheckResponses: this.currentCheckResponses,
             conceptCheckResponseDetails: this.currentCheckResponseDetails,

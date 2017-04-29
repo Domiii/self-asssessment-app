@@ -16,7 +16,7 @@ import _ from 'lodash';
 
 class _UserForm extends Component {
   static contextTypes = {
-    userInfoRef: PropTypes.object.isRequired
+    userInfoRef: PropTypes.object
   };
 
 
@@ -71,7 +71,6 @@ export default class UserProfilePage extends Component {
   render() {
     // data
     const { userInfoRef } = this.context;
-    const isAdmin = userInfoRef && userInfoRef.isAdmin();
     const isBusy = userInfoRef && !userInfoRef.isLoaded;
 
     // actions

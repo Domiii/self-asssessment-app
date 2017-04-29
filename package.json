@@ -1,6 +1,6 @@
 {
   "name": "self-assessment-app",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "",
   "homepage_orig": "https://github.com/r-park/todo-react-redux",
   "homepage": "https://github.com/Domiii/self-asssessment-app",
@@ -51,7 +51,7 @@
     "redux": "^3.6.0",
     "redux-act": "^1.1.0",
     "redux-form": "^6.4.1",
-    "redux-react-firebase": "^2.3.3",
+    "redux-react-firebase": "file:local_modules/redux-react-firebase",
     "redux-thunk": "^2.1.0",
     "reselect": "^2.5.4",
     "scratch-vm": "git+https://github.com/LLK/scratch-vm.git"

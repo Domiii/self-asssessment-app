@@ -28,6 +28,8 @@ const ConceptCheckResponsesRef = makeRefWrapper({
   queryString({uid}) {
     // get all responses by given uid
     return this.indices.where({uid});
+    //return this.indices.where({uid: '11RtZ4mMz5QC9oMqY5gZbXlRLa03'});
+    //return this.indices.where({uid: 'CT5Wf1IAvDeOaMLrXBpkcetkJHR2'});
     // return this.indices.where({
     //   uid,
     //   conceptId
@@ -62,7 +64,7 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       });
     },
 
-    isNowActive(conceptId, checkId, response) {
+    isActive(conceptId, checkId, response) {
       const responseId = this.getResponseId(conceptId, checkId);
       const responseName = response.name;
       const categoryName = response.category;
@@ -70,11 +72,11 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       if (!this[categoryName]) {
         // NOTE: "this[categoryName]" is a the getter method for that specific category
         console.error(`Invalid categoryName "${categoryName}" in response "${responseName}"`);
-        return Promise.resolve(null);
+        return false;
       }
 
       const currentSelection = responseId && this[categoryName](responseId);
-      return !currentSelection || currentSelection !== responseName;
+      return currentSelection && currentSelection === responseName || false;
     },
 
     updateResponse(conceptId, checkId, checkStillExists, response) {
@@ -82,7 +84,9 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       const responseId = this.getResponseId(conceptId, checkId);
       const responseName = response.name;
       const categoryName = response.category;
-      const isNowActive = this.isNowActive(conceptId, checkId, response);
+
+      const isNowActive = !this.isActive(conceptId, checkId, response);
+
 
       if (checkStillExists) {
         // check still exists
