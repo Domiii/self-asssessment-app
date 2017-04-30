@@ -71,30 +71,6 @@ button:active { outline:none !important; }
   flex-flow: row wrap;
 }
 
-.concept-wrapper > * {
-  flex: 1 100%;
-}
-
-.concept-main { 
-  flex: 7 0px;
-  order: 1;
-}
-.concept-response-menu { 
-  flex: 1 auto;
-  order: 2;
-}
-
-.concept-response-menu > * {
-  min-height: 100%;
-  display: flex;
-  flex: 1 100%;
-  flex-flow: column wrap;
-  > * {
-    flex: 1 auto;
-  }
-}
-
-.footer  { order: 3; }
 
 .no-margin {
   margin: 0 !important;
@@ -134,6 +110,9 @@ button:active { outline:none !important; }
 .color-green {
   color: green;
 }
+.color-lightgreen {
+  color: lightgreen;
+}
 .color-gray {
   color: gray;
 }
@@ -146,8 +125,12 @@ button:active { outline:none !important; }
   color: yellow;
 }
 
-.color-light-red {
+.color-lightred {
   color: IndianRed;
+}
+
+.color-darkred {
+  color: darkred;
 }
 
 .background-red {
@@ -181,7 +164,7 @@ button:active { outline:none !important; }
 
 /**
  * #######################################################
- * App-specific classes: Header
+ * App-specific classes: Header + Footer
  * #######################################################
  */
 
@@ -201,6 +184,9 @@ button:active { outline:none !important; }
 .header-right > a {
   padding: 0 !important;
 }
+
+
+.footer  { order: 3; }
 
 
 /**
@@ -245,7 +231,34 @@ button:active { outline:none !important; }
   font-size: 1.4em;
 }
 
+.concept-response-buttons {
+  display: flex;
+  justify-content: center;
+}
 
+
+.concept-wrapper > * {
+  flex: 1 100%;
+}
+
+.concept-main { 
+  flex: 7 0px;
+  order: 1;
+}
+.concept-response-menu { 
+  flex: 1 auto;
+  order: 2;
+}
+
+.concept-response-menu > * {
+  min-height: 100%;
+  display: flex;
+  flex: 1 100%;
+  flex-flow: column wrap;
+  > * {
+    flex: 1 auto;
+  }
+}
 
 /**
  * #######################################################

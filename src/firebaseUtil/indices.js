@@ -175,18 +175,6 @@ class IndexSet {
     return !!this.indexNamesByKey[key];
   }
 
-  encodeQuery(query) {
-    const keys = _.keys(query);
-    const indexName = this.getIndexNameByKeys(keys);
-    if (!indexName) {
-      throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
-    }
-    const queryValue = this.encodeQueryValue(query, keys);
-    return {
-      [indexName]: queryValue
-    }
-  }
-
   where(query) {
     // console.log({
     //   orderByChild: indexName,
@@ -199,20 +187,20 @@ class IndexSet {
     }
     return {
       orderByChild: indexName,
-      equalTo: this.encodeQueryValue(query, keys)
+      equalTo: this.encodeQueryValueByKeys(query, keys)
     };
   }
 
-  encodeQueryValueAll(query) {
+  encodeQueryValue(query) {
     const keys = _.keys(query);
     const indexName = this.getIndexNameByKeys(keys);
     if (!indexName) {
       throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
     }
-    return this.encodeQueryValue(query, keys);
+    return this.encodeQueryValueByKeys(query, keys);
   }
 
-  encodeQueryValue(val, keys) {
+  encodeQueryValueByKeys(val, keys) {
     if (!keys || !keys.length) {
       console.error('Invalid query: keys are empty.');
       return null;
@@ -250,7 +238,7 @@ class IndexSet {
           continue;
         }
 
-        val[indexName] = this.encodeQueryValue(val, keys);
+        val[indexName] = this.encodeQueryValueByKeys(val, keys);
       }
     }
   }

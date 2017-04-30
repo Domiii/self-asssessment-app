@@ -5,9 +5,10 @@ import { routeNames, routeTemplates } from './routes';
 
 import App from './app';
 
-import SignIn from './pages/SignInPage';
+import SignInPage from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ConceptsPage from './pages/ConceptsPage';
+import NotificationPage from './pages/NotificationPage';
 import TestPage from './pages/TestPage';
 //import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
@@ -51,7 +52,7 @@ export const getRoutes = getState => {
       {
         name: routeNames.SIGN_IN,
         path: routeTemplates.SIGN_IN,
-        component: SignIn,
+        component: SignInPage,
         onEnter: requireUnauth(getState)
       },
       {
@@ -89,6 +90,14 @@ export const getRoutes = getState => {
         path: routeTemplates.CONCEPT_VIEW_MODE,
         indexRoute: {
           component: ConceptsPage,
+          onEnter: requireAuth(getState)
+        }
+      },
+      {
+        name: routeNames.NOTIFICATIONS,
+        path: routeTemplates.NOTIFICATIONS,
+        indexRoute: {
+          component: NotificationPage,
           onEnter: requireAuth(getState)
         }
       },

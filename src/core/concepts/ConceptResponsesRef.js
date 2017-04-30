@@ -24,35 +24,31 @@ const ConceptResponsesRef = makeRefWrapper({
     }
   },
 
-  queryString({uid, conceptId}) {
-    // get all responses by given uid + conceptId
-    return this.indices.where({uid, conceptId});
-  },
-
-  methods: {
-    updateTextResponse(givenConceptId, response) {
-      const { uid, conceptId } = this.props;
-
-      // sanity checks
-      if (!uid || !conceptId) {
-        return Promise.reject(new Error("[ERROR] Missing `uid` or `conceptId` props in ConceptResponsesRef."));
-      }
-
-      if (givenConceptId != conceptId) {
-        return Promise.reject(new Error(`[ERROR] Invalid "conceptId" given in ConceptResponsesRef: ${givenConceptId} - expected: ${conceptId}`));
-      }
-
-      return this.setByIndex({uid, conceptId}, {
-        uid,
-        conceptId,
-        ...response
-      });
-    }
-  },
-
   children: {
-    responses: {
+    response: {
       pathTemplate: '$(responseId)',
+
+      methods: {
+        updateTextResponse(givenConceptId, response) {
+          const { uid, conceptId } = this.props;
+
+          // sanity checks
+          if (!uid || !conceptId) {
+            return Promise.reject(new Error("[ERROR] Missing `uid` or `conceptId` props in ConceptResponsesRef."));
+          }
+
+          if (givenConceptId != conceptId) {
+            return Promise.reject(new Error(`[ERROR] Invalid "conceptId" given in ConceptResponsesRef: ${givenConceptId} - expected: ${conceptId}`));
+          }
+
+          //return this.setByIndex({uid, conceptId}, {
+          return this.update({
+            uid,
+            conceptId,
+            ...response
+          });
+        }
+      },
 
       children: {
         uid: 'uid',

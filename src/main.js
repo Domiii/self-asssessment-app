@@ -40,7 +40,7 @@ if (module.hot) {
 
 // show a message while logging in
 ReactDOM.render(
-  <LoadOverlay message="logging in..." className="color-light-red" />,
+  <LoadOverlay message="logging in..." className="color-lightred" />,
   rootElement
 );
 

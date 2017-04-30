@@ -22,10 +22,6 @@ import {
   Alert, Button, Jumbotron,
   Grid, Row, Col
 } from 'react-bootstrap';
-import { Link } from 'react-router';
-import {
-  LinkContainer
-} from 'react-router-bootstrap';
 
 import { hrefConceptView } from 'src/views/href';
 
@@ -61,9 +57,10 @@ import { EmptyObject, EmptyArray } from 'src/util';
   if (params.conceptId) {
     const conceptId = params.conceptId;
     const uid = Firebase._.authUid;
+    const conceptResponseArgs = { responseId: {uid, conceptId} };
 
     queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
-    queries.push(ConceptResponsesRef.makeQuery({uid, conceptId}));
+    queries.push(ConceptResponsesRef.response.makeQuery(conceptResponseArgs));
     queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
     queries.push(ConceptCheckResponseDetailsRef.makeQuery({uid, conceptId}));
   }
@@ -81,16 +78,18 @@ import { EmptyObject, EmptyArray } from 'src/util';
   };
 
   if (conceptId) {
+    const conceptResponseArgs = { uid, conceptId };
+    const conceptResponsePathArgs = { responseId: {uid, conceptId} };
     const checkArgs = { conceptId: conceptId || 0 };
-    const responsesRefArgs = { uid };
-    const responseDetailsArgs = {uid, conceptId};
+    const checkResponsesArgs = { uid };
+    const checkResponsesDetailsArgs = { uid, conceptId };
 
     Object.assign(refs, {
       //UserInfoRef.user(firebase, {auth, uid: auth.uid});
+      conceptResponsesRef: ConceptResponsesRef.response(firebase, conceptResponseArgs, conceptResponsePathArgs),
       conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
-      conceptResponsesRef: ConceptResponsesRef(firebase, responseDetailsArgs),
-      conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, responsesRefArgs),
-      conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, responseDetailsArgs)
+      conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, checkResponsesArgs),
+      conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, checkResponsesDetailsArgs)
     });
   }
   return refs;
@@ -407,11 +406,16 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(
       conceptResponsesRef.updateTextResponse(conceptId, conceptResponse)
       .then(() => {
-        return notificationsRef.addNotification('conceptResponse', null, {
-          conceptId,
-          text: conceptResponse.text,
-          hasSubmitted: conceptResponse.hasSubmitted
-        });
+        if (conceptResponse.hasSubmitted) {
+          return notificationsRef.addNotification('conceptResponse', null, {
+            conceptId,
+            text: conceptResponse.text,
+            hasSubmitted: conceptResponse.hasSubmitted
+          });
+        }
+        else {
+          // TODO: add log entry
+        }
       })
     );
   }

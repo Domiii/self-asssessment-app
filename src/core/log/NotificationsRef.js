@@ -60,11 +60,12 @@ NotificationTypeSettings.byName = _.keyBy(NotificationTypeSettings.list, 'name')
 const NotificationsRef = makeRefWrapper({
   pathTemplate: '/notifications',
 
-  makeQuery(args) {
-    // TODO: get some notifications
+  queryString(q) {
+    const limit = q && q.limit || 20;
+    
     return {
-      orderByChild: 'null',
-      equalTo: 1
+      orderByChild: 'updatedAt',
+      limitToLast: limit
     };
   },
 

@@ -127,6 +127,10 @@ TODO
 
 TODO: `queryString` + `makeQuery`
 
+1. The `makeQuery` function can be overridden to return a different path and appended query string.
+1. The `queryString` function can be overridden to customize the query string behind the path.
+1. A custom `queryString` function can make use of the `indices.where` function to produce custom queries, based on pre-defined `indices`
+
 #### Custom indexing
 
 TODO: `indices`

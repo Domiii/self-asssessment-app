@@ -82,9 +82,11 @@ export default class Header extends Component {
               <Link to='/' onlyActiveOnIndex={true}><span>Home</span></Link>
             </Navbar.Brand>
             <Navbar.Toggle />
-            {/*<Nav>
-              
-            </Nav>*/ }
+            <Nav>
+              <LinkContainer to='/notifications'>
+                <NavItem eventKey={1}>Notifications</NavItem>
+              </LinkContainer>
+            </Nav>
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight className="header-right-container">

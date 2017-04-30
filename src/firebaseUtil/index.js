@@ -83,6 +83,7 @@ export function makeRefWrapper(cfgOrPath) {
   return _makeRefWrapper(defaultConfig, null, cfgOrPath);
 }
 
+// TODO: currently unused
 function logDBAction(pathTemplate, actionName, args) {
   try {
     if (_.isObject(args) && _.has(args, 'updatedAt')) {
@@ -157,14 +158,28 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
 
   inheritedSettings = Object.assign({}, inheritedSettings, cfg);
 
-  let { pathTemplate, children, queryString, makeQuery, indices } = cfg;
+  // some configuration parameters only affect the current config node
+  let { 
+    pathTemplate, children, queryString, makeQuery,
+    // static, // cannot get static here because it's a reserved keyword
+    methods, inheritedMethods, cascadingMethods
+  } = cfg;
+
+  // some configuration parameters are inherited down the chain
+  let { 
+    indices,
+    updatedAt
+  } = inheritedSettings;
+
   pathTemplate = parent && 
     pathJoin(parent.pathTemplate, pathTemplate) || 
     pathTemplate;
 
-  const getPath = createPathGetterFromTemplateProps(pathTemplate);
+  indices = makeIndices(indices || {});
+
+  const variableTransform = indices.encodeQueryValue.bind(indices);
+  const getPath = createPathGetterFromTemplateProps(pathTemplate, variableTransform);
   const WrapperClass = createRefWrapperBase();
-  indices = indices && makeIndices(indices);
 
   // create the factory function
   const func = createWrapperFunc(parent, WrapperClass, getPath);
@@ -176,21 +191,22 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
   func.indices = indices;
-  func.makeQuery = makeQuery || _makeMakeQuery(getPath, queryString && queryString.bind(func));
+  func.makeQuery = makeQuery ||
+    _makeMakeQuery(getPath, queryString && queryString.bind(func));
 
   // recurse and add all children
-  cfg.cascadingMethods = cfg.cascadingMethods || {};
-  if (cfg.children) {
+  cascadingMethods = cascadingMethods || {};
+  if (children) {
     WrapperClass._ChildWrappers = {};
-    for (let wrapperName in cfg.children) {
-      const childCfg = cfg.children[wrapperName];
+    for (let wrapperName in children) {
+      const childCfg = children[wrapperName];
 
       WrapperClass._ChildWrappers = func[wrapperName] = 
         _makeRefWrapper(inheritedSettings, func, childCfg);
 
       if (childCfg.cascadingMethods) {
         // add all descendant cascading methods as well
-        Object.assign(cfg.cascadingMethods, childCfg.cascadingMethods);
+        Object.assign(cascadingMethods, childCfg.cascadingMethods);
       }
     }
   }
@@ -202,18 +218,18 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   // if (_.isFunction(inheritedSettings.pushedAt)) {
   //   WrapperClass.prototype._decoratePushedAt = inheritedSettings.pushedAt;
   // }
-  if (_.isFunction(inheritedSettings.updatedAt)) {
-    WrapperClass.prototype._decorateUpdatedAt = inheritedSettings.updatedAt;
+  if (_.isFunction(updatedAt)) {
+    WrapperClass.prototype._decorateUpdatedAt = updatedAt;
   }
-  else if (_.isString(inheritedSettings.updatedAt)) {
-    WrapperClass.prototype._decorateUpdatedAt = makeUpdatedAt(inheritedSettings.updatedAt);
+  else if (_.isString(updatedAt)) {
+    WrapperClass.prototype._decorateUpdatedAt = makeUpdatedAt(updatedAt);
   }
 
-  // add get,set,update,add,delete accessors
-  createDataAccessors(WrapperClass.prototype, cfg.children);
+  // add push,get,set,update,delete accessors
+  createDataAccessors(WrapperClass.prototype, children, variableTransform);
 
   // add inheritedMethods
-  const inheritedMethods = cfg.inheritedMethods || {};
+  inheritedMethods = inheritedMethods || {};
   if (parent && parent.inheritedMethods) {
     Object.assign(inheritedMethods, parent.inheritedMethods);
   }
@@ -221,7 +237,7 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
 
   // add cascadingMethods
   const varNames = parseTemplateString(pathTemplate).varNames;
-  const cascadingMethods = _.mapValues(cfg.cascadingMethods, function(method, name) {
+  cascadingMethods = _.mapValues(cascadingMethods, function(method, name) {
     // replace path variables with props
     return function (...args2) {
       const props = this.props;
@@ -232,8 +248,8 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   Object.assign(WrapperClass.prototype, cascadingMethods);
 
   // add methods
-  if (cfg.methods) {
-    Object.assign(WrapperClass.prototype, cfg.methods);
+  if (methods) {
+    Object.assign(WrapperClass.prototype, methods);
   }
 
   // log all possible DB actions (that we are aware of)
@@ -242,12 +258,12 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   return func;
 }
 
-function createDataAccessors(prototype, children) {
+function createDataAccessors(prototype, children, variableTransform) {
   // add all children
-  createChildDataAccessors(prototype, children, '');
+  createChildDataAccessors(prototype, children, '', variableTransform);
 }
 
-function createChildDataAccessors(prototype, children, parentPathTemplate) {
+function createChildDataAccessors(prototype, children, parentPathTemplate, variableTransform) {
   if (!children) {
     return;
   }
@@ -261,8 +277,10 @@ function createChildDataAccessors(prototype, children, parentPathTemplate) {
 
     // the path is the relative path from the node of given prototype to current child
     // NOTE: The path is NOT the full path.
+    // NOTE2: The path for `push` is actually the path up to and including the parent only.
     const pathTemplate = pathJoin(parentPathTemplate, childPath);
-    const getPath = createPathGetterFromTemplateArray(pathTemplate);
+    const getPath = createPathGetterFromTemplateArray(pathTemplate, variableTransform);
+    const addGetPath = createPathGetterFromTemplateArray(parentPathTemplate, variableTransform);
 
     if (prototype[wrapperName]) {
       throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPathTemplate}'`);
@@ -272,7 +290,6 @@ function createChildDataAccessors(prototype, children, parentPathTemplate) {
     prototype[wrapperName] = createChildDataGet(getPath);
 
     // add
-    const addGetPath = createPathGetterFromTemplateArray(parentPathTemplate);
     prototype['push_' + wrapperName] = createChildDataPush(addGetPath);
 
     // set
@@ -439,40 +456,52 @@ function parseTemplateString(text, varLookup) {
   };
 }
 
-function createPathGetterFromTemplateProps(pathTemplate) {
+function _makePathVariable(val, variableTransform) {
+  if (_.isPlainObject(val)) {
+    // use index transformation for variable
+    return variableTransform(val);
+  }
+  return val;
+}
+
+// creates a function that plugs in path variables from a single plain object argument that names variables explicitely
+function createPathGetterFromTemplateProps(pathTemplate, variableTransform) {
   const varLookup = (props, varName, iArg) => {
     if (!props || props[varName] === undefined) {
       throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
-    return props[varName];
+
+    return _makePathVariable(props[varName], variableTransform);
   }
-  const substituter = function getPath(props) {
-    return substituter.pathInfo.nodes.map(node => node(props)).join('');
+
+  const getPathWVariables = function getPathWVariables(props) {
+    return getPathWVariables.pathInfo.nodes.map(node => node(props)).join('');
   };
 
-  return createPathGetterFromTemplate(pathTemplate, varLookup, substituter);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables);
 }
 
-// 
-function createPathGetterFromTemplateArray(pathTemplate) {
+// creates a function that plugs in path variables from the function's arguments
+function createPathGetterFromTemplateArray(pathTemplate, variableTransform) {
   const varLookup = (args, varName, iArg) => {
     if (!args || iArg >= args.length) {
       throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
-    return args[iArg];
+
+    return _makePathVariable(args[iArg], variableTransform);
   };
-  const substituter = function getPath(...args) {
-    return substituter.pathInfo.nodes.map(node => node(args)).join('');
+  const getPathWVariables = function getPathWVariables(...args) {
+    return getPathWVariables.pathInfo.nodes.map(node => node(args)).join('');
   };
-  return createPathGetterFromTemplate(pathTemplate, varLookup, substituter);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables);
 }
 
-function createPathGetterFromTemplate(pathTemplate, varLookup, substituter) {
+function createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables) {
   const pathInfo = parseTemplateString(pathTemplate, varLookup);
   let getPath;
   if (pathInfo.nVars > 0) {
     // template substitution from array
-    getPath = substituter;
+    getPath = getPathWVariables;
     getPath.hasVariables = true;
     getPath.pathInfo = pathInfo;
   }
@@ -486,16 +515,18 @@ function createPathGetterFromTemplate(pathTemplate, varLookup, substituter) {
 }
 
 function createWrapperFunc(parent, WrapperClass, getPath) {
-  return function wrapper(firebaseDataRoot, props) {
+  return function wrapper(firebaseDataRoot, props, pathArgs) {
+    pathArgs = pathArgs || props || {};
     props = props || {};
-    let path = getPath(props);
+    
+    let path = getPath(pathArgs);
     path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
 
     //console.log('creating wrapper at: ' + path);
 
     const getData = makeGetDataDefault(firebaseDataRoot, path);
 
-    const db = props && props.db || Firebase.database();
+    const db = props.db || Firebase.database();
     const ref = db.ref(path);
     const refWrapper = new WrapperClass();
     refWrapper.__init(parent, getPath.pathTemplate, db, getData, ref, props);
@@ -624,7 +655,7 @@ function createRefWrapperBase() {
     }
 
     setByIndex(indexData, childValue) {
-      const key = this.indices.encodeQueryValueAll(indexData);
+      const key = this.indices.encodeQueryValue(indexData);
       return this.setChild(key, childValue);
     }
 

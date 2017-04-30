@@ -12,7 +12,7 @@ const { pathToJS } = helpers;
 import { FAIcon } from 'src/views/components/util';
 import { Button } from 'react-bootstrap';
 
-export function SignIn({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
+export function SignInPage({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
 
   { /*
     <Button bsStyle="primary" onClick={signInWithGithub}>
@@ -35,7 +35,7 @@ export function SignIn({signInWithGithub, signInWithGoogle, signInWithTwitter}) 
   );
 }
 
-SignIn.propTypes = {
+SignInPage.propTypes = {
   signInWithGithub: PropTypes.func.isRequired,
   signInWithGoogle: PropTypes.func.isRequired,
   signInWithTwitter: PropTypes.func.isRequired
@@ -50,4 +50,4 @@ export default connect(state => ({
   signInWithGithub,
   signInWithGoogle,
   signInWithTwitter
-}))(SignIn);
+}))(SignInPage);
