@@ -3,13 +3,13 @@ import _ from 'lodash';
 
 
 const UserActivityLogRef = makeRefWrapper({
-  pathTemplate: '/logs/uiActivities',
+  pathTemplate: '/logs/userActivity',
 
   updatedAt: null,
 
   children: {
     entry: {
-      pathTemplate: '$(uid)/$(updatedAt)',
+      pathTemplate: '$(entryId)',
 
       children: {
         page: 'page',

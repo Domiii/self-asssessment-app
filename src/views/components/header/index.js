@@ -34,13 +34,14 @@ export default class Header extends Component {
     const switchToEn = () => userInfoRef.set_locale('en');
     const switchToZh = () => userInfoRef.set_locale('zh');
     const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
+    const isAdminView = userInfoRef.adminDisplayMode();
 
     // elements
     const adminToolsEL = (!user || !user.isAdmin) ? null : (
       <NavItem className='header-right'>
-        <Button onClick={toggleAdminView} bsStyle={userInfoRef.adminDisplayMode() && 'success' || 'danger'}
+        <Button onClick={toggleAdminView} bsStyle={isAdminView && 'success' || 'danger'}
           className="header-gavel-button"
-          active={userInfoRef.adminDisplayMode()}>
+          active={isAdminView}>
           <FAIcon name="gavel"/>
         </Button>
         <span className="padding-half" />
@@ -83,9 +84,11 @@ export default class Header extends Component {
             </Navbar.Brand>
             <Navbar.Toggle />
             <Nav>
-              <LinkContainer to='/notifications'>
-                <NavItem eventKey={1}>Notifications</NavItem>
-              </LinkContainer>
+              {isAdminView && 
+                <LinkContainer to='/notifications'>
+                  <NavItem eventKey={1}>Notifications</NavItem>
+                </LinkContainer>
+              }
             </Nav>
           </Navbar.Header>
           <Navbar.Collapse>
