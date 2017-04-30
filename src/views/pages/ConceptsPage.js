@@ -388,11 +388,13 @@ export default class ConceptsPage extends Component {
       conceptCheckResponsesRef.updateResponse(
         conceptId, checkId, checkStillExists, response)
       .then(() => {
-        return notificationsRef.addNotification('checkResponse', response.name, {
-          conceptId,
-          checkId,
-          status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
-        });
+        if (!this.isAdmin) {
+          return notificationsRef.addNotification('checkResponse', response.name, {
+            conceptId,
+            checkId,
+            status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
+          });
+        }
       })
     );
   }
@@ -406,15 +408,12 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(
       conceptResponsesRef.updateTextResponse(conceptId, conceptResponse)
       .then(() => {
-        if (conceptResponse.hasSubmitted) {
+        if (!this.isAdmin) {
           return notificationsRef.addNotification('conceptResponse', null, {
             conceptId,
             text: conceptResponse.text,
             hasSubmitted: conceptResponse.hasSubmitted
           });
-        }
-        else {
-          // TODO: add log entry
         }
       })
     );

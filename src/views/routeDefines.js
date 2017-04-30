@@ -101,6 +101,15 @@ export const getRoutes = getState => {
           onEnter: requireAuth(getState)
         }
       },
+      {
+        name: routeNames.SUBMISSIONS,
+        path: routeTemplates.SUBMISSIONS,
+        indexRoute: {
+          component: NotificationPage,
+          onEnter: requireAuth(getState),
+          filter: ['type', 'conceptResponse']
+        }
+      },
       // {
       //   name: routeNames.TEST,
       //   path: routeTemplates.TEST,

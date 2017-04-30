@@ -6,6 +6,7 @@ export const routeNames = {
   CONCEPT_VIEW: 'concept',
   CONCEPT_PLAY: 'play',
   NOTIFICATIONS: 'notifications',
+  SUBMISSIONS: 'submissions',
   TEST: 'test'
 };
 
@@ -17,6 +18,7 @@ export const routePaths = {
   CONCEPT_VIEW: `/${routeNames.CONCEPT_VIEW}`,
   CONCEPT_PLAY: `/${routeNames.CONCEPT_PLAY}`,
   NOTIFICATIONS: `/${routeNames.NOTIFICATIONS}`,
+  SUBMISSIONS: `/${routeNames.SUBMISSIONS}`,
   TEST: `/${routeNames.TEST}`
 };
 
@@ -30,5 +32,6 @@ export const routeTemplates = {
   CONCEPT_VIEW_MODE: `${routeNames.CONCEPT_VIEW}/:ownerId/:conceptId/:mode`,
   CONCEPT_PLAY: `${routeNames.CONCEPT_PLAY}/:ownerId/:conceptId`,
   NOTIFICATIONS: `${routeNames.NOTIFICATIONS}`,
+  SUBMISSIONS: `/${routeNames.SUBMISSIONS}`,
   TEST: `/${routeNames.TEST}`
 };

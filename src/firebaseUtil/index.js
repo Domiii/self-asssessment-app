@@ -160,7 +160,7 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
 
   // some configuration parameters only affect the current config node
   let { 
-    pathTemplate, children, queryString, makeQuery,
+    pathTemplate, children,
     // static, // cannot get static here because it's a reserved keyword
     methods, inheritedMethods, cascadingMethods
   } = cfg;
@@ -168,7 +168,9 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   // some configuration parameters are inherited down the chain
   let { 
     indices,
-    updatedAt
+    updatedAt,
+    queryString,
+    makeQuery
   } = inheritedSettings;
 
   pathTemplate = parent && 

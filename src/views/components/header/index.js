@@ -34,7 +34,7 @@ export default class Header extends Component {
     const switchToEn = () => userInfoRef.set_locale('en');
     const switchToZh = () => userInfoRef.set_locale('zh');
     const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
-    const isAdminView = userInfoRef.adminDisplayMode();
+    const isAdminView = userInfoRef && userInfoRef.adminDisplayMode();
 
     // elements
     const adminToolsEL = (!user || !user.isAdmin) ? null : (
@@ -83,13 +83,16 @@ export default class Header extends Component {
               <Link to='/' onlyActiveOnIndex={true}><span>Home</span></Link>
             </Navbar.Brand>
             <Navbar.Toggle />
-            <Nav>
-              {isAdminView && 
+            {isAdminView &&
+              <Nav> 
                 <LinkContainer to='/notifications'>
                   <NavItem eventKey={1}>Notifications</NavItem>
                 </LinkContainer>
-              }
-            </Nav>
+                <LinkContainer to='/submissions'>
+                  <NavItem eventKey={1}>Submissions</NavItem>
+                </LinkContainer>
+              </Nav>
+            }
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight className="header-right-container">

@@ -24,15 +24,19 @@ import autoBind from 'react-autobind';
 
 @firebaseConnect((props, firebase) => {
   return [
-    NotificationsRef.makeQuery()
+    NotificationsRef.public.makeQuery({filter: props.route.filter})
   ];
 })
 @connect(({ firebase }, props) => {
   return {
-    notificationsRef: NotificationsRef(firebase)
+    notificationsRef: NotificationsRef.public(firebase)
   };
 })
 class NotificationPage extends Component {
+  static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
+
   static propTypes = {
     notificationsRef: PropTypes.object.isRequired
   };
@@ -59,8 +63,6 @@ class NotificationPage extends Component {
       return (<LoadOverlay />);
     }
 
-    const { notificationsRef } = this.props;
-
     if (!this.currentNotifications) {
       return (
         <Alert bsStyle="warning">
@@ -70,7 +72,8 @@ class NotificationPage extends Component {
     }
 
     return (
-      <NotificationList notifications={this.currentNotifications} />
+      <NotificationList  
+        notifications={this.currentNotifications} />
     );
   }
 }

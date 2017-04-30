@@ -14,7 +14,7 @@ export default class NotificationList extends Component {
   render() {
     const { notifications } = this.props;
 
-    const list = _.sortBy(notifications, notification => notification.updatedAt);
+    const list = _.sortBy(notifications, notification => -notification.updatedAt);
 
     const entryEls = _.map(list, (notification, id) => 
       <NotificationEntry key={id + ''} {...{notification}} />

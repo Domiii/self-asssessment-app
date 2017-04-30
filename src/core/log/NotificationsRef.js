@@ -8,27 +8,15 @@ export const NotificationTypeSettings = {
   list: [
     {
       // there has been a change to any sort of concept data
-      name: 'conceptUpdate',
+      name: 'checkResponse',
       parameters: {
-        conceptId: 'conceptId'
+        conceptId: 'conceptId',
+        checkId: 'checkId',
+        status: 'status'
       },
 
-      subtypeSettings: {
-        public: {
-          // concept made public
-        },
-
-        unpublic: {
-          // concept made unpublic
-        },
-
-        edit: {
-          // concept contents (or checks) have been edited
-        },
-
-        delete: {
-          // concept has been deleted
-        }
+      isPublic(subtype, args) {
+        return subtype === 'done' && args.status;
       },
 
       // get URL to the given concept
@@ -45,32 +33,86 @@ export const NotificationTypeSettings = {
         hasSubmitted: 'hasSubmitted'
       },
 
+      isPublic(subtype, args) {
+        return args.hasSubmitted;
+      },
+
       subtypeSettings: null,  // TODO: settings per response type
 
       // get URL to the given concept
       getUrl(notification) {
         // TODO:
       }
-    }
+    },
+    // {
+    //   name: 'conceptEdited',
+
+
+    //   subtypeSettings: {
+    //     public: {
+    //       // concept made public
+    //     },
+
+    //     unpublic: {
+    //       // concept made unpublic
+    //     },
+
+    //     edit: {
+    //       // concept contents (or checks) have been edited
+    //     },
+
+    //     delete: {
+    //       // concept has been deleted
+    //     }
+    //   },
+    // }
   ]
 };
 
 NotificationTypeSettings.byName = _.keyBy(NotificationTypeSettings.list, 'name');
 
+function makeNotificationEntrySpecs(prefix) {
+  return { 
+    [`${prefix}_entry`] : {
+      pathTemplate: '$(notificationId)',
+
+      children: {
+        [`${prefix}_uid`]: 'uid',
+        [`${prefix}_type`]: 'type',
+        [`${prefix}_subtype`]: 'subtype',
+        [`${prefix}_args`]: 'args',
+        [`${prefix}_updatedAt`]: 'updatedAt',
+      }
+    }
+  };
+}
+
 const NotificationsRef = makeRefWrapper({
   pathTemplate: '/notifications',
 
-  queryString(q) {
-    const limit = q && q.limit || 20;
-    
-    return {
-      orderByChild: 'updatedAt',
+  queryString(args) {
+    const limit = args && args.limit || 20;
+    const filter = args && args.filter;
+
+    const q = {
       limitToLast: limit
     };
+
+    if (filter) {
+      console.log('filter: ' + JSON.stringify(filter));
+      Object.assign(q, {
+        orderByChild: filter[0],
+        equalTo: filter[1],
+      });
+    }
+
+    return q;
   },
 
   methods: {
     addNotification(type, subtype, args) {
+      // TODO: Determine where to store this
+
       // start notification verification process
       if (!type || !args || !NotificationTypeSettings.byName[type]) {
         console.error(`[ERROR] Invalid notification type: ` + type);
@@ -88,7 +130,11 @@ const NotificationsRef = makeRefWrapper({
         }
       };
 
-      return this.push({
+      const childPath = settings.isPublic(subtype, args) ?
+        'public' :
+        'other';
+
+      return this.pushChild(childPath, {
         uid: this.props.uid,
         type,
         subtype,
@@ -98,16 +144,14 @@ const NotificationsRef = makeRefWrapper({
   },
 
   children: {
-    entry: {
-      pathTemplate: '$(notificationId)',
+    public: { 
+      pathTemplate: 'public',
+      children: makeNotificationEntrySpecs('public') // copy
+    },
 
-      children: {
-        uid: 'uid',
-        type: 'type',
-        subtype: 'subtype',
-        args: 'args',
-        updatedAt: 'updatedAt',
-      }
+    other: {
+      pathTemplate: 'other',
+      children: makeNotificationEntrySpecs('other') // copy
     }
   }
 });

@@ -26,18 +26,23 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * safety switch: Don't be able to delete concepts that have children
 * safety switch: Don't display trash can when adding stuff
 
-* Notification page
-** can see all recent activity on one page
-
-* submission system
-** simple YSIWYG MD editor
-** add new symbols to markdown: link, google drive/slides, youtube video, scratch project (can easily choose: embed mode and/or code)
+* Notifications
+** create a parameter -> path mapping for notification-related data
+** create a batch request for all notification-related data, possibly using simpler syntax
+** render notifications properly
 
 * feedback system
 ** teacher/admin can give written feedback on all submissions
 ** add submission feedback page route
 ** add notification for feedback entry
 ** can see all feedback given to self on one page
+
+* submission progress bar
+** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
+
+* better submission system + advanced response (not just vanilla text)
+** simple YSIWYG MD editor
+** add new symbols to markdown: link, google drive/slides, youtube video, scratch project (can easily choose: embed mode and/or code)
 
 * Will need test database anytime soon...
 
@@ -47,9 +52,6 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * stats + "evaluation system"
 ** Visualize data and evaluate first results, after Wed class
 ** See stats/comparisons related to every concept/conceptCheck?
-
-* submission progress bar
-** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
 
 * all kinds of small things
 ** Navigation: Add "left" , "right" + "up" buttons to quickly navigate to previous and next siblings, and parent
