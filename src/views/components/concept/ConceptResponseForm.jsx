@@ -83,7 +83,8 @@ class _ConceptResponseForm extends Component {
             <span className="margin" />
             <Button type="button" bsStyle="danger" bsSize="large"
               onClick={this.doSubmit.bind(this, true, !hasSubmitted)}
-              active={hasSubmitted}>
+              active={hasSubmitted}
+              disabled={hasSubmitted}>
               <span>
                 <FAIcon name="upload"/> Submit (提交)
               </span>
