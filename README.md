@@ -21,8 +21,13 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
+
+* make sure to separate progress updates from other check responses!!!
+* make check responses less convoluted... `selected` sub path makes queries a pain
+* change checkResponse key to match `uid_checkId` index?
+
 * bug: Safari layouting is broken!!!!
-* bug: child ordering is not by number but lexicographically
+* bug: percentage summation is broken
 * safety switch: Don't be able to delete concepts that have children
 * safety switch: Don't display trash can when adding stuff
 

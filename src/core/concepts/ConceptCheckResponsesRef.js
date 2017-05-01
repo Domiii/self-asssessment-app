@@ -17,9 +17,9 @@ const ConceptCheckResponsesRef = makeRefWrapper({
 
   indices: {
     uid: ['uid'],
-    groupId: ['groupId'],
     conceptId: ['conceptId'],
-    groupId_conceptId: ['groupId', 'conceptId']
+    //groupId: ['groupId'],
+    //groupId_conceptId: ['groupId', 'conceptId']
 
     // cannot currently use updatedAt, since it is only set after query returns
     //conceptId_updatedAt: ['conceptId', 'updatedAt']
