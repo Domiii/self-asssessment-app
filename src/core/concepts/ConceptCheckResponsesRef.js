@@ -16,6 +16,7 @@ const ConceptCheckResponsesRef = makeRefWrapper({
   pathTemplate: '/conceptCheckResponses',
 
   indices: {
+    done: ['selected/'],
     uid: ['uid'],
     conceptId: ['conceptId'],
     //groupId: ['groupId'],
