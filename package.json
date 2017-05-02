@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --display-chunks --progress",
+    "deploy": "run-s build && firebase deploy",
     "clean": "del-cli public",
     "lint": "eslint -c .eslintrc.yml *.js src server",
     "prebuild": "run-s clean",

@@ -21,11 +21,7 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
-
-* make sure to separate progress updates from other check responses!!!
-* make check responses less convoluted... `selected` sub path makes queries a pain
-* change checkResponse key to match `uid_checkId` index?
-
+* layout: change layout of "done" items: background = grey-ish, change button color (red -> green)
 * bug: Safari layouting is broken!!!!
 * bug: percentage summation is broken
 * safety switch: Don't be able to delete concepts that have children
@@ -35,6 +31,10 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** create a parameter -> path mapping for notification-related data
 ** create a batch request for all notification-related data, possibly using simpler syntax
 ** render notifications properly
+
+* Better submission + progress overview
+** need submission progress bar
+** need single (admin-only?) view over everyone's current submission status (of a specific concept + child concepts)
 
 * feedback system
 ** teacher/admin can give written feedback on all submissions
@@ -99,6 +99,10 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * More Submission features
 ** Backend for viewing, checking off and working with submissions
 ** Peer assessment
+
+* Data refactoring
+** separate progress updates from other check responses, separate into different paths, instead of using `selected` child
+** change checkResponse key to match `uid_checkId` index
 
 * Filter: Finished, Unfinished, Untried
 * Filters: Checkboxes of response types
