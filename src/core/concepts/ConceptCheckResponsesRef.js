@@ -133,7 +133,7 @@ const ConceptCheckResponsesRef = makeRefWrapper({
         uid: 'uid',
         conceptId: 'conceptId',
         checkId: 'checkId',
-        progress: 'progress',
+        //progress: 'progress',
         done: 'done'
         // selected: {
         //   pathTemplate: 'selected',
