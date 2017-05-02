@@ -12,11 +12,11 @@ export const NotificationTypeSettings = {
       parameters: {
         conceptId: 'conceptId',
         checkId: 'checkId',
-        status: 'status'
+        done: 'done'
       },
 
-      isPublic(subtype, args) {
-        return subtype === 'done' && args.status;
+      isPublic(args) {
+        return args.done;
       },
 
       // get URL to the given concept
@@ -33,11 +33,9 @@ export const NotificationTypeSettings = {
         hasSubmitted: 'hasSubmitted'
       },
 
-      isPublic(subtype, args) {
+      isPublic(args) {
         return args.hasSubmitted;
       },
-
-      subtypeSettings: null,  // TODO: settings per response type
 
       // get URL to the given concept
       getUrl(notification) {
@@ -79,7 +77,6 @@ function makeNotificationEntrySpecs(prefix) {
       children: {
         [`${prefix}_uid`]: 'uid',
         [`${prefix}_type`]: 'type',
-        [`${prefix}_subtype`]: 'subtype',
         [`${prefix}_args`]: 'args',
         [`${prefix}_updatedAt`]: 'updatedAt',
       }
@@ -110,7 +107,7 @@ const NotificationsRef = makeRefWrapper({
   },
 
   methods: {
-    addNotification(type, subtype, args) {
+    addNotification(type, args) {
       // TODO: Determine where to store this
 
       // start notification verification process
@@ -130,14 +127,13 @@ const NotificationsRef = makeRefWrapper({
         }
       };
 
-      const childPath = settings.isPublic(subtype, args) ?
+      const childPath = settings.isPublic(args) ?
         'public' :
         'other';
 
       return this.pushChild(childPath, {
         uid: this.props.uid,
         type,
-        subtype,
         args
       });
     }

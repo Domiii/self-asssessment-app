@@ -16,7 +16,6 @@ const ConceptCheckResponsesRef = makeRefWrapper({
   pathTemplate: '/conceptCheckResponses',
 
   indices: {
-    done: ['selected/'],
     uid: ['uid'],
     conceptId: ['conceptId'],
     //groupId: ['groupId'],
@@ -70,14 +69,17 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       const responseName = response.name;
       const categoryName = response.category;
 
-      if (!this[categoryName]) {
-        // NOTE: "this[categoryName]" is a the getter method for that specific category
-        console.error(`Invalid categoryName "${categoryName}" in response "${responseName}"`);
-        return false;
-      }
+      const currentSelection = this.response(responseId);
+      return !!(currentSelection && currentSelection.done);
 
-      const currentSelection = responseId && this[categoryName](responseId);
-      return currentSelection && currentSelection === responseName || false;
+      // if (!this[categoryName]) {
+      //   // NOTE: "this[categoryName]" is a the getter method for that specific category
+      //   console.error(`Invalid categoryName "${categoryName}" in response "${responseName}"`);
+      //   return false;
+      // }
+
+      // const currentSelection = responseId && this[categoryName](responseId);
+      // return currentSelection && currentSelection === responseName || false;
     },
 
     updateResponse(conceptId, checkId, checkStillExists, response) {
@@ -86,46 +88,45 @@ const ConceptCheckResponsesRef = makeRefWrapper({
       const responseName = response.name;
       const categoryName = response.category;
 
-      const isNowActive = !this.isActive(conceptId, checkId, response);
-
+      // TODO: Revamp this - Separate the different categories into different paths
 
       if (checkStillExists) {
         // check still exists
-        const newStatus = isNowActive ? responseName : null;
-        const update = {};
+        const isNowActive = !this.isActive(conceptId, checkId, response);
+        const newStatus = isNowActive;
+        const update = {
+          done: newStatus
+        };
 
-        if (response.category === 'statusUpdate') {
-          update.progress = isNowActive && response.progress || 0;
+        if (categoryName !== 'statusUpdate') {
+          //update.progress = isNowActive && response.progress || 0;
+          throw new Error("Invalid response category: " + categoryName);
         }
 
         if (responseId) {
-          // stupid -> update + push semantics are different.
-          update[`selected/${categoryName}`] = newStatus;
           //console.log(responseId, update);
-          return this.updateChild(responseId, update);
+          return (this.updateChild(responseId, update)
+          .then(() => isNowActive));
         }
         else {
-          return this.push(Object.assign(update, {
+          return (this.push(Object.assign(update, {
             uid,
             conceptId,
-            checkId,
-            selected: {
-              [categoryName]: newStatus
-            }
-          }));
+            checkId
+          }))
+          .then(() => true));
         }
         //return Promise.resolve(1);
       }
-      //else if (!isNowActive) {
       else {
         // check object is gone -> delete response
-        return this.setChild(responseId, null);
+        return this.setChild(responseId, null).then(() => false);
       }
     }
   },
 
   children: {
-    responses: {
+    response: {
       pathTemplate: '$(responseId)',
 
       children: {
@@ -133,15 +134,16 @@ const ConceptCheckResponsesRef = makeRefWrapper({
         conceptId: 'conceptId',
         checkId: 'checkId',
         progress: 'progress',
-        selected: {
-          pathTemplate: 'selected',
+        done: 'done'
+        // selected: {
+        //   pathTemplate: 'selected',
 
-          children: {
-            statusUpdate: 'statusUpdate',
-            feedback: 'feedback',
-            request: 'request',
-          }
-        }
+        //   children: {
+        //     statusUpdate: 'statusUpdate',
+        //     feedback: 'feedback',
+        //     request: 'request',
+        //   }
+        // }
       }
     }
   }

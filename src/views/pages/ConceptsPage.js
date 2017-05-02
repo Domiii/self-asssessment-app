@@ -387,12 +387,12 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(
       conceptCheckResponsesRef.updateResponse(
         conceptId, checkId, checkStillExists, response)
-      .then(() => {
+      .then(done => {
         if (!this.isAdmin) {
-          return notificationsRef.addNotification('checkResponse', response.name, {
+          return notificationsRef.addNotification('checkResponse', {
             conceptId,
             checkId,
-            status: conceptCheckResponsesRef.isActive(conceptId, checkId, response)
+            done
           });
         }
       })
@@ -409,7 +409,7 @@ export default class ConceptsPage extends Component {
       conceptResponsesRef.updateTextResponse(conceptId, conceptResponse)
       .then(() => {
         if (!this.isAdmin) {
-          return notificationsRef.addNotification('conceptResponse', null, {
+          return notificationsRef.addNotification('conceptResponse', {
             conceptId,
             text: conceptResponse.text,
             hasSubmitted: conceptResponse.hasSubmitted

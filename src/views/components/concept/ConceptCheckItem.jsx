@@ -30,7 +30,9 @@ export default class ConceptCheckItem extends Component {
 
   onCheckReponseClick(responseName) {
     // store result
-    const { conceptId, checkId, check, updateCheckResponse } = this.props;
+    const { 
+      conceptId, checkId, check, updateCheckResponse
+    } = this.props;
     const responses = ConceptCheckResponseTypes.default.byName;
     const response = responses[responseName];
     if (response) {
@@ -41,53 +43,80 @@ export default class ConceptCheckItem extends Component {
     ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it
   }
 
-  get ResponsesEl() {
+  get CheckButton() {
     const { lookupLocalized } = this.context;
     const { 
       selectedResponse,
       responseDetails
     } = this.props;
 
-    const responseCategories = ConceptCheckResponseTypes.default.list;
+    const response = ConceptCheckResponseTypes.default.byName.done;
+    const responseName = 'done';
 
-    const responseEls = _.map(responseCategories, ({category, responses}, iCategory) => {
-      const buttonEls = _.map(responses, (response) => {
-        const responseName = response.name;
+    const isDone = selectedResponse && !!selectedResponse.done || false;
 
-        const tooltip = (
-          <Tooltip className="in" id="tooltip">
-            { lookupLocalized(response, 'title') || '' }
-          </Tooltip>
-        );
+    const tooltip = (
+      <Tooltip className="in" id="tooltip">
+        { lookupLocalized(response, 'title') || '' }
+      </Tooltip>
+    );
 
-        const selections = selectedResponse && selectedResponse.selected;
-        return (
-          <OverlayTrigger key={responseName} placement="bottom" overlay={tooltip}>
-            <Button 
-              bsSize="large"
-              active={ selections && selections[category] === responseName }
-              bsStyle={ response.bsStyle || 'default' }
-              ref={ 'check-'+responseName }
-              onClick={ this.onCheckReponseClick.bind(this, responseName) }
-              className={'concept-check-response-button no-padding ' + (response.className || '')}>
-              { response.icon && <FAIcon name={response.icon} /> }
-            </Button>
-          </OverlayTrigger>
-        );
-      });
+    const responseEls = (
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
+        <Button 
+          bsSize="large"
+          active={ isDone }
+          bsStyle={ isDone ? 'success' : 'danger' }
+          ref={ 'check-'+responseName }
+          onClick={ this.onCheckReponseClick.bind(this, responseName) }
+          className={'concept-check-response-button no-padding '}>
+          { response.icon && <FAIcon name={response.icon} /> }
+        </Button>
+      </OverlayTrigger>
+    );
 
-      return (<span key={ category }>
-        <ButtonGroup
-          className="concept-check-response-buttons">
-          { buttonEls }
-        </ButtonGroup>
-        { iCategory < responseCategories.length-1 && <span className="margin-half" /> }
-      </span>);
-    });
+    return (
+      <span style={{display: 'flex'}}>{ responseEls }</span>
+    );
 
-    return (<div className="max-width inline-hcentered">
-      { responseEls }
-    </div>);
+    // TODO: revamp the complete response system
+
+    //const responseCategories = ConceptCheckResponseTypes.default.list;
+
+    // const responseEls = _.map(responseCategories, ({category, responses}, iCategory) => {
+    //   const buttonEls = _.map(responses, (response) => {
+    //     const responseName = response.name;
+
+    //     const tooltip = (
+    //       <Tooltip className="in" id="tooltip">
+    //         { lookupLocalized(response, 'title') || '' }
+    //       </Tooltip>
+    //     );
+
+    //     const selections = selectedResponse && selectedResponse.selected;
+    //     return (
+    //       <OverlayTrigger key={responseName} placement="bottom" overlay={tooltip}>
+    //         <Button 
+    //           bsSize="large"
+    //           active={ selections && selections[category] === responseName }
+    //           bsStyle={ response.bsStyle || 'default' }
+    //           ref={ 'check-'+responseName }
+    //           onClick={ this.onCheckReponseClick.bind(this, responseName) }
+    //           className={'concept-check-response-button no-padding ' + (response.className || '')}>
+    //           { response.icon && <FAIcon name={response.icon} /> }
+    //         </Button>
+    //       </OverlayTrigger>
+    //     );
+    //   });
+
+    //   return (<span key={ category }>
+    //     <ButtonGroup
+    //       className="concept-check-response-buttons">
+    //       { buttonEls }
+    //     </ButtonGroup>
+    //     { iCategory < responseCategories.length-1 && <span className="margin-half" /> }
+    //   </span>);
+    // });
 /*
         <Flex>
           <Item flexGrow="1" key={name}>
@@ -104,16 +133,13 @@ export default class ConceptCheckItem extends Component {
     const styleOverride = !check && { backgroundColor: 'lightgray' } || EmptyObject;
 
     return (
-      <ListGroupItem className="no-padding">
-        <ListGroup className="no-margin concept-check">
-          <ListGroupItem style={styleOverride} className="concept-check-description">
-            { check && lookupLocalized(check, 'title') || '' }
-            { !check && '<deleted check>' }
-          </ListGroupItem>
-          <ListGroupItem className="no-padding" style={styleOverride}>
-            { this.ResponsesEl }
-          </ListGroupItem>
-        </ListGroup>
+      <ListGroupItem className="no-padding concept-check-item">
+        { this.CheckButton }
+        <span className="margin" />
+        <span style={styleOverride} className="concept-check-description">
+          { check && lookupLocalized(check, 'title') || '' }
+          { !check && '<deleted check>' }
+        </span>
       </ListGroupItem>
     );
   }
