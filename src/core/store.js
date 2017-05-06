@@ -1,34 +1,59 @@
-import { applyMiddleware, compose, createStore } from 'redux';
-import { reduxReactFirebase } from 'redux-react-firebase';
+import { applyMiddleware, compose, createStore } from 'redux'
+import thunk from 'redux-thunk'
+import makeRootReducer from './reducers'
+import { browserHistory } from 'react-router'
+import { reactReduxFirebase, getFirebase } from 'react-redux-firebase'
+import { firebaseConfig, reduxFirebaseConfig } from 'src/config/firebase.cfg'
+import { version } from 'package.json'
 
-import thunk from 'redux-thunk';
-import reducers from './reducers';
+export default (initialState = {}, history) => {
+  // ======================================================
+  // Window Vars Config
+  // ======================================================
+  window.version = version
 
+  // ======================================================
+  // Middleware Configuration
+  // ======================================================
+  const middleware = [
+    thunk.withExtraArgument(getFirebase)
+    // This is where you add other middleware like redux-observable
+  ]
 
-export default (firebaseConfig, initialState = {}) => {
-  let middleware = applyMiddleware(thunk);
-
+  // ======================================================
+  // Store Enhancers
+  // ======================================================
+  const enhancers = []
   if (process.env.NODE_ENV !== 'production') {
-    // configure redux-devtools-extension
-    // @see https://github.com/zalmoxisus/redux-devtools-extension
-    const devToolsExtension = window.devToolsExtension;
+    const devToolsExtension = window.devToolsExtension
     if (typeof devToolsExtension === 'function') {
-      middleware = compose(middleware, devToolsExtension());
+      enhancers.push(devToolsExtension())
     }
   }
 
-  // insert firebase "middleware"
-  const createStoreWithFirebase = compose(
-    reduxReactFirebase(firebaseConfig)
-  )(createStore.bind(null, reducers, initialState, middleware))
+  // ======================================================
+  // Store Instantiation and HMR Setup
+  // ======================================================
+  const store = createStore(
+    makeRootReducer(),
+    initialState,
+    compose(
+      applyMiddleware(...middleware),
+      reactReduxFirebase(firebaseConfig, reduxFirebaseConfig),
+      ...enhancers
+    )
+  )
+  store.asyncReducers = {}
 
-  const store = createStoreWithFirebase();
+  //// To unsubscribe, invoke `store.unsubscribeHistory()` anytime
+  //store.unsubscribeHistory = browserHistory.listen(updateLocation(store))
 
   if (module.hot) {
     module.hot.accept('./reducers', () => {
-      store.replaceReducer(require('./reducers').default);
-    });
+      const reducers = require('./reducers').default
+      store.replaceReducer(reducers(store.asyncReducers))
+    })
   }
 
-  return store;
-};
+  return store
+}

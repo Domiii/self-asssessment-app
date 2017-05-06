@@ -17,7 +17,7 @@ import autoBind from 'react-autobind';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Firebase, { Promise } from 'firebase';
-import { firebase } from 'redux-react-firebase';
+import { firebaseConnect } from 'react-redux-firebase';
 import {
   Alert, Button, Jumbotron,
   Grid, Row, Col
@@ -48,7 +48,7 @@ import _ from 'lodash';
 
 import { EmptyObject, EmptyArray } from 'src/util';
 
-@firebase((props, firebase) => {
+@firebaseConnect((props, firebase) => {
   const { params } = props;
   const queries = [
     ConceptsRef.makeQuery(params.ownerId)

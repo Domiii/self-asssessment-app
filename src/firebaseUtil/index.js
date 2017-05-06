@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import Firebase from 'firebase';
-import { helpers } from 'redux-react-firebase';
+import { helpers } from 'react-redux-firebase';
 import { makeIndices } from './indices';
 
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;

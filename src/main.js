@@ -15,19 +15,21 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { 
+  syncHistoryWithStore,
+  getFirebase
+} from 'react-router-redux';
 
 import configureStore from './core/store';
 import Root from './views/root';
 
 import firebase from 'firebase';
-import firebaseConfig from './config/firebase.cfg';
 
 import { LoadOverlay } from 'src/views/components/overlays';
 
 
 // GO!
-const store = configureStore(firebaseConfig);
+const store = configureStore();
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
 
@@ -45,7 +47,7 @@ ReactDOM.render(
 );
 
 // Wait until after authentication has finished before rendering the root
-firebase.auth().onAuthStateChanged(function (authData) {
+getFirebase().auth().onAuthStateChanged(function (authData) {
   // done! Let's kick this thing into gear!
   
   // try {

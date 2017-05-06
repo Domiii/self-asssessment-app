@@ -6,7 +6,7 @@ import {
   signInWithTwitter
 } from 'src/firebaseUtil';
 
-import { firebase, helpers } from 'redux-react-firebase'
+import { firebaseConnect, helpers } from 'react-redux-firebase'
 const { pathToJS } = helpers;
 
 import { FAIcon } from 'src/views/components/util';

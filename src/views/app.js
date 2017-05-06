@@ -7,7 +7,7 @@ import { createSelector } from 'reselect';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Firebase from 'firebase';
-import { firebase as firebaseConnect, helpers } from 'redux-react-firebase'
+import { firebaseConnect, helpers } from 'react-redux-firebase'
 import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 import { lookupLocalized } from 'src/util/localizeUtil';
