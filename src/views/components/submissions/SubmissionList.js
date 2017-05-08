@@ -3,21 +3,26 @@
 import React, { Component, PropTypes } from 'react';
 import SubmissionEntry from './SubmissionEntry';
 import {
-  ListGroup, ListGroupItem
+  ListGroup, ListGroupItem, Button
 } from 'react-bootstrap';
 
 export default class SubmissionList extends Component {
   static propTypes = {
-    submissions: PropTypes.object.isRequired
+    submissions: PropTypes.object.isRequired,
+    loadMore: PropTypes.func.isRequired,
+    hasMore: PropTypes.bool.isRequired
   };
 
   render() {
-    const { submissions } = this.props;
+    const { 
+      submissions,
+      loadMore,
+      hasMore
+    } = this.props;
 
     const list = _.sortBy(submissions, item => -item.updatedAt);
 
     const entryEls = _.map(list, (submission, id) => {
-      console.log(submission);
       return (
         <SubmissionEntry key={id} {...{
           submissionId: id,
@@ -27,9 +32,18 @@ export default class SubmissionList extends Component {
     });
 
     return (
-      <ListGroup>
-        {entryEls}
-      </ListGroup>
+      <div>
+        <ListGroup>
+          {entryEls}
+        </ListGroup>
+        <Button block
+          bsStyle="primary"
+          bsSize="large"
+          onClick={loadMore}
+          disabled={!hasMore}>
+          Load more...
+        </Button>
+      </div>
     );
   }
 }

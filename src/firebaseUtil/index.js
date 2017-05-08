@@ -47,7 +47,6 @@ export function isAuthenticated(firebaseApp) {
 
 // get data at given path from current state in store
 export function makeGetDataDefault(firebaseDataRoot, path, queryArgs) {
-  console.log(path, queryArgs);
   if (_.isPlainObject(queryArgs) && queryArgs.populates) {
     return () => populatedDataToJS(firebaseDataRoot, path, queryArgs.populates);
   }

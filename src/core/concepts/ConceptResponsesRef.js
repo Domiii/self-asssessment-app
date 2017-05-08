@@ -38,7 +38,7 @@ const ConceptResponsesRef = makeRefWrapper({
       q.queryParams.push(`limitToLast=${limit}`);
     }
 
-    if (filter) {
+    if (filter && filter.length) {
       //console.log('filter: ' + JSON.stringify(filter));
       q.queryParams.push(
         `orderByChild=${filter[0]}`,

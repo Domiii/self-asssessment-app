@@ -3,9 +3,12 @@
 import React, { Component, PropTypes } from 'react';
 import Moment from 'react-moment';
 import {
-  ListGroup, ListGroupItem
+  ListGroup, ListGroupItem, Well
 } from 'react-bootstrap';
+import { Link } from 'react-router';
 import { FAIcon } from 'src/views/components/util';
+
+import { hrefConceptView } from 'src/views/href';
 
 export default class SubmissionEntry extends Component {
   static propTypes = {
@@ -16,8 +19,34 @@ export default class SubmissionEntry extends Component {
     lookupLocalized: PropTypes.func.isRequired
   };
 
+  makeConceptEl(conceptId, concept) {
+    const {
+      lookupLocalized
+    } = this.context;
+
+    // TODO: Get conceptId
+    return (
+      <pre style={{display: 'inline', fontSize: '1.2em'}}
+        className="margin-half no-padding">
+        <Link className="margin"
+          to={hrefConceptView(concept.ownerId, conceptId)}>
+          {lookupLocalized(concept, 'title')}
+        </Link>
+      </pre>
+    );
+  }
+
+  makeUserEl(uid, user) {
+    const name = user && user.data && user.data.displayName || '<unknown>';
+    const email = user && user.data && user.data.email || '<unknown>';
+
+    return (<span>
+      {`${user.data.displayName} (${user.data.email})`}
+    </span>);
+  }
+
   render() {
-    const { 
+    let { 
       submission: {
         uid,
         conceptId,
@@ -27,13 +56,18 @@ export default class SubmissionEntry extends Component {
       }
     } = this.props;
 
-    const {
-      lookupLocalized
-    } = this.context;
+    // the weird names are due to `populate` not allowing aliasing the populated object's key
+    // see: https://github.com/prescottprue/react-redux-firebase/issues/126
+    const user = uid;
+    uid = user.uid;
 
-    // TODO: Need to get submission-related data
-    //    uid => user name
-    //    conceptId => concept title?
+    const concept = conceptId;
+    conceptId = conceptId.conceptId;
+
+    const iconSize = '2em';
+    const userIcon = user && user.data &&
+      <img style={{maxWidth: iconSize}} src={user.data.photoURL} /> || 
+      <FAIcon style={{fontSize: iconSize}} name="user" />;
 
     return (
       <li className="list-group-item">
@@ -44,7 +78,11 @@ export default class SubmissionEntry extends Component {
               <FAIcon name="remove" className="color-red" />
             }
           </div>
-          {`Submission for ${lookupLocalized(conceptId, 'title')} by ${uid.data.displayName}`}
+          <span>
+            { userIcon } <span className="margin-half" />
+            Submission for{ this.makeConceptEl(conceptId, concept) }
+            by { this.makeUserEl(uid, user) }
+          </span>
         </h4>
         <Moment fromNow>{updatedAt}</Moment> (<Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{updatedAt}</Moment>)
         <pre className="list-group-item-text">
