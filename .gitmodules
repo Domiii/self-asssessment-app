@@ -1,3 +1,0 @@
-[submodule "local_modules/redux-react-firebase"]
-	path = local_modules/redux-react-firebase
-	url = https://github.com/Domiii/redux-react-firebase.git

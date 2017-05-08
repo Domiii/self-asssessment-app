@@ -3,8 +3,9 @@ import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import { helpers, getFirebase } from 'react-redux-firebase';
 import { makeIndices } from './indices';
+import { EmptyObject } from 'src/util';
 
-const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
+const { pathToJS, isLoaded, isEmpty, dataToJS, populatedDataToJS } = helpers;
 
 const defaultConfig = {
   pushedAt(val) {
@@ -45,7 +46,11 @@ export function isAuthenticated(firebaseApp) {
 };
 
 // get data at given path from current state in store
-export function makeGetDataDefault(firebaseDataRoot, path) {
+export function makeGetDataDefault(firebaseDataRoot, path, queryArgs) {
+  console.log(path, queryArgs);
+  if (_.isPlainObject(queryArgs) && queryArgs.populates) {
+    return () => populatedDataToJS(firebaseDataRoot, path, queryArgs.populates);
+  }
   return () => dataToJS(firebaseDataRoot, path);
 };
 
@@ -110,32 +115,54 @@ function logDBAction(pathTemplate, actionName, args) {
 // }
 
 
+function _buildQueryFinal(path, args) {
+  if (!args) {
+    return path;
+  }
+  else if (_.isString(args)) {
+    return `${path}#${args}`;
+  }
+  else if (_.isArray(args)) {
+    return ({
+      path,
+      queryParams: args
+    });
+  }
+  else if (_.isPlainObject(args)) {
+    return ({
+      path,
+      ...args
+    });
+  }
+  else {
+    throw new Error('Invalid query arguments: ' + JSON.stringify(args));
+  }
+}
+
 // converts query objects into propriotory `redux-react-firebase` query syntax
 // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
 function _makeMakeQuery(getPath, queryString) {
-  let querySuffixFunc = queryString instanceof Function && queryString;
-  let querySuffixConst = !(queryString instanceof Function) && queryString;
-  let getQuerySuffix = (...allArgs) => {
-    let res = querySuffixFunc && querySuffixFunc.apply(self, allArgs) || querySuffixConst;
-    if (_.isObject(res) && !_.isString(res)) {
-      res = _.map(res, (value, key) => key + '=' + value).join('&');
-    }
+  let queryArgsFunc = queryString instanceof Function && queryString;
+  let queryArgsConst = !(queryString instanceof Function) && queryString;
+  let getQueryArgs = (...allArgs) => {
+    let res = queryArgsFunc && queryArgsFunc.apply(this, allArgs) || queryArgsConst;
     return res;
   };
 
   function _defaultMakeQueryWithVariables(pathArgs, ...customArgs) {
-    const basePath = getPath(pathArgs);
-    const querySuffix = getQuerySuffix(...customArgs, ...pathArgs);
-    return basePath + (querySuffix && ('#' + querySuffix) || '');
+    const path = getPath(pathArgs);
+    const queryArgs = getQueryArgs.call(this, ...customArgs, ...pathArgs);
+    return _buildQueryFinal(path, queryArgs);
   }
 
   function _defaultMakeQueryNoVariables(...customArgs) {
-    const basePath = getPath();
-    const querySuffix = getQuerySuffix(...customArgs);
-    return basePath + (querySuffix && ('#' + querySuffix) || '');
+    const path = getPath();
+    const queryArgs = getQueryArgs.call(this, ...customArgs);
+    return _buildQueryFinal(path, queryArgs);
   }
 
-  return getPath.hasVariables && _defaultMakeQueryWithVariables || 
+  return getPath.hasVariables && 
+    _defaultMakeQueryWithVariables || 
     _defaultMakeQueryNoVariables;
 }
 
@@ -186,8 +213,7 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
   func.indices = indices;
-  func.makeQuery = makeQuery ||
-    _makeMakeQuery(getPath, queryString && queryString.bind(func));
+  func.makeQuery = (makeQuery || _makeMakeQuery(getPath, queryString)).bind(func);
 
   // recurse and add all children
   cascadingMethods = cascadingMethods || {};
@@ -469,11 +495,11 @@ function createPathGetterFromTemplateProps(pathTemplate, variableTransform) {
     return _makePathVariable(props[varName], variableTransform);
   }
 
-  const getPathWVariables = function getPathWVariables(props) {
-    return getPathWVariables.pathInfo.nodes.map(node => node(props)).join('');
+  const getPathWithVariables = function getPathWithVariables(props) {
+    return getPathWithVariables.pathInfo.nodes.map(node => node(props)).join('');
   };
 
-  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables);
 }
 
 // creates a function that plugs in path variables from the function's arguments
@@ -485,18 +511,18 @@ function createPathGetterFromTemplateArray(pathTemplate, variableTransform) {
 
     return _makePathVariable(args[iArg], variableTransform);
   };
-  const getPathWVariables = function getPathWVariables(...args) {
-    return getPathWVariables.pathInfo.nodes.map(node => node(args)).join('');
+  const getPathWithVariables = function getPathWithVariables(...args) {
+    return getPathWithVariables.pathInfo.nodes.map(node => node(args)).join('');
   };
-  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables);
+  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables);
 }
 
-function createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables) {
+function createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables) {
   const pathInfo = parseTemplateString(pathTemplate, varLookup);
   let getPath;
   if (pathInfo.nVars > 0) {
     // template substitution from array
-    getPath = getPathWVariables;
+    getPath = getPathWithVariables;
     getPath.hasVariables = true;
     getPath.pathInfo = pathInfo;
   }
@@ -510,16 +536,17 @@ function createPathGetterFromTemplate(pathTemplate, varLookup, getPathWVariables
 }
 
 function createWrapperFunc(parent, WrapperClass, getPath) {
-  return function wrapper(firebaseDataRoot, props, pathArgs) {
-    pathArgs = pathArgs || props || {};
-    props = props || {};
+  const f = function wrapper(firebaseDataRoot, props, pathArgs, ...allQueryArgs) {
+    pathArgs = pathArgs || props || EmptyObject;
+    props = props || EmptyObject;
     
     let path = getPath(pathArgs);
     path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
 
     //console.log('creating wrapper at: ' + path);
-
-    const getData = makeGetDataDefault(firebaseDataRoot, path);
+    const makeQuery = f.makeQuery;
+    const queryArgs = allQueryArgs.length && makeQuery(...allQueryArgs) || null;
+    const getData = makeGetDataDefault(firebaseDataRoot, path, queryArgs);
 
     const db = props.db || getFirebase().database();
     const ref = db.ref(path);
@@ -527,6 +554,7 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
     refWrapper.__init(parent, getPath.pathTemplate, db, getData, ref, props);
     return refWrapper;
   };
+  return f;
 }
 
 function createRefWrapperBase() {

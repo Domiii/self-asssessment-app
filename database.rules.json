@@ -17,7 +17,7 @@
       ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
     },
     "conceptResponses": {
-      ".indexOn": ["uid", "conceptId", "uid_conceptId"],
+      ".indexOn": ["hasSubmitted", "uid", "conceptId", "uid_conceptId"],
       ".read": "auth !== null",
       
       "$responseId" : {

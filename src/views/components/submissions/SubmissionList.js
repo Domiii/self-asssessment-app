@@ -14,11 +14,17 @@ export default class SubmissionList extends Component {
   render() {
     const { submissions } = this.props;
 
-    const list = _.sortBy(submissions, entry => -entry.updatedAt);
+    const list = _.sortBy(submissions, item => -item.updatedAt);
 
-    const entryEls = _.map(list, (submission, id) => 
-      <SubmissionEntry key={id} {...submission} />
-    );
+    const entryEls = _.map(list, (submission, id) => {
+      console.log(submission);
+      return (
+        <SubmissionEntry key={id} {...{
+          submissionId: id,
+          submission
+        }} />
+      );
+    });
 
     return (
       <ListGroup>

@@ -11,6 +11,10 @@ export default class SubmissionEntry extends Component {
   static propTypes = {
     submission: PropTypes.object.isRequired
   };
+  
+  static contextTypes = {
+    lookupLocalized: PropTypes.func.isRequired
+  };
 
   render() {
     const { 
@@ -23,6 +27,10 @@ export default class SubmissionEntry extends Component {
       }
     } = this.props;
 
+    const {
+      lookupLocalized
+    } = this.context;
+
     // TODO: Need to get submission-related data
     //    uid => user name
     //    conceptId => concept title?
@@ -30,12 +38,15 @@ export default class SubmissionEntry extends Component {
     return (
       <li className="list-group-item">
         <h4 className="list-group-item-heading">
-          { hasSubmitted &&
-            <FAIcon name="done" className="color-green" /> ||  
-            <FAIcon name="remove" className="color-red" />}
-          {`Submission for ${conceptId}`} by ${uid}`}
+          <div style={{float: 'right'}}>
+            { hasSubmitted &&
+              <FAIcon name="check" className="color-green" /> ||  
+              <FAIcon name="remove" className="color-red" />
+            }
+          </div>
+          {`Submission for ${lookupLocalized(conceptId, 'title')} by ${uid.data.displayName}`}
         </h4>
-        <Moment fromNow>{updatedAt}</Moment> (<Moment format="MMMM Do YYYY, h:mm:ss a">{updatedAt}</Moment>)
+        <Moment fromNow>{updatedAt}</Moment> (<Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{updatedAt}</Moment>)
         <pre className="list-group-item-text">
           { text }
         </pre>

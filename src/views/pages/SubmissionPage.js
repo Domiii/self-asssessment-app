@@ -22,14 +22,30 @@ import _ from 'lodash';
 import autoBind from 'react-autobind';
 
 
+// see: http://react-redux-firebase.com/docs/populate
+const submissionPopulateCfg = [
+  { child: 'uid', root: 'users' }
+];
+
+const responsesArgs = {
+  limit: 20,
+  filter: [
+    'hasSubmitted', true
+  ],
+  populates: [
+    { child: 'uid', root: 'users' },
+    { child: 'conceptId', root: 'concepts' }
+  ]
+};
 @firebaseConnect((props, firebase) => {
+
   return [
-    ConceptResponsesRef.makeQuery()
+    ConceptResponsesRef.makeQuery(responsesArgs)
   ];
 })
 @connect(({ firebase }, props) => {
   return {
-    conceptResponsesRef: ConceptResponsesRef(firebase)
+    conceptResponsesRef: ConceptResponsesRef(firebase, null, null, responsesArgs)
   };
 })
 class SubmissionPage extends Component {
@@ -73,7 +89,8 @@ class SubmissionPage extends Component {
 
     return (
       <SubmissionList  
-        submissions={this.currentSubmissions} />
+        submissions={this.currentSubmissions}
+        hasMore={}/>
     );
   }
 }

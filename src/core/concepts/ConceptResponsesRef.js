@@ -26,21 +26,28 @@ const ConceptResponsesRef = makeRefWrapper({
 
 
   queryString(args) {
-    const limit = args && args.limit || 20;
-    const filter = args && args.filter || [
-      'hasSubmitted', true
-    ];
+    const limit = args && args.limit;
+    const filter = args && args.filter;
+    const populates = args && args.populates;
 
     const q = {
-      limitToLast: limit
+      queryParams: []
     };
 
+    if (limit) {
+      q.queryParams.push(`limitToLast=${limit}`);
+    }
+
     if (filter) {
-      console.log('filter: ' + JSON.stringify(filter));
-      Object.assign(q, {
-        orderByChild: filter[0],
-        equalTo: filter[1],
-      });
+      //console.log('filter: ' + JSON.stringify(filter));
+      q.queryParams.push(
+        `orderByChild=${filter[0]}`,
+        `equalTo=${filter[1]}`
+      );
+    }
+
+    if (populates) {
+      q.populates = populates;
     }
 
     return q;
