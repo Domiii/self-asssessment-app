@@ -1,13 +1,15 @@
 import DBStatusRef from 'src/core/DBStatusRef';
 import { UserInfoRef } from 'src/core/users';
 import { startLogging } from 'src/core/users';
-import { isInitialized } from 'src/firebaseUtil';
 import { createSelector } from 'reselect';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import Firebase from 'firebase';
-import { firebaseConnect, helpers } from 'react-redux-firebase'
+import { 
+  firebaseConnect, 
+  helpers,
+  getFirebase
+} from 'react-redux-firebase'
 import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 import { lookupLocalized } from 'src/util/localizeUtil';
@@ -20,11 +22,12 @@ console.log('starting app...');
 
 
 // our firebase utility needs a set of all paths
-const mapPropsToPaths = (props, Firebase) => {
-  const uid = Firebase._.authUid;
+const mapPropsToPaths = (props, firebase) => {
   const paths = [
     DBStatusRef.makeQuery()
   ];
+  
+  const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
   if (uid) {
     paths.push(UserInfoRef.user.makeQuery({uid}));
   }

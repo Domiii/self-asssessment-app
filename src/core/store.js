@@ -3,10 +3,9 @@ import thunk from 'redux-thunk'
 import makeRootReducer from './reducers'
 import { browserHistory } from 'react-router'
 import { reactReduxFirebase, getFirebase } from 'react-redux-firebase'
-import { firebaseConfig, reduxFirebaseConfig } from 'src/config/firebase.cfg'
 import { version } from 'package.json'
 
-export default (initialState = {}, history) => {
+export default (firebaseConfig, reduxFirebaseConfig, initialState = {}, history) => {
   // ======================================================
   // Window Vars Config
   // ======================================================

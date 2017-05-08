@@ -1,54 +1,47 @@
 import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
-import Firebase from 'firebase';
-import { helpers } from 'react-redux-firebase';
+import { helpers, getFirebase } from 'react-redux-firebase';
 import { makeIndices } from './indices';
 
 const { pathToJS, isLoaded, isEmpty, dataToJS } = helpers;
 
 const defaultConfig = {
   pushedAt(val) {
-    val.updatedAt = Firebase.database.ServerValue.TIMESTAMP;
+    val.updatedAt = getFirebase().database.ServerValue.TIMESTAMP;
   },
   updatedAt(val) {
-    val.updatedAt = Firebase.database.ServerValue.TIMESTAMP;
+    val.updatedAt = getFirebase().database.ServerValue.TIMESTAMP;
   }
 };
 
 function makeUpdatedAt(propName) {
   return function updatedAt(val) {
-    val[propName] = Firebase.database.ServerValue.TIMESTAMP;
+    val[propName] = getFirebase().database.ServerValue.TIMESTAMP;
   };
 }
 
 
-export function authenticate(provider) {
-  return Firebase.auth().signInWithRedirect(provider);
-};
+// export function authenticate(provider) {
+//   return getFirebase().auth().signInWithRedirect(provider);
+// };
 
-export function signInWithGithub() {
-  return authenticate(new Firebase.auth.GithubAuthProvider());
-};
-
-
-export function signInWithGoogle() {
-  return authenticate(new Firebase.auth.GoogleAuthProvider());
-};
+// export function signInWithGithub() {
+//   return authenticate(new getFirebase().auth.GithubAuthProvider());
+// };
 
 
-export function signInWithTwitter() {
-  return authenticate(new Firebase.auth.TwitterAuthProvider());
-};
+// export function signInWithGoogle() {
+//   return authenticate(new getFirebase().auth.GoogleAuthProvider());
+// };
 
 
-export function isInitialized(firebaseApp) {
-  return isLoaded(pathToJS(firebaseApp, 'auth'));
-};
+// export function signInWithTwitter() {
+//   return authenticate(new getFirebase().auth.TwitterAuthProvider());
+// };
 
 export function isAuthenticated(firebaseApp) {
-  //return !!Firebase.auth().currentUser;
-  return !!pathToJS(firebaseApp, 'auth');
+  return !!getFirebase().auth().currentUser;
 };
 
 // get data at given path from current state in store
@@ -528,7 +521,7 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
     const getData = makeGetDataDefault(firebaseDataRoot, path);
 
-    const db = props.db || Firebase.database();
+    const db = props.db || getFirebase().database();
     const ref = db.ref(path);
     const refWrapper = new WrapperClass();
     refWrapper.__init(parent, getPath.pathTemplate, db, getData, ref, props);

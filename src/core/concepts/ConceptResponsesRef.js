@@ -24,6 +24,28 @@ const ConceptResponsesRef = makeRefWrapper({
     }
   },
 
+
+  queryString(args) {
+    const limit = args && args.limit || 20;
+    const filter = args && args.filter || [
+      'hasSubmitted', true
+    ];
+
+    const q = {
+      limitToLast: limit
+    };
+
+    if (filter) {
+      console.log('filter: ' + JSON.stringify(filter));
+      Object.assign(q, {
+        orderByChild: filter[0],
+        equalTo: filter[1],
+      });
+    }
+
+    return q;
+  },
+
   children: {
     response: {
       pathTemplate: '$(responseId)',

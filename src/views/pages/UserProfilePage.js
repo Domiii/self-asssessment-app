@@ -72,10 +72,10 @@ export default class UserProfilePage extends Component {
   render() {
     // data
     const { userInfoRef } = this.context;
-    const isBusy = userInfoRef && !userInfoRef.isLoaded;
+    const isBusy = userInfoRef && !userInfoRef.isLoaded || false;
 
     // actions
-    const updateUser = userInfoRef.updateUser.bind(userInfoRef);
+    const updateUser = userInfoRef && userInfoRef.updateUser.bind(userInfoRef);
 
     // go render!
     if (isBusy) {
@@ -83,7 +83,7 @@ export default class UserProfilePage extends Component {
       return (<LoadOverlay />);
     }
 
-    const userInfo = userInfoRef.val;
+    const userInfo = userInfoRef && userInfoRef.val;
     return (
       <UserForm onSubmit={updateUser} initialValues={userInfo} />
     );
