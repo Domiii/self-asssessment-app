@@ -36,7 +36,7 @@ export function computeAllChecksProgress(concepts, checkResponses) {
     conceptId => !childCounts[conceptId]
   );
 
-  console.log('\nComputing progress:');
+  //console.log('\nComputing progress:');
   //console.log(JSON.stringify(_.keys(concepts)));
   //console.log(JSON.stringify(childCounts));
 

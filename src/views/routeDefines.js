@@ -1,5 +1,5 @@
 import React from 'react';
-import { isInitialized, isAuthenticated } from 'src/firebaseUtil';
+import { isAuthenticated } from 'src/firebaseUtil';
 
 import { routeNames, routeTemplates } from './routes';
 
@@ -9,16 +9,9 @@ import SignInPage from './pages/SignInPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ConceptsPage from './pages/ConceptsPage';
 import NotificationPage from './pages/NotificationPage';
-import TestPage from './pages/TestPage';
+import SubmissionPage from './pages/SubmissionPage';
+//import TestPage from './pages/TestPage';
 //import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
-
-// const requireLoading = getState => {
-//   return (nextState, replace) => {
-//     if (!isInitialized(getState().firebase)) {
-//       replace
-//     }
-//   }
-// };
 
 const requireAuth = getState => {
   return (nextState, replace) => {
@@ -105,9 +98,8 @@ export const getRoutes = getState => {
         name: routeNames.SUBMISSIONS,
         path: routeTemplates.SUBMISSIONS,
         indexRoute: {
-          component: NotificationPage,
-          onEnter: requireAuth(getState),
-          filter: ['type', 'conceptResponse']
+          component: SubmissionPage,
+          onEnter: requireAuth(getState)
         }
       },
       // {

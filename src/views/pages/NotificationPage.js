@@ -16,7 +16,7 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 import { NotificationList } from 'src/views/components/notifications';
 
-import { firebase as firebaseConnect } from 'redux-react-firebase'
+import { firebaseConnect } from 'react-redux-firebase'
 
 import _ from 'lodash';
 import autoBind from 'react-autobind';

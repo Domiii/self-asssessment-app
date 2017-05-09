@@ -91,7 +91,7 @@ const UserRef = makeRefWrapper({
   // ...
 });
 
-@firebase(...)    // UserRef.makeQuery(...) here
+@firebaseConnect(...)    // UserRef.makeQuery(...) here
 @connect(...)     // UserRef(firebase, customProps) here
 export class UserView {
   render() {

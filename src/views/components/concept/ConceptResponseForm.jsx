@@ -39,8 +39,15 @@ class _ConceptResponseForm extends Component {
     change('conceptResponse.hasSubmitted', submit);
 
     handleSubmit(values => {
+      const trimmedText = values.conceptResponse.text.trim();
+      if (isSubmitButton && !trimmedText.length) {
+        return false;
+      }
       const newValues = _.merge({}, values, {
-        conceptResponse: { hasSubmitted: submit }
+        conceptResponse: { 
+          hasSubmitted: submit,
+          text: trimmedText
+        }
       });
 
       return onSubmit(newValues);
@@ -59,7 +66,7 @@ class _ConceptResponseForm extends Component {
     } = this.props;
 
     const { 
-      reset, pristine, submitting
+      reset, pristine, submitting, values
     } = this.props;
 
     const hasSubmitted = conceptResponse && conceptResponse.hasSubmitted || false;
@@ -76,15 +83,17 @@ class _ConceptResponseForm extends Component {
 
           <div className="concept-response-buttons">
             <Button type="button" bsStyle="primary" disabled={pristine || submitting}
-              onClick={this.doSubmit.bind(this, false, false)}
-            >
+                onClick={this.doSubmit.bind(this, false, false)}
+              >
               <span><FAIcon name="upload" /> Save (暫存)</span>
             </Button>
+
             <span className="margin" />
+
             <Button type="button" bsStyle="danger" bsSize="large"
               onClick={this.doSubmit.bind(this, true, !hasSubmitted)}
               active={hasSubmitted}
-              disabled={hasSubmitted}>
+              disabled={pristine || hasSubmitted}>
               <span>
                 <FAIcon name="upload"/> Submit (提交)
               </span>
@@ -97,7 +106,9 @@ class _ConceptResponseForm extends Component {
                 } 
               </span>
             </Button>
+
             <span className="margin" />
+
             <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
           </div>
         </form>

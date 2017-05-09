@@ -31,6 +31,9 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
+* migrate to https://github.com/prescottprue/react-redux-firebase
+** http://react-redux-firebase.com/docs/populate
+
 * layout: change layout of "done" items: background = grey-ish, change button color (red -> green)
 * bug: Safari layouting is broken!!!!
 * bug: percentage summation is broken

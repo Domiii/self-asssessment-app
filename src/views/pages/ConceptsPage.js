@@ -16,8 +16,8 @@ from 'src/core/log';
 import autoBind from 'react-autobind';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import Firebase, { Promise } from 'firebase';
-import { firebase } from 'redux-react-firebase';
+import { Promise } from 'firebase';
+import { firebaseConnect, getFirebase } from 'react-redux-firebase';
 import {
   Alert, Button, Jumbotron,
   Grid, Row, Col
@@ -48,7 +48,7 @@ import _ from 'lodash';
 
 import { EmptyObject, EmptyArray } from 'src/util';
 
-@firebase((props, firebase) => {
+@firebaseConnect((props, firebase) => {
   const { params } = props;
   const queries = [
     ConceptsRef.makeQuery(params.ownerId)
@@ -56,7 +56,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
 
   if (params.conceptId) {
     const conceptId = params.conceptId;
-    const uid = Firebase._.authUid;
+    const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
     const conceptResponseArgs = { responseId: {uid, conceptId} };
 
     queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
@@ -69,7 +69,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
 })
 @connect(({ firebase }, props) => {
   const { params } = props;
-  const uid = Firebase._.authUid;
+  const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
   const conceptId = params.conceptId;
 
   const refs = {

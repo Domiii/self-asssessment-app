@@ -6,13 +6,12 @@ import {
   signInWithTwitter
 } from 'src/firebaseUtil';
 
-import { firebase, helpers } from 'redux-react-firebase'
-const { pathToJS } = helpers;
+import { firebaseConnect, getFirebase } from 'react-redux-firebase'
 
 import { FAIcon } from 'src/views/components/util';
 import { Button } from 'react-bootstrap';
 
-export function SignInPage({signInWithGithub, signInWithGoogle, signInWithTwitter}) {
+export function SignInPage({firebase}) {
 
   { /*
     <Button bsStyle="primary" onClick={signInWithGithub}>
@@ -22,6 +21,11 @@ export function SignInPage({signInWithGithub, signInWithGoogle, signInWithTwitte
       <FAIcon name="twitter" /> Twitter
     </Button>
   */ }
+
+  const signInWithGoogle = () => getFirebase().login({
+     provider: 'google',
+     type: 'redirect'
+   });
 
   return (
     <div className="g-row sign-in">
@@ -36,9 +40,9 @@ export function SignInPage({signInWithGithub, signInWithGoogle, signInWithTwitte
 }
 
 SignInPage.propTypes = {
-  signInWithGithub: PropTypes.func.isRequired,
-  signInWithGoogle: PropTypes.func.isRequired,
-  signInWithTwitter: PropTypes.func.isRequired
+  // signInWithGithub: PropTypes.func.isRequired,
+  // signInWithGoogle: PropTypes.func.isRequired,
+  // signInWithTwitter: PropTypes.func.isRequired
 };
 
 
@@ -47,7 +51,7 @@ SignInPage.propTypes = {
 //-------------------------------------
 
 export default connect(state => ({
-  signInWithGithub,
-  signInWithGoogle,
-  signInWithTwitter
+  // signInWithGithub,
+  // signInWithGoogle,
+  // signInWithTwitter
 }))(SignInPage);
