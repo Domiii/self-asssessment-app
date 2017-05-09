@@ -185,10 +185,10 @@ class IndexSet {
     if (!indexName) {
       throw new Error('invalid query - keys did not match any index: ' + JSON.stringify(query));
     }
-    return {
-      orderByChild: indexName,
-      equalTo: this.encodeQueryValueByKeys(query, keys)
-    };
+    return [
+      `orderByChild=${indexName}`,
+      `equalTo=${this.encodeQueryValueByKeys(query, keys)}`
+    ];
   }
 
   encodeQueryValue(query) {

@@ -19,7 +19,7 @@ export default class SubmissionList extends Component {
       loadMore,
       hasMore
     } = this.props;
-
+    
     const list = _.sortBy(submissions, item => -item.updatedAt);
 
     const entryEls = _.map(list, (submission, id) => {

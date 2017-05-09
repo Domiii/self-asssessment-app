@@ -309,10 +309,16 @@ export default class ConceptsPage extends Component {
     const { conceptsRef, conceptChecksRef } = this.props;
 
     concept.nChecks = _.size(checks);
-    return this.wrapPromise(Promise.all([
-      conceptsRef.set_concept(conceptId, concept),
-      conceptChecksRef.update(checks)
-    ]));
+
+    const actions = [
+      conceptsRef.set_concept(conceptId, concept)
+    ];
+
+    if (checks) {
+      actions.push(conceptChecksRef.set(checks));
+    }
+
+    return this.wrapPromise(Promise.all(actions));
   }
 
   deleteConcept(deleteConceptId) {

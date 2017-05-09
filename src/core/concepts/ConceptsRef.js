@@ -7,17 +7,17 @@ const ConceptsRef = makeRefWrapper({
   queryString(ownerId) {
     if (ownerId) {
       // get all entries of given parent
-      return {
-        orderByChild: 'ownerId',
-        equalTo: ownerId
-      };
+      return [
+        'orderByChild=ownerId',
+        `equalTo=${ownerId}`
+      ];
     }
     else {
       // get root entries
-      return {
-        orderByChild: 'parentId',
-        equalTo: null
-      };
+      return [
+        'orderByChild=parentId',
+        `equalTo=null`
+      ];
     }
   },
 

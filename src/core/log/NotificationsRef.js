@@ -91,16 +91,16 @@ const NotificationsRef = makeRefWrapper({
     const limit = args && args.limit || 20;
     const filter = args && args.filter;
 
-    const q = {
-      limitToLast: limit
-    };
+    const q = [
+      `limitToLast=${limit}`
+    ];
 
     if (filter) {
       console.log('filter: ' + JSON.stringify(filter));
-      Object.assign(q, {
-        orderByChild: filter[0],
-        equalTo: filter[1],
-      });
+      q.push(
+        `orderByChild=${filter[0]}`,
+        `equalTo=${filter[1]}`
+      );
     }
 
     return q;

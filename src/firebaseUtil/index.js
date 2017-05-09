@@ -212,7 +212,7 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
   func.indices = indices;
-  func.makeQuery = (makeQuery || _makeMakeQuery(getPath, queryString)).bind(func);
+  func.makeQuery = (makeQuery || _makeMakeQuery.call(func, getPath, queryString)).bind(func);
 
   // recurse and add all children
   cascadingMethods = cascadingMethods || {};
@@ -646,14 +646,23 @@ function createRefWrapperBase() {
       return true;
     }
 
-    _doPush(ref, newChild) {
-      const newRef = this.onBeforeWrite() && 
-        this.onPush(newChild) &&
-        this.onFinalizeWrite(newChild) &&
-        ref.push(newChild);
+    _onError(action, ref, err) {
+      throw new Error(`${action} (at ${ref})\n${err.stack}`);
+    }
 
-      //newRef.then(() => this.onAfterWrite('push', newChild));
-      return newRef;
+    _doPush(ref, newChild) {
+      try {
+        const newRef = this.onBeforeWrite() && 
+          this.onPush(newChild) &&
+          this.onFinalizeWrite(newChild) &&
+          ref.push(newChild);
+
+        //newRef.then(() => this.onAfterWrite('push', newChild));
+        return newRef;
+      }
+      catch (err) {
+        this._onError('push', ref, err);
+      }
     }
 
     push(newChild) {
@@ -667,13 +676,18 @@ function createRefWrapperBase() {
 
     set(val) {
       const ref = this._ref;
-      return (
-        this.onBeforeWrite(val) &&
-        this.onUpdate(val) &&
-        this.onFinalizeWrite(val) &&
-        ref.set(val)
-        .then(() => this.onAfterWrite('set', this.val))
-      );
+      try {
+        return (
+          this.onBeforeWrite(val) &&
+          this.onUpdate(val) &&
+          this.onFinalizeWrite(val) &&
+          ref.set(val)
+          .then(() => this.onAfterWrite('set', this.val))
+        );
+      }
+      catch (err) {
+        this._onError('set', ref, err);
+      }
     }
 
     setByIndex(indexData, childValue) {
@@ -684,75 +698,100 @@ function createRefWrapperBase() {
     setChild(path, childValue) {
       // TODO: use proper decorators for descendant paths
       const ref = this.getRef(path);
-      return (
-        this.onBeforeWrite(childValue) &&
-        this.onUpdate(childValue) &&
-        this.onFinalizeWrite(childValue) &&
-        ref.set(childValue)
-        .then(() => this.onAfterWritePath('set', childValue, path))
-      );
+      try {
+        return (
+          this.onBeforeWrite(childValue) &&
+          this.onUpdate(childValue) &&
+          this.onFinalizeWrite(childValue) &&
+          ref.set(childValue)
+          .then(() => this.onAfterWritePath('set', childValue, path))
+        );
+      }
+      catch (err) {
+        this._onError('setChild', ref, err);
+      }
     }
 
     update(val) {
       const ref = this._ref;
-      return (
-        this.onBeforeWrite(val) &&
-        this.onUpdate(val) &&
-        this.onFinalizeWrite(val) &&
+      try {
+        return (
+          this.onBeforeWrite(val) &&
+          this.onUpdate(val) &&
+          this.onFinalizeWrite(val) &&
 
-        ref.update(val)
-        .then(() => {
-          // TODO: sadly, value is not yet updated in local repository
-          const newVal = val;
-          return this.onAfterWrite('update', 
-            newVal
-            //_.zipObject(_.keys(val), _.map(val, (v,k) => _.get(newVal, k)))
-          );
-        })
-      );
+          ref.update(val)
+          .then(() => {
+            // TODO: sadly, value is not yet updated in local repository
+            const newVal = val;
+            return this.onAfterWrite('update', 
+              newVal
+              //_.zipObject(_.keys(val), _.map(val, (v,k) => _.get(newVal, k)))
+            );
+          })
+        ); 
+      }
+      catch (err) {
+        this._onError('update', ref, err);
+      }
     }
 
     updateChild(path, childValue) {
       // TODO: use proper decorators for descendant paths
       const ref = this.getRef(path);
-      return (
-        this.onBeforeWrite(childValue) &&
-        this.onUpdate(childValue) &&
-        this.onFinalizeWrite(childValue) &&
+      try {
+        return (
+          this.onBeforeWrite(childValue) &&
+          this.onUpdate(childValue) &&
+          this.onFinalizeWrite(childValue) &&
 
-        ref.update(childValue)
-        .then(() => {
-          const newVal = childValue;
-          return this.onAfterWritePath('update', 
-            newVal
-            // _.zipObject(
-            //   _.keys(childValue), 
-            //   _.map(childValue, (v, k) => this.getDataIn(childValue, k))
-            // )
-          , path);
-        })
-      );
+          ref.update(childValue)
+          .then(() => {
+            const newVal = childValue;
+            return this.onAfterWritePath('update', 
+              newVal
+              // _.zipObject(
+              //   _.keys(childValue), 
+              //   _.map(childValue, (v, k) => this.getDataIn(childValue, k))
+              // )
+            , path);
+          })
+        );
+      }
+      catch (err) {
+        this._onError('updateChild', ref, err);
+      }
     }
 
     // see: https://firebase.google.com/docs/reference/js/firebase.database.Reference#transaction
-    transaction(cb) {
+    transactionChild(cb) {
       // TODO: add write hooks!!!
       const ref = this._ref;
-      return (
-        this.onBeforeWrite() && 
-        ref.transaction(cb)
-        .then(() => this.onAfterWrite('transaction', '?'))
-      );
+      try {
+        return (
+          this.onBeforeWrite() && 
+          ref.transaction(cb)
+          .then(() => this.onAfterWrite('transaction', '?'))
+        );
+      }
+      catch (err) {
+        this._onError('transactionChild', ref, err);
+      }
     }
 
     transactionChild(path, cb) {
       // TODO: add write hooks!!!
       const ref = this.getRef(path);
-      return (
-        this.onBeforeWrite() && 
-        ref.transaction(cb)
-        .then(() => this.onAfterWritePath('transaction', '?', path))
-      );
+      try {
+        return (
+          this.onBeforeWrite() && 
+          ref.transaction(cb)
+          .then(() => this.onAfterWritePath('transaction', '?', path))
+        );
+      }
+      catch (err) {
+        this._onError('transactionChild', ref, err);
+      }
     }
   }
 
