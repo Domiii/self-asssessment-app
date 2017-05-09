@@ -15,8 +15,18 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
   1. `firebase init` (with default settings)
 
 ## Deployment
-  1. `npm run build`
-  1. `firebase deploy`
+  1. `npm run deploy` (requires full privileges for the firebase account)
+
+
+## Technology Stack
+  1. NodeJs
+  1. Bable (for [ES6](http://es6-features.org/) + ES7 support) ([a brief history of JS](https://benmccormick.org/2015/09/14/es5-es6-es2016-es-next-whats-going-on-with-javascript-versioning/), [一看就懂的 React ES5、ES6+ 常見用法對照表](http://blog.techbridge.cc/2016/04/04/react-react-native-es5-es6-cheat-sheet/))
+  1. React (front-end)
+  1. Redux (front-end data model)
+  1. Firebase (database)
+  1. redux-react-firebase (glues it all together)
+  1. Other libraries (Bootstrap)
+  1. Other tools: `npm` + `git`
 
 
 
