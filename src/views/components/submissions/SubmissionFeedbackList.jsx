@@ -12,6 +12,7 @@ import {
   ListGroup, Alert, Button
 } from 'react-bootstrap';
 import { FAIcon } from 'src/views/components/util';
+import SubmissionFeedbackEntry from './SubmissionFeedbackEntry';
 import SubmissionFeedbackForm from './SubmissionFeedbackForm';
 
 export default class SubmissionFeedbackList extends Component {
@@ -110,15 +111,12 @@ export default class SubmissionFeedbackList extends Component {
 
   ListEl() {
     const {
-      submissionId, submission, feedbacks
+      feedbacks
     } from this.props;
 
     return (
-      map(feedbacks, (feedback, feedbackId) => (<div>
+      map(feedbacks, (feedback, feedbackId) => (<div key={feedbackId}>
         <SubmissionFeedbackEntry {...{
-          key: feedbackId,
-          submissionId,
-          submission,
           feedbackId,
           feedback,
 
