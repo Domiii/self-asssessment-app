@@ -9,7 +9,7 @@ import { FAIcon } from 'src/views/components/util';
 import {
   ConceptDescriptionFull,
   ConceptChecksPanel,
-  ConceptResponseForm
+  ConceptSubmissionForm
 } from 'src/views/components/concept';
 
 import ProgressBar from 'src/views/components/ProgressBar';
@@ -20,13 +20,13 @@ export class ConceptPlayView extends Component {
     userPrefs: PropTypes.object.isRequired,
     conceptId: PropTypes.string.isRequired,
     concept: PropTypes.object.isRequired,
-    conceptResponse: PropTypes.object,
+    conceptSubmission: PropTypes.object,
     conceptChecks: PropTypes.object,
     conceptCheckResponses: PropTypes.array.isRequired,
     conceptCheckResponseDetails: PropTypes.object,
     conceptProgress: PropTypes.object,
 
-    updateConceptResponse: PropTypes.func,
+    updateConceptSubmission: PropTypes.func,
     updateCheckResponse: PropTypes.func.isRequired
   };
 
@@ -46,12 +46,12 @@ export class ConceptPlayView extends Component {
     const {
       userPrefs,
       conceptId, concept, 
-      conceptResponse,
+      conceptSubmission,
       conceptChecks,
       conceptCheckResponses,
       conceptCheckResponseDetails,
 
-      updateConceptResponse,
+      updateConceptSubmission,
       updateCheckResponse
     } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
@@ -81,12 +81,12 @@ export class ConceptPlayView extends Component {
           </Item>
         </Flex>
         {
-          (!!conceptResponse || concept.expectsSubmission) && 
+          (!!conceptSubmission || concept.expectsSubmission) && 
             (<div>
-              <ConceptResponseForm {...{
+              <ConceptSubmissionForm {...{
                 conceptId,
-                conceptResponse,
-                onSubmit: updateConceptResponse
+                conceptSubmission,
+                onSubmit: updateConceptSubmission
               }} />
             </div>)
         }

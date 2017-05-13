@@ -17,10 +17,10 @@ const lang = {
 
 };
 
-class _ConceptResponseForm extends Component {
+class _ConceptSubmissionForm extends Component {
   static propTypes = {
     conceptId: PropTypes.string.isRequired,
-    conceptResponse: PropTypes.object
+    conceptSubmission: PropTypes.object
   };
 
   constructor(...args) {
@@ -36,15 +36,15 @@ class _ConceptResponseForm extends Component {
       handleSubmit, onSubmit, change, reset
     } = this.props;
 
-    change('conceptResponse.hasSubmitted', submit);
+    change('conceptSubmission.hasSubmitted', submit);
 
     handleSubmit(values => {
-      const trimmedText = values.conceptResponse.text.trim();
+      const trimmedText = values.conceptSubmission.text.trim();
       if (isSubmitButton && !trimmedText.length) {
         return false;
       }
       const newValues = _.merge({}, values, {
-        conceptResponse: { 
+        conceptSubmission: { 
           hasSubmitted: submit,
           text: trimmedText
         }
@@ -62,21 +62,21 @@ class _ConceptResponseForm extends Component {
 
   render() {
     const {
-      conceptResponse
+      conceptSubmission
     } = this.props;
 
     const { 
       reset, pristine, submitting, values
     } = this.props;
 
-    const hasSubmitted = conceptResponse && conceptResponse.hasSubmitted || false;
+    const hasSubmitted = conceptSubmission && conceptSubmission.hasSubmitted || false;
 
     // render go!
     return (
       <Panel header={this.PanelTitle(hasSubmitted)} bsStyle={hasSubmitted && 'success' || 'danger'}>
         <form className="form-horizontal" onSubmit={() => {}}>
           <Field name="conceptId" component="input" type="hidden" />
-          <FormSection name="conceptResponse">
+          <FormSection name="conceptSubmission">
             <Field ref="hasSubmitted" name="hasSubmitted" component="input" type="hidden" />
             <Field name="text" component="textarea" rows="10" style={{width: '100%'}} />
           </FormSection>
@@ -93,7 +93,7 @@ class _ConceptResponseForm extends Component {
             <Button type="button" bsStyle="danger" bsSize="large"
               onClick={this.doSubmit.bind(this, true, !hasSubmitted)}
               active={hasSubmitted}
-              disabled={pristine || hasSubmitted}>
+              disabled={hasSubmitted}>
               <span>
                 <FAIcon name="upload"/> Submit (提交)
               </span>
@@ -117,18 +117,18 @@ class _ConceptResponseForm extends Component {
   }
 }
 
-_ConceptResponseForm = reduxForm({ enableReinitialize: true })(_ConceptResponseForm);
+_ConceptSubmissionForm = reduxForm({ enableReinitialize: true })(_ConceptSubmissionForm);
 
-const ConceptResponseForm = connect(
-  (state, { conceptId, conceptResponse }) => {
+const ConceptSubmissionForm = connect(
+  (state, { conceptId, conceptSubmission }) => {
     return ({
       form: 'concept_response_' + conceptId,
       initialValues: {
         conceptId,
-        conceptResponse: conceptResponse
+        conceptSubmission: conceptSubmission
       },
     });
   }
-)(_ConceptResponseForm);
+)(_ConceptSubmissionForm);
 
-export default ConceptResponseForm;
+export default ConceptSubmissionForm;

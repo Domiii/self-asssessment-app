@@ -1,5 +1,9 @@
 import { makeRefWrapper } from 'src/firebaseUtil';
 
+export const SubmissionStatus = {
+  NotSubmitted,
+  Submitted
+};
 
 // TODO: Likes + maybe some more responses toward entire concepts
 /*
@@ -11,7 +15,8 @@ import { makeRefWrapper } from 'src/firebaseUtil';
   },
 */
 
-const ConceptResponsesRef = makeRefWrapper({
+const ConceptSubmissionsRef = makeRefWrapper({
+  // TODO: Rename path
   pathTemplate: '/conceptResponses',
 
   indices: {
@@ -55,26 +60,26 @@ const ConceptResponsesRef = makeRefWrapper({
 
   children: {
     response: {
-      pathTemplate: '$(responseId)',
+      pathTemplate: '$(submissionId)',
 
       methods: {
-        updateTextResponse(givenConceptId, response) {
+        updateSubmission(givenConceptId, text) {
           const { uid, conceptId } = this.props;
 
           // sanity checks
           if (!uid || !conceptId) {
-            return Promise.reject(new Error("[ERROR] Missing `uid` or `conceptId` props in ConceptResponsesRef."));
+            return Promise.reject(new Error("[ERROR] Missing `uid` or `conceptId` props in ConceptSubmissionsRef."));
           }
 
           if (givenConceptId != conceptId) {
-            return Promise.reject(new Error(`[ERROR] Invalid "conceptId" given in ConceptResponsesRef: ${givenConceptId} - expected: ${conceptId}`));
+            return Promise.reject(new Error(`[ERROR] Invalid "conceptId" given in ConceptSubmissionsRef: ${givenConceptId} - expected: ${conceptId}`));
           }
 
           //return this.setByIndex({uid, conceptId}, {
           return this.update({
             uid,
             conceptId,
-            ...response
+            ...text
           });
         }
       },
@@ -91,4 +96,4 @@ const ConceptResponsesRef = makeRefWrapper({
   }
 });
 
-export default ConceptResponsesRef;
+export default ConceptSubmissionsRef;

@@ -1,21 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 import SubmissionEntry from './SubmissionEntry';
 import {
-  ListGroup, ListGroupItem, Button
+  ListGroup
 } from 'react-bootstrap';
 
 export default class SubmissionList extends Component {
   static propTypes = {
-    submissions: PropTypes.object.isRequired,
-    loadMore: PropTypes.func.isRequired,
-    hasMore: PropTypes.bool.isRequired
+    submissions: PropTypes.object.isRequired
   };
 
   render() {
     const { 
-      submissions,
-      loadMore,
-      hasMore
+      submissions
     } = this.props;
     
     const list = _.sortBy(submissions, item => -item.updatedAt);
@@ -30,18 +26,9 @@ export default class SubmissionList extends Component {
     });
 
     return (
-      <div>
-        <ListGroup>
-          {entryEls}
-        </ListGroup>
-        <Button block
-          bsStyle="primary"
-          bsSize="large"
-          onClick={loadMore}
-          disabled={!hasMore}>
-          Load more...
-        </Button>
-      </div>
+      <ListGroup>
+        {entryEls}
+      </ListGroup>
     );
   }
 }

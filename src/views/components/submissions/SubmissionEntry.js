@@ -39,7 +39,7 @@ export default class SubmissionEntry extends Component {
     const email = user && user.data && user.data.email || '<unknown>';
 
     return (<span>
-      {`${user.data.displayName} (${user.data.email})`}
+      {`${name} (${email})`}
     </span>);
   }
 

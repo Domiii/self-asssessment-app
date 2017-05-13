@@ -574,7 +574,9 @@ function createRefWrapperBase() {
       if (_.isFunction(this.updateProps)) {
         this.updateProps(props);
       }
-      this.props = props;
+      else {
+        this.props = props;
+      }
 
       this.onAfterWrite = this.onAfterWrite.bind(this);
       this.onAfterWritePath = this.onAfterWritePath.bind(this);
@@ -586,6 +588,10 @@ function createRefWrapperBase() {
 
     get isLoaded() {
       return isLoaded(this.val);
+    }
+
+    findKey(filter) {
+      return this.val && _.findKey(this.val, filter);
     }
 
     getDataIn(obj, path, defaultValue = null) {

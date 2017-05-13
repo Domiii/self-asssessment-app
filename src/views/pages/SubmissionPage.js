@@ -1,12 +1,12 @@
 import {
-  ConceptResponsesRef
+  ConceptSubmissionsRef
 }
 from 'src/core/concepts';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { 
-  Alert, Button, Jumbotron, Well
+  Alert, Button, Jumbotron, Well, Panel
 } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import {
@@ -16,46 +16,28 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 import { SubmissionList } from 'src/views/components/submissions';
 
-import { firebaseConnect, getFirebase, dataToJS } from 'react-redux-firebase'
-
-import {
-  NotificationsRef
-}
-from 'src/core/log';
-import { UserInfoRef } from 'src/core/users';
+import { firebaseConnect } from 'react-redux-firebase'
 
 import _ from 'lodash';
 import autoBind from 'react-autobind';
 
 
-
-
-// @firebaseConnect((props, firebase) => {
-//   //console.log(queryArgs.submissions.limit);
-//   const paths = [
-//     ConceptResponsesRef.makeQuery(props.queryArgs.submissions)
-//   ];
-//   return paths;
-// })
-// @connect(({ firebase }, { queryArgs }) => {
-//   return {
-//     //conceptResponsesRef: ConceptResponsesRef(firebase, null, null, queryArgs.submissions)
-//   };
-// })
-
 @firebaseConnect(({ queryArgs }, firebase) => {
   return [
-    ConceptResponsesRef.makeQuery(queryArgs.submissions)
+    ConceptSubmissionsRef.makeQuery(queryArgs.submissions)
   ];
 })
 @connect(({ firebase }, { queryArgs }) => {
   return {
-    conceptResponsesRef: ConceptResponsesRef(firebase, null, null, queryArgs.submissions)
+    conceptSubmissionsRef: ConceptSubmissionsRef(firebase, null, null, queryArgs.submissions)
   };
 })
 class _SubmissionPage extends Component {
   static propTypes = {
-    //conceptResponsesRef: PropTypes.object.isRequired
+    //conceptSubmissionsRef: PropTypes.object.isRequired
+    loadMore: PropTypes.func.isRequired,
+    isLoadAll: PropTypes.func.isRequired,
+    toggleLoadAll: PropTypes.func.isRequired
   };
 
   constructor(...args) {
@@ -65,23 +47,59 @@ class _SubmissionPage extends Component {
   }
 
   get isNotLoadedYet() {
-    const { conceptResponsesRef } = this.props;
-    return !conceptResponsesRef.isLoaded;
+    const { conceptSubmissionsRef } = this.props;
+    return !conceptSubmissionsRef.isLoaded;
   }
 
   get currentSubmissions() {
-    const { conceptResponsesRef } = this.props;
-    return conceptResponsesRef.val;
+    const { conceptSubmissionsRef } = this.props;
+    return conceptSubmissionsRef.val;
+  }
+
+  get hasMore() {
+    const submissions = this.currentSubmissions;
+    const submissionArgs = this.props.queryArgs.submissions;
+    return _.size(submissions) === submissionArgs.limit;
+  }
+
+  PanelTitle() {
+    const {
+      loadMore,
+      toggleLoadAll,
+      isLoadAll
+    } = this.props;
+    const hasMore = this.hasMore;
+    const submissionCount = _.size(this.currentSubmissions);
+
+    return (<span>
+      <h3>
+        Submissions ({submissionCount})
+        <span className="margin-half"/>
+        <Button
+          bsStyle={isLoadAll() ? 'success' : 'danger'}
+          active={isLoadAll()}
+          onClick={toggleLoadAll}>
+          all
+        </Button>
+        <Button
+          bsStyle="primary"
+          onClick={loadMore}
+          disabled={!hasMore}>
+          load more...
+        </Button>
+      </h3>
+    </span>);
   }
 
   render() {
-    return <span>hiasdasd</span>;
     if (this.isNotLoadedYet) {
       // still loading
       return (<LoadOverlay />);
     }
 
-    if (!this.currentSubmissions) {
+    const submissions = this.currentSubmissions;
+
+    if (!submissions) {
       return (
         <Alert bsStyle="warning">
           <span>there are no submissions</span>
@@ -89,19 +107,12 @@ class _SubmissionPage extends Component {
       );
     }
 
-    const {
-      loadMore
-    } = this.props;
-    const submissions = this.currentSubmissions;
-    const submissionArgs = this.props.queryArgs.submissions;
-    const hasMore = _.size(submissions) === submissionArgs.limit;
-
     return (
-      <SubmissionList {...{
-        submissions,
-        loadMore,
-        hasMore
-      }} />
+      <Panel header={this.PanelTitle()}>
+        <SubmissionList {...{
+          submissions
+        }} />
+      </Panel>
     );
   }
 }
@@ -121,7 +132,7 @@ class SubmissionPage extends Component {
         submissions: {
           page: 0,
           limit: this.itemsPerPage,
-          filter: [],
+          filter: ['hasSubmitted', true],
           
           // see: http://react-redux-firebase.com/docs/populate
           populates: [
@@ -146,6 +157,7 @@ class SubmissionPage extends Component {
 
   setPage(iPage) {
     const { queryArgs } = this.state;
+
     queryArgs.submissions.page = iPage;
     queryArgs.submissions.limit = (iPage+1) * this.itemsPerPage;
     this.setState({queryArgs});
@@ -155,6 +167,28 @@ class SubmissionPage extends Component {
     this.setPage(this.currentPage+1);
   }
 
+  isLoadAll() {
+    const { queryArgs } = this.state;
+
+    return !queryArgs.submissions.limit;
+  }
+
+  toggleLoadAll() {
+    this.setLoadAll(!this.isLoadAll());
+  }
+
+  setLoadAll(isOn) {
+    const { queryArgs } = this.state;
+
+    if (isOn) {
+      queryArgs.submissions.limit = null;
+      this.setState({queryArgs});
+    }
+    else {
+      this.setPage(this.currentPage);
+    }
+  }
+
   render() {
     return(<_SubmissionPage
         {...this.props}
@@ -162,6 +196,8 @@ class SubmissionPage extends Component {
 
         setPage={this.setPage}
         loadMore={this.loadMore}
+        isLoadAll={this.isLoadAll}
+        toggleLoadAll={this.toggleLoadAll}
       />);
   }
 }

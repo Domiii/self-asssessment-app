@@ -6,4 +6,4 @@ export ConceptChecksPanel from './ConceptChecksPanel';
 export ConceptViewSmall from './ConceptViewSmall';
 export ConceptGrid from './ConceptGrid';
 export ConceptBreadcrumbs from './ConceptBreadcrumbs';
-export ConceptResponseForm from './ConceptResponseForm';
+export ConceptSubmissionForm from './ConceptSubmissionForm';

@@ -1,7 +1,7 @@
 import { 
   ConceptsRef,
   ConceptChecksRef,
-  ConceptResponsesRef,
+  ConceptSubmissionsRef,
   ConceptCheckResponsesRef,
   ConceptCheckResponseDetailsRef,
 
@@ -57,10 +57,10 @@ import { EmptyObject, EmptyArray } from 'src/util';
   if (params.conceptId) {
     const conceptId = params.conceptId;
     const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
-    const conceptResponseArgs = { responseId: {uid, conceptId} };
+    const conceptSubmissionArgs = { submissionId: {uid, conceptId} };
 
     queries.push(ConceptChecksRef.ofConcept.makeQuery({conceptId}));
-    queries.push(ConceptResponsesRef.response.makeQuery(conceptResponseArgs));
+    queries.push(ConceptSubmissionsRef.response.makeQuery(conceptSubmissionArgs));
     queries.push(ConceptCheckResponsesRef.makeQuery({uid}));
     queries.push(ConceptCheckResponseDetailsRef.makeQuery({uid, conceptId}));
   }
@@ -78,15 +78,15 @@ import { EmptyObject, EmptyArray } from 'src/util';
   };
 
   if (conceptId) {
-    const conceptResponseArgs = { uid, conceptId };
-    const conceptResponsePathArgs = { responseId: {uid, conceptId} };
+    const conceptSubmissionArgs = { uid, conceptId };
+    const conceptSubmissionPathArgs = { submissionId: {uid, conceptId} };
     const checkArgs = { conceptId: conceptId || 0 };
     const checkResponsesArgs = { uid };
     const checkResponsesDetailsArgs = { uid, conceptId };
 
     Object.assign(refs, {
       //UserInfoRef.user(firebase, {auth, uid: auth.uid});
-      conceptResponsesRef: ConceptResponsesRef.response(firebase, conceptResponseArgs, conceptResponsePathArgs),
+      conceptSubmissionsRef: ConceptSubmissionsRef.response(firebase, conceptSubmissionArgs, conceptSubmissionPathArgs),
       conceptChecksRef: ConceptChecksRef.ofConcept(firebase, checkArgs),
       conceptCheckResponsesRef: ConceptCheckResponsesRef(firebase, checkResponsesArgs),
       conceptCheckResponseDetailsRef: ConceptCheckResponseDetailsRef(firebase, checkResponsesDetailsArgs)
@@ -104,7 +104,7 @@ export default class ConceptsPage extends Component {
     params: PropTypes.object.isRequired,
     firebase: PropTypes.object.isRequired,
     conceptsRef: PropTypes.object.isRequired,
-    conceptResponsesRef: PropTypes.object,
+    conceptSubmissionsRef: PropTypes.object,
     conceptChecksRef: PropTypes.object,
     conceptCheckResponsesRef: PropTypes.object,
     conceptCheckResponseDetailsRef: PropTypes.object,
@@ -181,10 +181,10 @@ export default class ConceptsPage extends Component {
     return conceptChecksRef.val;
   }
 
-  get currentConceptResponse() {
-    const { conceptResponsesRef } = this.props;
-    return conceptResponsesRef && 
-      conceptResponsesRef.val;
+  get currentConceptSubmission() {
+    const { conceptSubmissionsRef } = this.props;
+    return conceptSubmissionsRef && 
+      conceptSubmissionsRef.val;
   }
 
   // all relevant responses by current user
@@ -405,20 +405,20 @@ export default class ConceptsPage extends Component {
     );
   }
 
-  updateConceptResponse({conceptId, conceptResponse}) {
+  updateConceptSubmission({conceptId, conceptSubmission}) {
     const { 
-      conceptResponsesRef,
+      conceptSubmissionsRef,
       notificationsRef
     } = this.props;
 
     return this.wrapPromise(
-      conceptResponsesRef.updateTextResponse(conceptId, conceptResponse)
+      conceptSubmissionsRef.updateSubmission(conceptId, conceptSubmission)
       .then(() => {
         if (!this.isAdmin) {
-          return notificationsRef.addNotification('conceptResponse', {
+          return notificationsRef.addNotification('conceptSubmission', {
             conceptId,
-            text: conceptResponse.text,
-            hasSubmitted: conceptResponse.hasSubmitted
+            text: conceptSubmission.text,
+            hasSubmitted: conceptSubmission.hasSubmitted
           });
         }
       })
@@ -575,13 +575,13 @@ export default class ConceptsPage extends Component {
             userPrefs: this.userPrefs,
             conceptId: this.currentConceptId,
             concept: this.currentConcept,
-            conceptResponse: this.currentConceptResponse,
+            conceptSubmission: this.currentConceptSubmission,
             conceptChecks: this.currentConceptChecks,
             conceptCheckResponses: this.currentCheckResponses,
             conceptCheckResponseDetails: this.currentCheckResponseDetails,
             conceptProgress,
 
-            updateConceptResponse: this.updateConceptResponse,
+            updateConceptSubmission: this.updateConceptSubmission,
             updateCheckResponse: this.updateCheckResponse
           }} /> }
         { childConceptsEl }

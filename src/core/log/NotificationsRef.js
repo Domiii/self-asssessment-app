@@ -26,7 +26,7 @@ export const NotificationTypeSettings = {
     },
 
     {
-      name: 'conceptResponse',
+      name: 'conceptSubmission',
       parameters: {
         conceptId: 'conceptId',
         text: 'text',
