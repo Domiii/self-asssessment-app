@@ -2,8 +2,6 @@
 
 // TODO: play around with themes (https://github.com/isagalaev/highlight.js/tree/master/src/styles)
 
-'use strict';
-
 import React, { PureComponent } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/ocean.css';

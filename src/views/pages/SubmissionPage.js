@@ -16,31 +16,47 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 import { SubmissionList } from 'src/views/components/submissions';
 
-import { firebaseConnect } from 'react-redux-firebase'
+import { firebaseConnect, getFirebase, dataToJS } from 'react-redux-firebase'
+
+import {
+  NotificationsRef
+}
+from 'src/core/log';
+import { UserInfoRef } from 'src/core/users';
 
 import _ from 'lodash';
 import autoBind from 'react-autobind';
 
 
 
-@firebaseConnect(({queryArgs}, firebase) => {
-  //console.log(queryArgs.submissions.limit);
+
+// @firebaseConnect((props, firebase) => {
+//   //console.log(queryArgs.submissions.limit);
+//   const paths = [
+//     ConceptResponsesRef.makeQuery(props.queryArgs.submissions)
+//   ];
+//   return paths;
+// })
+// @connect(({ firebase }, { queryArgs }) => {
+//   return {
+//     //conceptResponsesRef: ConceptResponsesRef(firebase, null, null, queryArgs.submissions)
+//   };
+// })
+
+@firebaseConnect(({ queryArgs }, firebase) => {
   return [
     ConceptResponsesRef.makeQuery(queryArgs.submissions)
   ];
 })
 @connect(({ firebase }, { queryArgs }) => {
+  console.log(dataToJS(firebase,'/users'));
   return {
     conceptResponsesRef: ConceptResponsesRef(firebase, null, null, queryArgs.submissions)
   };
 })
 class _SubmissionPage extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   static propTypes = {
-    conceptResponsesRef: PropTypes.object.isRequired
+    //conceptResponsesRef: PropTypes.object.isRequired
   };
 
   constructor(...args) {
@@ -60,6 +76,7 @@ class _SubmissionPage extends Component {
   }
 
   render() {
+    return <span>hiasdasd</span>;
     if (this.isNotLoadedYet) {
       // still loading
       return (<LoadOverlay />);
@@ -78,12 +95,14 @@ class _SubmissionPage extends Component {
     } = this.props;
     const submissions = this.currentSubmissions;
     const submissionArgs = this.props.queryArgs.submissions;
+    const hasMore = _.size(submissions) === submissionArgs.limit;
 
     return (
-      <SubmissionList  
-        submissions={submissions}
-        loadMore={loadMore}
-        hasMore={_.size(submissions) === submissionArgs.limit}/>
+      <SubmissionList {...{
+        submissions,
+        loadMore,
+        hasMore
+      }} />
     );
   }
 }
@@ -106,10 +125,10 @@ class SubmissionPage extends Component {
           filter: [],
           
           // see: http://react-redux-firebase.com/docs/populate
-          populates: [
-            { child: 'uid', root: 'users', keyProp: 'uid' },
-            { child: 'conceptId', root: 'concepts', keyProp: 'conceptId' }
-          ]
+          // populates: [
+          //   { child: 'uid', root: 'users', keyProp: 'uid' },
+          //   { child: 'conceptId', root: 'concepts', keyProp: 'conceptId' }
+          // ]
         }
       }
     };

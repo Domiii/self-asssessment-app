@@ -33,10 +33,6 @@ import autoBind from 'react-autobind';
   };
 })
 class NotificationPage extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   static propTypes = {
     notificationsRef: PropTypes.object.isRequired
   };

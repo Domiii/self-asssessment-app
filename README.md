@@ -2,11 +2,6 @@
 Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/tiberiuc/redux-react-firebase).
 
 ## Get Ready #1: Install the app
-  1. `git submodule update --init --recursive`
-  1. `cd local_modules/redux-react-firebase`
-  1. `git remote set-url --push origin git@github.com:Domiii/redux-react-firebase.git`
-  1. `npm i --only=dev --ignore-scripts` # (see [NPM issue #9707](https://github.com/npm/npm/issues/9707))
-  1. `cd ../..`
   1. `npm update`
 
 ## Get Ready #2: Setup firebase

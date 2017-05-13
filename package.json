@@ -56,7 +56,6 @@
     "redux": "^3.6.0",
     "redux-act": "^1.1.0",
     "redux-form": "^6.4.1",
-    "redux-react-firebase": "file:local_modules/redux-react-firebase",
     "redux-thunk": "^2.1.0",
     "reselect": "^2.5.4",
     "scratch-vm": "git+https://github.com/LLK/scratch-vm.git"
