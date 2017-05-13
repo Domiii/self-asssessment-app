@@ -49,7 +49,6 @@ import autoBind from 'react-autobind';
   ];
 })
 @connect(({ firebase }, { queryArgs }) => {
-  console.log(dataToJS(firebase,'/users'));
   return {
     conceptResponsesRef: ConceptResponsesRef(firebase, null, null, queryArgs.submissions)
   };
@@ -125,10 +124,10 @@ class SubmissionPage extends Component {
           filter: [],
           
           // see: http://react-redux-firebase.com/docs/populate
-          // populates: [
-          //   { child: 'uid', root: 'users', keyProp: 'uid' },
-          //   { child: 'conceptId', root: 'concepts', keyProp: 'conceptId' }
-          // ]
+          populates: [
+            { child: 'uid', root: 'users', keyProp: 'uid' },
+            { child: 'conceptId', root: 'concepts', keyProp: 'conceptId' }
+          ]
         }
       }
     };
