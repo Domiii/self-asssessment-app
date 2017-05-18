@@ -15,7 +15,7 @@ const SubmissionFeedbackRef = makeRefWrapper({
   pathTemplate: '/submissionFeedback',
 
   indices: {
-    reviewerId: ['reviewerId']
+    reviewerId: ['reviewerId'],
     submissionId: ['submissionId'],
     conceptId: ['conceptId'],
     status: ['status']
@@ -54,7 +54,7 @@ const SubmissionFeedbackRef = makeRefWrapper({
   methods: {
     addFeedback(submissionId, conceptId, submitterId, status, text) {
       const { uid } = this.props;
-      uid || throw new Error('missing uid');
+      if (!uid) throw new Error('missing uid');
 
       // add feedback status entry
       const newFeedbackRef = this.push({
@@ -79,7 +79,7 @@ const SubmissionFeedbackRef = makeRefWrapper({
       const textPath = SubmissionFeedbackRef.feedbackDetails.text.getPath({ feedbackId });
 
       const { uid } = this.props;
-      uid || throw new Error('missing uid');
+      if (!uid) throw new Error('missing uid');
 
       return this.update({
         [reviewerPath]: uid,
