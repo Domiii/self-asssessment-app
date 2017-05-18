@@ -1,8 +1,8 @@
 import { makeRefWrapper } from 'src/firebaseUtil';
 
 export const SubmissionStatus = {
-  NotSubmitted,
-  Submitted
+  NotSubmitted: 0,
+  Submitted: 1
 };
 
 // TODO: Likes + maybe some more responses toward entire concepts
