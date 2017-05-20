@@ -35,11 +35,18 @@ export default class SubmissionEntry extends Component {
   }
 
   makeUserEl(uid, user) {
+    const iconSize = '2em';
+
     const name = user && user.data && user.data.displayName || '<unknown>';
     const email = user && user.data && user.data.email || '<unknown>';
+    const userIcon = user && user.data &&
+      <img style={{maxWidth: iconSize}} src={user.data.photoURL} /> || 
+      <FAIcon style={{fontSize: iconSize}} name="user" />;
 
-    return (<span>
-      {`${name} (${email})`}
+    return (<span className="submission-user">
+      <span className="submission-user-icon">{ userIcon }</span
+      > <span className="submission-user-name">{ name }</span
+      > <span className="submission-user-email">({ email })</span>
     </span>);
   }
 
@@ -62,11 +69,6 @@ export default class SubmissionEntry extends Component {
     const concept = conceptId;
     conceptId = conceptId.conceptId;
 
-    const iconSize = '2em';
-    const userIcon = user && user.data &&
-      <img style={{maxWidth: iconSize}} src={user.data.photoURL} /> || 
-      <FAIcon style={{fontSize: iconSize}} name="user" />;
-
     return (
       <li className="list-group-item">
         <h4 className="list-group-item-heading">
@@ -77,9 +79,7 @@ export default class SubmissionEntry extends Component {
             }
           </div>
           <span>
-            { userIcon } <span className="margin-half" />
-            Submission for{ this.makeConceptEl(conceptId, concept) }
-            by { this.makeUserEl(uid, user) }
+            { this.makeUserEl(uid, user) } submitted{ this.makeConceptEl(conceptId, concept) }
           </span>
         </h4>
         <Moment fromNow>{updatedAt}</Moment> (<Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{updatedAt}</Moment>)

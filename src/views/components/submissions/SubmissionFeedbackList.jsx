@@ -1,7 +1,7 @@
 // basics
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import autoBind from 'auto-bind';
+import autoBind from 'react-autobind';
 
 // lodash
 import map from 'lodash/map';
@@ -20,10 +20,10 @@ export default class SubmissionFeedbackList extends Component {
     userInfoRef: PropTypes.object
   };
 
-  static propTypes {
+  static propTypes = {
     submissionId: PropTypes.string.isRequired,
     submission: PropTypes.object.isRequired,
-    feedbacks: PropTypes.object.isRequired,
+    feedbacks: PropTypes.object,
     addFeedback: PropTypes.func,
     updateFeedback: PropTypes.func
   };
@@ -49,8 +49,8 @@ export default class SubmissionFeedbackList extends Component {
   }
 
   get hasFeedback() {
-    const { feedbacks } from this.props;
-    return size(feedbacks) > 0;
+    const { feedbacks } = this.props;
+    return feedbacks && size(feedbacks) > 0;
   }
 
 
@@ -63,7 +63,7 @@ export default class SubmissionFeedbackList extends Component {
   }
 
   toggleAdding() {
-    this.setEditMode(this.isAdding && null || 'add');
+    this.setEditMode(this.isAdding() && null || 'add');
   }
 
   toggleEditing(feedbackId) {
@@ -75,11 +75,11 @@ export default class SubmissionFeedbackList extends Component {
     }
   }
 
-  get isAdding() {
+  isAdding() {
     return this.state.editMode === 'add';
   }
 
-  get isEditing(feedbackId) {
+  isEditing(feedbackId) {
     return this.state.editMode === 'edit' && this.state.feedbackId === feedbackId;
   }
 
@@ -92,7 +92,7 @@ export default class SubmissionFeedbackList extends Component {
     const { addFeedback, submission } = this.props;
     const {
       submissionId, conceptId, uid
-    } from submission;
+    } = submission;
     return () => {
       const newRef = addFeedback(submissionId, conceptId, uid, status, text);
       const feedbackId = newRef.key;
@@ -112,7 +112,7 @@ export default class SubmissionFeedbackList extends Component {
   ListEl() {
     const {
       feedbacks
-    } from this.props;
+    } = this.props;
 
     return (
       map(feedbacks, (feedback, feedbackId) => (<div key={feedbackId}>
@@ -134,7 +134,7 @@ export default class SubmissionFeedbackList extends Component {
   }
 
   AddFeedbackFormEl() {
-    return this.isAdding && (
+    return !this.isAdding() ? null : (
       <SubmissionFeedbackForm {...{
         onSubmit: this.addFeedback,
         feedback: {}
@@ -143,7 +143,7 @@ export default class SubmissionFeedbackList extends Component {
   }
 
   EditFeedbackFormEl(feedbackId, feedback) {
-    return this.isEditing(feedbackId) && (
+    return !this.isEditing(feedbackId) ? null : (
       <SubmissionFeedbackForm {...{
         onSubmit: this.updateFeedback,
         feedbackId,
