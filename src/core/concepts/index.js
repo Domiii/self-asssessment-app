@@ -1,7 +1,7 @@
 
 export ConceptsRef from './ConceptsRef';
 export ConceptSubmissionsRef, { SubmissionStatus } from './ConceptSubmissionsRef';
-export SubmissionFeedbackRef, { FeedbackStatus } from './SubmissionFeedbackRef';
+export SubmissionFeedbackRef, { SubmissionFeedbackStatus } from './SubmissionFeedbackRef';
 
 //export ConceptTreeRef from './ConceptTreeRef';
 export ConceptChecksRef from './ConceptChecksRef';

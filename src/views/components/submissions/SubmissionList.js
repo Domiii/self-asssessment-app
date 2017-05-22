@@ -1,14 +1,13 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import SubmissionEntry from './SubmissionEntry';
 import SubmissionFeedbackList from './SubmissionFeedbackList';
 import {
   ListGroup
 } from 'react-bootstrap';
 
-export default class SubmissionList extends Component {
+export default class SubmissionList extends PureComponent {
   static propTypes = {
     submissions: PropTypes.object.isRequired,
-    feedbacks: PropTypes.object,
     addFeedback: PropTypes.func,
     updateFeedback: PropTypes.func
   };
@@ -16,33 +15,33 @@ export default class SubmissionList extends Component {
   render() {
     const { 
       submissions,
-      feedbacks,
       addFeedback,
       updateFeedback
     } = this.props;
     
     const ids = _.map(submissions, (_, id) => id);
     const sortedIds = _.sortBy(ids, id => -submissions[id].updatedAt);
-    const styles = {
-      display: 'flex',
-      flex: '2 50%'
+    const halfColumnStyles = {
+      width: '50%'
     };
 
     const entryEls = _.map(sortedIds, submissionId => {
       const submission = submissions[submissionId];
       return (
-        <div key={submissionId} style={styles}>
-          <SubmissionEntry {...{
+        <div key={submissionId}>
+          <SubmissionEntry style={halfColumnStyles} {...{
             submissionId,
             submission
           }} />
-          <SubmissionFeedbackList {...{
+          {/*
+          <SubmissionFeedbackList style={halfColumnStyles} {...{
             submissionId,
             submission,
-            feedbacks,
+            feedbacks: submission.feedbacks,
             addFeedback,
             updateFeedback
           }} />
+          */}
         </div>
       );
     });

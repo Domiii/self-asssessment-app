@@ -40,7 +40,7 @@ class _ConceptSubmissionForm extends Component {
 
     handleSubmit(values => {
       const trimmedText = values.conceptSubmission.text.trim();
-      if (isSubmitButton && !trimmedText.length) {
+      if (isSubmitButton && submit && !trimmedText.length) {
         return false;
       }
       const newValues = _.merge({}, values, {
@@ -66,7 +66,7 @@ class _ConceptSubmissionForm extends Component {
     } = this.props;
 
     const { 
-      reset, pristine, submitting, values
+      reset, pristine, submitting
     } = this.props;
 
     const hasSubmitted = conceptSubmission && conceptSubmission.hasSubmitted || false;
@@ -93,7 +93,7 @@ class _ConceptSubmissionForm extends Component {
             <Button type="button" bsStyle="danger" bsSize="large"
               onClick={this.doSubmit.bind(this, true, !hasSubmitted)}
               active={hasSubmitted}
-              disabled={hasSubmitted}>
+              disabled={false}>
               <span>
                 <FAIcon name="upload"/> Submit (提交)
               </span>

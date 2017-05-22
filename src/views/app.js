@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import autoBind from 'react-autobind';
 import { 
   firebaseConnect, 
   helpers,
@@ -20,9 +21,7 @@ const { pathToJS } = helpers;
 
 console.log('starting app...');
 
-
-// our firebase utility needs a set of all paths
-const mapPropsToPaths = (props, firebase) => {
+@firebaseConnect((props, firebase) => {
   const paths = [
     DBStatusRef.makeQuery()
   ];
@@ -32,23 +31,14 @@ const mapPropsToPaths = (props, firebase) => {
     paths.push(UserInfoRef.user.makeQuery({uid}));
   }
   return paths;
-};
-
-const mapStateToProps = ({ firebase }, ownProps) => {
+})
+@connect(({ firebase }, ownProps) => {
   const auth = pathToJS(firebase, 'auth');
-  const dBStatusRef = DBStatusRef(firebase);
+  //const dBStatusRef = DBStatusRef(firebase);
 
   const props = {
-    signOut() {
-      try {
-        ownProps.firebase.logout();
-      }
-      catch (err) {
-        console.error(err.stack);
-      }
-    },
-    dBStatusRef,
-    clientVersion: dBStatusRef.version()
+    //dBStatusRef,
+    //clientVersion: dBStatusRef.version()
   };
 
   if (auth && auth.uid) {
@@ -59,13 +49,7 @@ const mapStateToProps = ({ firebase }, ownProps) => {
   }
 
   return props;
-};
-
-const mapDispatchToProps = dispatch => ({});
-
-
-@firebaseConnect(mapPropsToPaths)
-@connect(mapStateToProps, mapDispatchToProps)
+})
 export class App extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired
@@ -74,7 +58,7 @@ export class App extends Component {
   static propTypes = {
     firebase: PropTypes.object.isRequired,
     userInfoRef: PropTypes.object,
-    dBStatusRef: PropTypes.object.isRequired,
+    //dBStatusRef: PropTypes.object.isRequired,
 
     children: PropTypes.object
   };
@@ -85,21 +69,22 @@ export class App extends Component {
   };
 
   getChildContext() {
-    const lang = this.props.userInfoRef && this.props.userInfoRef.locale() || 'en';
     return {
       userInfoRef: this.props.userInfoRef,
-      lookupLocalized: lookupLocalized.bind(null, lang)
+      lookupLocalized: this.lookupLocalized
     }
   }
 
   constructor(...args) {
     super(...args);
     this.state = {wasBusy: false};
+
+    autoBind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { router } = this.context;
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   const { router } = this.context;
+  // }
 
   componentDidMount() {
     //const { userInfoRef } = this.props;
@@ -112,8 +97,22 @@ export class App extends Component {
     // });
   }
 
+  signOut() {
+    try {
+      this.props.firebase.logout();
+    }
+    catch (err) {
+      console.error(err.stack);
+    }
+  }
+
+  lookupLocalized(obj, entry) {
+    const lang = this.props.userInfoRef && this.props.userInfoRef.locale() || 'en';
+    return lookupLocalized(lang, obj, entry);
+  }
+
   render() {
-    const { userInfoRef, dBStatusRef, signOut, children } = this.props;
+    const { userInfoRef, children } = this.props;
     const { router } = this.context;
 
     //const notYetLoaded = !dBStatusRef.isLoaded;
@@ -131,8 +130,8 @@ export class App extends Component {
     return (
       <div className="app container max-height">
         <Header
-          signOut={signOut}
-          openURL={window::open}
+          currentUser={userInfoRef.val}
+          signOut={this.signOut}
         />
 
         <main className="app-main max-height">

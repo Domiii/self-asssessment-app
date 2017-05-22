@@ -11,6 +11,12 @@ import { makeRefWrapper } from 'src/firebaseUtil';
   },
 */
 
+export const SubmissionFeedbackStatus = {
+  Problematic: 1,
+  Ok: 2,
+  WellDone: 3
+};
+
 const SubmissionFeedbackRef = makeRefWrapper({
   pathTemplate: '/submissionFeedback',
 

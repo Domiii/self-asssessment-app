@@ -10,8 +10,12 @@ const UserInfoRef = makeRefWrapper({
       pathTemplate: '$(uid)',
 
       methods: {
+        get uid() {
+          return this.props && this.props.uid;
+        },
+
         isLoggedIn() {
-          return !!this.props.auth && !!this.props.auth.uid;
+          return !!this.props && !!this.props.uid;
         },
 
         getLocalized(obj, entry) {

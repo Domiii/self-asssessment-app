@@ -115,15 +115,17 @@ export default class SubmissionFeedbackList extends Component {
     } = this.props;
 
     return (
-      map(feedbacks, (feedback, feedbackId) => (<div key={feedbackId}>
-        <SubmissionFeedbackEntry {...{
-          feedbackId,
-          feedback,
+      map(feedbacks, (feedback, feedbackId) => (
+        <div key={feedbackId}>
+          <SubmissionFeedbackEntry {...{
+            feedbackId,
+            feedback,
 
-          toggleEditing: this.toggleEditing.bind(this, feedbackId)
-        }}/>
-        { this.EditFeedbackFormEl(feedbackId, feedback) }
-      </div>))
+            toggleEditing: this.toggleEditing.bind(this, feedbackId)
+          }}/>
+          { this.EditFeedbackFormEl(feedbackId, feedback) }
+        </div>
+      ))
     );
   }
 

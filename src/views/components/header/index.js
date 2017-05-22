@@ -1,7 +1,10 @@
-import React, { PropTypes, Component } from 'react';
+import React, { PropTypes, PureComponent } from 'react';
+import { connect } from 'redux';
+import autoBind from 'react-autobind';
 import { Link } from 'react-router';
+
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem, Button, ButtonGroup
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Button, ButtonGroup, Alert
 } from 'react-bootstrap';
 import {
   LinkContainer
@@ -9,37 +12,83 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
-export default class Header extends Component {
+export default class Header extends PureComponent {
   static contextTypes = {
     router: PropTypes.object.isRequired,
     userInfoRef: PropTypes.object
   };
 
   static propTypes = {
-    openURL: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired
   };
 
-  render() {
-    const { router, userInfoRef } = this.context;
-    const { openURL, signOut } = this.props;
+  constructor(...args) {
+    super(...args);
 
+    autoBind(this);
+  }
+
+
+  gotoProfile() {
+    const { router } = this.context;
+    router.replace('/user');
+  }
+
+  gotoSubmissions(evt) {
+    this.openInNewTab(evt, '/submissions');
+  }
+
+  gotoGit(evt) {
+    this.openInNewTab(evt, 'https://github.com/Domiii/self-asssessment-app');
+  }
+
+  gotoScratch3Sandbox(evt) {
+    this.openInNewTab(evt, 'http://codepen.io/Domiii/pen/JbvLbe');
+  }
+
+  openInNewTab(evt, url) {
+    evt.preventDefault();
+    window.open(url,'_blank');
+  }
+
+  switchToEn() {
+    const { userInfoRef } = this.context;
+    userInfoRef.set_locale('en');
+  }
+
+  switchToZh() {
+    const { userInfoRef } = this.context;
+    userInfoRef.set_locale('zh');
+  }
+
+  toggleAdminView() {
+    const { userInfoRef } = this.context;
+    userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
+  }
+
+  render() {
+    //console.log('header');
+    const { router, userInfoRef } = this.context;
+    const { signOut } = this.props;
+
+    if (router.location.pathname === '/submissions') {
+      return (
+        <Alert bsStyle="danger">
+          This page is buggy :/
+        </Alert>
+      );
+    }
+
+    const isAdminView = userInfoRef && userInfoRef.adminDisplayMode();
     const isLoading = !userInfoRef || !userInfoRef.isLoaded;
     const user = userInfoRef && userInfoRef.val;
     const userData = userInfoRef && userInfoRef.data();
     const lang = userInfoRef && userInfoRef.locale() || 'en';
 
-    // actions
-    const gotoProfile = () => router.replace('/user');
-    const switchToEn = () => userInfoRef.set_locale('en');
-    const switchToZh = () => userInfoRef.set_locale('zh');
-    const toggleAdminView = () => userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
-    const isAdminView = userInfoRef && userInfoRef.adminDisplayMode();
-
     // elements
     const adminToolsEL = (!user || !user.isAdmin) ? null : (
       <NavItem className='header-right'>
-        <Button onClick={toggleAdminView} bsStyle={isAdminView && 'success' || 'danger'}
+        <Button onClick={this.toggleAdminView} bsStyle={isAdminView && 'success' || 'danger'}
           className="header-gavel-button"
           active={isAdminView}>
           <FAIcon name="gavel"/>
@@ -51,10 +100,10 @@ export default class Header extends Component {
     const userToolsEl = !user ? null : (
       <NavItem className='header-right'>
         <ButtonGroup>
-          <Button active={lang === 'en'} onClick={switchToEn} bsSize="small">
+          <Button active={lang === 'en'} onClick={this.switchToEn} bsSize="small">
             EN
           </Button>
-          <Button active={lang === 'zh'} onClick={switchToZh} bsSize="small">
+          <Button active={lang === 'zh'} onClick={this.switchToZh} bsSize="small">
             中文
           </Button>
         </ButtonGroup>
@@ -62,7 +111,7 @@ export default class Header extends Component {
     );
 
     const profileEl = (userData && 
-      <MenuItem eventKey="user-drop-profile" onClick={gotoProfile}>
+      <MenuItem eventKey="user-drop-profile" onClick={this.gotoProfile}>
         <span>
           {
             userData.photoURL &&
@@ -88,7 +137,7 @@ export default class Header extends Component {
                 <LinkContainer to='/notifications'>
                   <NavItem eventKey={1}>Notifications</NavItem>
                 </LinkContainer>
-                <LinkContainer to='/submissions'>
+                <LinkContainer to='/submissions' onClick={ this.gotoSubmissions }>
                   <NavItem eventKey={1}>Submissions</NavItem>
                 </LinkContainer>
               </Nav>
@@ -103,10 +152,10 @@ export default class Header extends Component {
                 }>
                 { profileEl }
                 { user && <MenuItem divider /> }
-                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('https://github.com/Domiii/self-asssessment-app')}>
+                <MenuItem eventKey="more-drop-sand" onClick={ this.gotoGit }>
                  <FAIcon name="github" /> View Source Code
                 </MenuItem>
-                <MenuItem eventKey="more-drop-sand" onClick={() => openURL('http://codepen.io/Domiii/pen/JbvLbe')}>
+                <MenuItem eventKey="more-drop-sand" onClick={ this.gotoScratch3Sandbox }>
                   Scratch 3.0 Sandbox
                 </MenuItem>  
                 { user && <MenuItem divider /> }

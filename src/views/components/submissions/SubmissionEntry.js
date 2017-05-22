@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import Moment from 'react-moment';
 import {
   ListGroup, ListGroupItem, Well
@@ -7,8 +7,9 @@ import { Link } from 'react-router';
 import { FAIcon } from 'src/views/components/util';
 
 import { hrefConceptView } from 'src/views/href';
+import isEqual from 'lodash/isEqual';
 
-export default class SubmissionEntry extends Component {
+export default class SubmissionEntry extends PureComponent {
   static propTypes = {
     submission: PropTypes.object.isRequired
   };
@@ -16,6 +17,10 @@ export default class SubmissionEntry extends Component {
   static contextTypes = {
     lookupLocalized: PropTypes.func.isRequired
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(nextProps, this.props);
+  }
 
   makeConceptEl(conceptId, concept) {
     const {
@@ -52,6 +57,7 @@ export default class SubmissionEntry extends Component {
 
   render() {
     let { 
+      submissionId,
       submission: {
         uid,
         conceptId,
@@ -60,6 +66,8 @@ export default class SubmissionEntry extends Component {
         updatedAt
       }
     } = this.props;
+
+    // renderCalls[submissionId] = renderCalls[submissionId] ? (renderCalls[submissionId] + 1) : 1;
 
     // the weird names are due to `populate` not allowing aliasing the populated object's key
     // see: https://github.com/prescottprue/react-redux-firebase/issues/126

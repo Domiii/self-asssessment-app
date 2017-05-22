@@ -2,6 +2,8 @@ import { UserInfo } from 'src/core/users';
 
 import React, { Component, PropTypes } from 'react';
 //import { connect } from 'react-redux';
+import autoBind from 'react-autobind';
+
 import { 
   Alert, Button, Jumbotron, Well
 } from 'react-bootstrap';
@@ -69,13 +71,21 @@ export default class UserProfilePage extends Component {
     userInfoRef: PropTypes.object.isRequired
   };
 
+  constructor(...args) {
+    super(...args);
+
+    autoBind(this);
+  }
+
+  updateUser(...args) {
+    const { userInfoRef } = this.context;
+    return userInfoRef && userInfoRef.updateUser(...args);
+  }
+
   render() {
     // data
     const { userInfoRef } = this.context;
     const isBusy = userInfoRef && !userInfoRef.isLoaded || false;
-
-    // actions
-    const updateUser = userInfoRef && userInfoRef.updateUser.bind(userInfoRef);
 
     // go render!
     if (isBusy) {
@@ -85,7 +95,7 @@ export default class UserProfilePage extends Component {
 
     const userInfo = userInfoRef && userInfoRef.val;
     return (
-      <UserForm onSubmit={updateUser} initialValues={userInfo} />
+      <UserForm onSubmit={this.updateUser} initialValues={userInfo} />
     );
   }
 }

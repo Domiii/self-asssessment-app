@@ -62,7 +62,7 @@ export default class ConceptCheckItem extends Component {
     );
 
     const responseEls = (
-      <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <OverlayTrigger placement="left" overlay={tooltip}>
         <Button 
           bsSize="large"
           active={ isDone }

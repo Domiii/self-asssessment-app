@@ -1,4 +1,72 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { 
+  Field, reduxForm
+} from 'redux-form';
+
+import map from 'lodash/map';
+
+import { 
+  Alert, ListGroupItem, ListGroup, ButtonGroup, Button,
+  OverlayTrigger, Tooltip
+} from 'react-bootstrap';
+
+import { SubmissionFeedbackStatus } from 'src/core/concepts';
+
+const StatusSettings = {
+  Problematic: {
+    bsStyle: 'danger',
+    icon: 'exclamation-circle',
+    tooltip_en: 'Not complete yet.',
+    tooltip_zh: '還不夠完整'
+  },
+  Ok: {
+    bsStyle: 'warning',
+    icon: 'check',
+    tooltip_en: 'Ok... Can be better, but... Ok...',
+    tooltip_zh: 'Ok... 有進步的空間，但。。。 還行啦。。。'
+  },
+  WellDone: {
+    bsStyle: 'success',
+    icon: 'heart',
+    tooltip_en: 'Well done!',
+    tooltip_zh: '不錯！棒！'
+  }
+};
+
+
+export class StatusPanel extends Component {
+  render() {
+    const {
+      value,
+      onChange
+    } = this.props.input;
+
+    const buttonEls = map(StatusSettings, (settings, key) => {
+      const buttonVal = SubmissionFeedbackStatus[key];
+      return (
+        <OverlayTrigger key={key} placement="bottom" overlay={tooltip}>
+          <Button 
+            bsSize="large"
+            active={ value === buttonVal }
+            bsStyle={ settings.bsStyle || 'default' }
+            ref={ 'status-'+key }
+            onClick={ () => onChange(buttonVal) }
+            className="submission-feedback-status-button no-padding">
+            { settings.icon && <FAIcon name={settings.icon} /> }
+          </Button>
+        </OverlayTrigger>
+      );
+    });
+
+    return (
+      <ButtonGroup className="submission-feedback-status-panel">
+        { buttonEls }
+      </ButtonGroup>
+    );
+  }
+}
 
 /*
         submissionId: 'submissionId',
@@ -14,9 +82,23 @@ import React, { Component } from 'react';
         text
         */
 class _SubmissionFeedbackForm extends Component {
+  static contextTypes = {
+    userInfoRef: PropTypes.object.isRequired
+  };
+
   render() {
+    const {
+      userInfoRef
+    } = this.context;
+
     const { 
-      handleSubmit, reset, pristine, submitting, values
+      feedbackId,
+      status,
+      text
+    } = this.props;
+
+    const { 
+      handleSubmit, reset, pristine, submitting
     } = this.props;
 
     // actions
@@ -25,10 +107,13 @@ class _SubmissionFeedbackForm extends Component {
       reset();
     };
 
-        // TODO: add all above fields
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
+        <Field name="feedbackId" component="input" type="hidden" />
+
         <Field name="text" component="textarea" rows="10" style={{width: '100%'}} />
+
+        <Field name="status" component={StatusPanel} />
       </form>
     );
   }
@@ -38,11 +123,13 @@ class _SubmissionFeedbackForm extends Component {
 _SubmissionFeedbackForm = reduxForm({ enableReinitialize: true })(_SubmissionFeedbackForm);
 
 const SubmissionFeedbackForm = connect(
-  (state, { feedback }) => {
+  (state, { feedbackId, status, text }) => {
     return ({
-      form: 'feedback_' + conceptId,
+      form: 'feedback_' + submission.conceptId,
       initialValues: {
-        feedback
+        feedbackId,
+        status,
+        text
       },
     });
   }

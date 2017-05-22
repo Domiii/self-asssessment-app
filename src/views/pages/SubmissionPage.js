@@ -3,8 +3,12 @@ import {
 }
 from 'src/core/concepts';
 
+import { EmptyObject, EmptyArray } from 'src/util';
+
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import autoBind from 'react-autobind';
+
 import { 
   Alert, Button, Jumbotron, Well, Panel
 } from 'react-bootstrap';
@@ -19,7 +23,6 @@ import { SubmissionList } from 'src/views/components/submissions';
 import { firebaseConnect } from 'react-redux-firebase'
 
 import _ from 'lodash';
-import autoBind from 'react-autobind';
 
 
 @firebaseConnect(({ queryArgs }, firebase) => {

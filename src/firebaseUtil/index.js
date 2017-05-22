@@ -4,6 +4,9 @@ import { createSelector } from 'reselect';
 import { helpers, getFirebase } from 'react-redux-firebase';
 import { makeIndices } from './indices';
 import { EmptyObject } from 'src/util';
+import Immutable from 'immutable';
+
+import isEqual from 'lodash/isEqual';
 
 const { pathToJS, isLoaded, isEmpty, dataToJS, populatedDataToJS } = helpers;
 
@@ -45,12 +48,53 @@ export function isAuthenticated(firebaseApp) {
   return !!getFirebase().auth().currentUser;
 };
 
+
+const dataCache = {};
+
+function _cachePut(path, args, data) {
+  let entry = dataCache[path];
+  if (!entry) {
+    entry = {};
+  }
+  entry.args = args;
+  entry.data = data;
+}
+
+function _cacheGet(path, args) {
+  const entry = dataCache[path];
+  if (entry && isEqual(args, entry.args)) {
+    return entry.data;
+  }
+  return null;
+}
+
+function _cacheLookup(path, args, newData) {
+  const oldData = _cacheGet(path, args);
+
+  if (!isEqual(newData, oldData)) {
+    // update cache
+    _cachePut(path, args, newData);
+    return newData;
+  }
+  return oldData;
+}
+
+function _cachedFetchPopulate(firebaseDataRoot, path, queryArgs) {
+  const newData = populatedDataToJS(firebaseDataRoot, path, queryArgs.populates);
+  return _cacheLookup(path, queryArgs, newData);
+}
+
+function _cachedFetchPlain(firebaseDataRoot, path) {
+  const newData = dataToJS(firebaseDataRoot, path);
+  return _cacheLookup(path, null, newData);
+}
+
 // get data at given path from current state in store
 export function makeGetDataDefault(firebaseDataRoot, path, queryArgs) {
   if (_.isPlainObject(queryArgs) && queryArgs.populates) {
-    return () => populatedDataToJS(firebaseDataRoot, path, queryArgs.populates);
+    return () => _cachedFetchPopulate(firebaseDataRoot, path, queryArgs);
   }
-  return () => dataToJS(firebaseDataRoot, path);
+  return () => _cachedFetchPlain(firebaseDataRoot, path);
 };
 
 /**

@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PureComponent, PropTypes } from 'react';
 import { 
   Grid, Row, Col,
   Form, FormGroup, FormControl, ControlLabel, FieldArray
@@ -6,9 +6,10 @@ import {
 import { Field } from 'redux-form';
 
 // Online demo: https://codepen.io/Domiii/pen/mOaGWG?editors=0010
-export class FAIcon extends Component {
+export class FAIcon extends PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
+    className: PropTypes.string,
     spinning: PropTypes.bool,
     childProps: PropTypes.object
   };
