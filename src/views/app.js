@@ -130,7 +130,7 @@ export class App extends Component {
     return (
       <div className="app container max-height">
         <Header
-          currentUser={userInfoRef.val}
+          currentUser={userInfoRef && userInfoRef.val}
           signOut={this.signOut}
         />
 
