@@ -15,14 +15,20 @@ import {
 import { SubmissionFeedbackStatus } from 'src/core/concepts';
 
 const StatusSettings = {
+  None: {
+    bsStyle: 'default',
+    icon: 'cogs',
+    tooltip_en: 'Pending evaluation',
+    tooltip_zh: ''
+  },
   Problematic: {
     bsStyle: 'danger',
     icon: 'exclamation-circle',
-    tooltip_en: 'Not complete yet.',
+    tooltip_en: 'Not quite complete yet.',
     tooltip_zh: '還不夠完整'
   },
   Ok: {
-    bsStyle: 'warning',
+    bsStyle: 'primary',
     icon: 'check',
     tooltip_en: 'Ok... Can be better, but... Ok...',
     tooltip_zh: 'Ok... 有進步的空間，但。。。 還行啦。。。'

@@ -102,7 +102,7 @@ export default class SubmissionFeedbackList extends Component {
 
   updateFeedback({feedbackId, status, text}) {
     const { updateFeedback } = this.props;
-    return () => updateFeedback(feedbackId, status, text);
+    return updateFeedback(feedbackId, status, text);
   }
 
   // ###########################################################
@@ -121,7 +121,7 @@ export default class SubmissionFeedbackList extends Component {
             feedbackId,
             feedback,
 
-            toggleEditing: this.toggleEditing.bind(this, feedbackId)
+            toggleEditing: this.toggleEditing
           }}/>
           { this.EditFeedbackFormEl(feedbackId, feedback) }
         </div>
