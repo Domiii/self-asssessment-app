@@ -64,7 +64,6 @@ const SubmissionFeedbackRef = makeRefWrapper({
 
       // add feedback status entry
       const newFeedbackRef = this.push({
-        submissionId,
         conceptId,
         submitterId,
         reviewerId: uid,
@@ -74,15 +73,17 @@ const SubmissionFeedbackRef = makeRefWrapper({
 
       // add feedback text using the newly generated id
       const feedbackId = newRef.key;
-      this.set_text(feedbackId, feedback.text);
+      this.set_text(submissionId, feedbackId, feedback.text);
 
       return newFeedbackRef;
     },
 
-    updateFeedback(feedbackId, status, text) {
-      const statusPath = SubmissionFeedbackRef.feedback.status.getPath({ feedbackId });
-      const reviewerPath = SubmissionFeedbackRef.feedback.reviewerId.getPath({ feedbackId });
-      const textPath = SubmissionFeedbackRef.feedbackDetails.text.getPath({ feedbackId });
+    updateFeedback(submissionId, feedbackId, status, text) {
+      const pathArgs = { submissionId, feedbackId };
+
+      const statusPath = SubmissionFeedbackRef.feedback.status.getPath(pathArgs);
+      const reviewerPath = SubmissionFeedbackRef.feedback.reviewerId.getPath(pathArgs);
+      const textPath = SubmissionFeedbackRef.feedbackDetails.text.getPath(pathArgs);
 
       const { uid } = this.props;
       if (!uid) throw new Error('missing uid');

@@ -134,15 +134,28 @@ class SubmissionPage extends Component {
       queryArgs: {
         submissions: {
           page: 0,
+          storeAs: 'submission_data',
           limit: this.itemsPerPage,
           //filter: ['hasSubmitted', true],
           orderBy: 'updatedAt',
           
           // see: http://react-redux-firebase.com/docs/populate
-          populates: [
-            { child: 'uid', root: 'users', keyProp: 'uid' },
-            { child: 'conceptId', root: 'concepts', keyProp: 'conceptId' }
-          ]
+
+          populates: (dataKey, originalData) => {
+            //console.log(dataKey, originalData);
+            return [
+              { 
+                child: 'uid',
+                root: 'users',
+                keyProp: 'uid'
+              },
+              {
+                child: 'conceptId',
+                root: 'concepts',
+                keyProp: 'conceptId'
+              }
+            ];
+          }
         }
       }
     };

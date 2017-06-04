@@ -98,12 +98,6 @@ class _SubmissionFeedbackForm extends Component {
     } = this.context;
 
     const { 
-      feedbackId,
-      status,
-      text
-    } = this.props;
-
-    const { 
       handleSubmit, reset, pristine, submitting
     } = this.props;
 
@@ -115,6 +109,7 @@ class _SubmissionFeedbackForm extends Component {
 
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
+        <Field name="submissionId" component="input" type="hidden" />
         <Field name="feedbackId" component="input" type="hidden" />
 
         <Field name="text" component="textarea" rows="10" style={{width: '100%'}} />
@@ -129,10 +124,11 @@ class _SubmissionFeedbackForm extends Component {
 _SubmissionFeedbackForm = reduxForm({ enableReinitialize: true })(_SubmissionFeedbackForm);
 
 const SubmissionFeedbackForm = connect(
-  (state, { feedbackId, status, text }) => {
+  (state, { submissionId, feedbackId, status, text }) => {
     return ({
       form: 'feedback_' + submission.conceptId,
       initialValues: {
+        submissionId,
         feedbackId,
         status,
         text

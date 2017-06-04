@@ -89,10 +89,15 @@ export default class SubmissionFeedbackList extends Component {
   // ###########################################################
 
   addFeedback({status, text}) {
-    const { addFeedback, submission } = this.props;
     const {
-      submissionId, conceptId, uid
+      submissionId,
+      submission,
+      addFeedback
+    } = this.props;
+    const {
+      conceptId, uid
     } = submission;
+    
     return () => {
       const newRef = addFeedback(submissionId, conceptId, uid, status, text);
       const feedbackId = newRef.key;
@@ -100,9 +105,9 @@ export default class SubmissionFeedbackList extends Component {
     };
   }
 
-  updateFeedback({feedbackId, status, text}) {
+  updateFeedback({submissionId, feedbackId, status, text}) {
     const { updateFeedback } = this.props;
-    return updateFeedback(feedbackId, status, text);
+    return updateFeedback(submissionId, feedbackId, status, text);
   }
 
   // ###########################################################
@@ -111,6 +116,7 @@ export default class SubmissionFeedbackList extends Component {
 
   ListEl() {
     const {
+      submissionId,
       feedbacks
     } = this.props;
 
@@ -124,7 +130,7 @@ export default class SubmissionFeedbackList extends Component {
 
             toggleEditing: this.toggleEditing
           }}/>
-          { this.EditFeedbackFormEl(feedbackId, feedback) }
+          { this.EditFeedbackFormEl(submissionId, feedbackId, feedback) }
         </ListGroupItem>
       )
     );
@@ -153,10 +159,11 @@ export default class SubmissionFeedbackList extends Component {
     );
   }
 
-  EditFeedbackFormEl(feedbackId, feedback) {
+  EditFeedbackFormEl(submissionId, feedbackId, feedback) {
     return !this.isEditing(feedbackId) ? null : (
       <SubmissionFeedbackForm {...{
         onSubmit: this.updateFeedback,
+        submissionId,
         feedbackId,
         feedback
       }} />
