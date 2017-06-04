@@ -135,7 +135,8 @@ class SubmissionPage extends Component {
         submissions: {
           page: 0,
           limit: this.itemsPerPage,
-          filter: ['hasSubmitted', true],
+          //filter: ['hasSubmitted', true],
+          orderBy: 'updatedAt',
           
           // see: http://react-redux-firebase.com/docs/populate
           populates: [

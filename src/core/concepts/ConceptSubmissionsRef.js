@@ -5,15 +5,6 @@ export const SubmissionStatus = {
   Submitted: 1
 };
 
-// TODO: Likes + maybe some more responses toward entire concepts
-/*
-  like: {
-    title_en: 'Like!',
-    icon: 'heart',
-    className: 'color-red',
-    bsStyle: 'warning'
-  },
-*/
 
 const ConceptSubmissionsRef = makeRefWrapper({
   // TODO: Rename path
@@ -32,6 +23,7 @@ const ConceptSubmissionsRef = makeRefWrapper({
 
   queryString(args) {
     const limit = args && args.limit;
+    const orderBy = args && args.orderBy;
     const filter = args && args.filter;
     const populates = args && args.populates;
 
@@ -41,6 +33,10 @@ const ConceptSubmissionsRef = makeRefWrapper({
 
     if (limit) {
       q.queryParams.push(`limitToLast=${limit}`);
+    }
+
+    if (orderBy) {
+      q.queryParams.push(`orderByChild=${orderBy}`);
     }
 
     if (filter && filter.length) {

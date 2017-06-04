@@ -46,11 +46,11 @@ export default (firebaseConfig, reduxFirebaseConfig, initialState = {}, history)
 
   //// To unsubscribe, invoke `store.unsubscribeHistory()` anytime
   //store.unsubscribeHistory = browserHistory.listen(updateLocation(store))
-
   if (module.hot) {
+    // Enable Webpack hot module replacement for reducers
     module.hot.accept('./reducers', () => {
-      const reducers = require('./reducers').default
-      store.replaceReducer(reducers(store.asyncReducers))
+      const nextRootReducer = require('./reducers')
+      store.replaceReducer(nextRootReducer)
     })
   }
 

@@ -270,8 +270,36 @@ button:active { outline:none !important; }
  * App-specific: submissions
  * #######################################################
  */
+
+.submission-entry {
+}
+
+.submission-entry-ready {
+}
+
+.submission-entry-not-ready {
+  background-color: lightgray !important;
+}
+
+.submission-columns {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.submission-columns > div {
+  width: 50%;
+}
+
+.submission-columns > div > pre {
+  
+}
+
 .submission-user-name {
   font-weight: bold;
+}
+
+.submission-entry-heading {
 }
 
 .submission-feedback-status-panel {

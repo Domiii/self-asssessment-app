@@ -5,13 +5,23 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { FAIcon } from 'src/views/components/util';
+import classNames from 'classnames';
 
 import { hrefConceptView } from 'src/views/href';
 import isEqual from 'lodash/isEqual';
 
+import SubmissionEntryTitle from './SubmissionEntryTitle';
+import SubmissionEntryContent from './SubmissionEntryContent';
+
+import SubmissionFeedbackList from './SubmissionFeedbackList';
+
 export default class SubmissionEntry extends PureComponent {
   static propTypes = {
-    submission: PropTypes.object.isRequired
+    submissionId: PropTypes.string.isRequired,
+    submission: PropTypes.object.isRequired,
+
+    addFeedback: PropTypes.func,
+    updateFeedback: PropTypes.func
   };
   
   static contextTypes = {
@@ -22,12 +32,11 @@ export default class SubmissionEntry extends PureComponent {
     return !isEqual(nextProps, this.props);
   }
 
-  makeConceptEl(conceptId, concept) {
+  ConceptEl(conceptId, concept) {
     const {
       lookupLocalized
     } = this.context;
 
-    // TODO: Get conceptId
     return (
       <pre style={{display: 'inline', fontSize: '1.2em'}}
         className="margin-half no-padding">
@@ -39,7 +48,7 @@ export default class SubmissionEntry extends PureComponent {
     );
   }
 
-  makeUserEl(uid, user) {
+  UserEl(uid, user) {
     const iconSize = '2em';
 
     const name = user && user.data && user.data.displayName || '<unknown>';
@@ -49,22 +58,53 @@ export default class SubmissionEntry extends PureComponent {
       <FAIcon style={{fontSize: iconSize}} name="user" />;
 
     return (<span className="submission-user">
-      <span className="submission-user-icon">{ userIcon }</span
-      > <span className="submission-user-name">{ name }</span
-      > <span className="submission-user-email">({ email })</span>
+      <span className="submission-user-icon">{ userIcon }</span> <span
+        className="submission-user-name">{ name }</span> <span
+          className="submission-user-email">({ email })</span>
     </span>);
+  }
+
+  UpdatedAtEl(timestamp) {
+    // return (
+    //   <span>hi</span>
+    //   (<span>world</span>)
+    // );
+
+    return (
+      <span>
+        <Moment fromNow>{timestamp}</Moment> (
+          <Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{timestamp}</Moment>)
+      </span>
+    );
+  }
+
+  SubmissionContentEl() {
+    const { 
+      submission: {
+        text,
+        hasSubmitted
+      }
+    } = this.props;
+
+    return !hasSubmitted ? null : (<pre className="list-group-item-text">
+      { text }
+    </pre>);
   }
 
   render() {
     let { 
       submissionId,
+      submission,
       submission: {
         uid,
         conceptId,
         text,
         hasSubmitted,
         updatedAt
-      }
+      },
+
+      addFeedback,
+      updateFeedback
     } = this.props;
 
     // renderCalls[submissionId] = renderCalls[submissionId] ? (renderCalls[submissionId] + 1) : 1;
@@ -75,26 +115,38 @@ export default class SubmissionEntry extends PureComponent {
     uid = user.uid;
 
     const concept = conceptId;
-    conceptId = conceptId.conceptId;
+    conceptId = concept.conceptId;
+
+    const classes = classNames({
+      'submission-entry': true,
+      'submission-entry-ready': hasSubmitted,
+      'submission-entry-not-ready': !hasSubmitted
+    });
 
     return (
-      <li className="list-group-item">
-        <h4 className="list-group-item-heading">
-          <div style={{float: 'right'}}>
-            { hasSubmitted &&
-              <FAIcon name="check" className="color-green" /> ||  
-              <FAIcon name="remove" className="color-red" />
-            }
-          </div>
-          <span>
-            { this.makeUserEl(uid, user) } submitted{ this.makeConceptEl(conceptId, concept) }
-          </span>
-        </h4>
-        <Moment fromNow>{updatedAt}</Moment> (<Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{updatedAt}</Moment>)
-        <pre className="list-group-item-text">
-          { text }
-        </pre>
-      </li>
+      <ListGroupItem className={classes}>
+        <SubmissionEntryTitle {...{
+          user,
+          concept,
+          hasSubmitted,
+          updatedAt
+        }} />
+        <hr />
+        <div className="submission-columns">
+          <SubmissionEntryContent {...{
+            text,
+            hasSubmitted
+          }} />
+          <SubmissionFeedbackList {...{
+            submissionId,
+            submission,
+            feedback: submission.feedback,
+            feedbackDetails: submission.feedbackDetails,
+            addFeedback,
+            updateFeedback
+          }} />
+        </div>
+      </ListGroupItem>
     );
   }
 }

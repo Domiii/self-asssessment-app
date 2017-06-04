@@ -97,11 +97,9 @@ const SubmissionFeedbackRef = makeRefWrapper({
 
   children: {
     feedback: {
-      pathTemplate: 'data/$(feedbackId)',
+      pathTemplate: 'data/$(submissionId)/$(feedbackId)',
 
       children: {
-        submissionId: 'submissionId',
-
         conceptId: 'conceptId',
         submitterId: 'submitterId',
 
@@ -113,7 +111,7 @@ const SubmissionFeedbackRef = makeRefWrapper({
     },
 
     feedbackDetails: {
-      pathTemplate: 'details/$(feedbackId)',
+      pathTemplate: 'details/$(submissionId)/$(feedbackId)',
 
       children: {
         text: 'text'

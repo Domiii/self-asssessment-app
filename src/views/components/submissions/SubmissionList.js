@@ -1,8 +1,9 @@
-import React, { PureComponent, PropTypes } from 'react';
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import SubmissionEntry from './SubmissionEntry';
 import SubmissionFeedbackList from './SubmissionFeedbackList';
 import {
-  ListGroup
+  ListGroup, ListGroupItem
 } from 'react-bootstrap';
 
 export default class SubmissionList extends PureComponent {
@@ -21,28 +22,17 @@ export default class SubmissionList extends PureComponent {
     
     const ids = _.map(submissions, (_, id) => id);
     const sortedIds = _.sortBy(ids, id => -submissions[id].updatedAt);
-    const halfColumnStyles = {
-      width: '50%'
-    };
 
     const entryEls = _.map(sortedIds, submissionId => {
       const submission = submissions[submissionId];
       return (
-        <div key={submissionId}>
-          <SubmissionEntry style={halfColumnStyles} {...{
-            submissionId,
-            submission
-          }} />
-          {/*
-          <SubmissionFeedbackList style={halfColumnStyles} {...{
-            submissionId,
-            submission,
-            feedbacks: submission.feedbacks,
-            addFeedback,
-            updateFeedback
-          }} />
-          */}
-        </div>
+        <SubmissionEntry {...{
+          key: submissionId,
+          submissionId,
+          submission,
+          addFeedback,
+          updateFeedback
+        }} />
       );
     });
 

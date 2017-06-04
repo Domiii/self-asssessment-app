@@ -9,7 +9,7 @@ import size from 'lodash/size';
 
 // components
 import {
-  ListGroup, Alert, Button
+  ListGroup, ListGroupItem, Alert, Button
 } from 'react-bootstrap';
 import { FAIcon } from 'src/views/components/util';
 import SubmissionFeedbackEntry from './SubmissionFeedbackEntry';
@@ -114,25 +114,34 @@ export default class SubmissionFeedbackList extends Component {
       feedbacks
     } = this.props;
 
-    return (
-      map(feedbacks, (feedback, feedbackId) => (
-        <div key={feedbackId}>
+    const els = map(feedbacks, 
+      (feedback, feedbackId) => (
+        <ListGroupItem key={feedbackId}>
           <SubmissionFeedbackEntry {...{
+            key: feedbackId,
             feedbackId,
             feedback,
 
             toggleEditing: this.toggleEditing
           }}/>
           { this.EditFeedbackFormEl(feedbackId, feedback) }
-        </div>
-      ))
+        </ListGroupItem>
+      )
+    );
+
+    return (
+      <ListGroup className="no-margin">
+        { els }
+      </ListGroup>
     );
   }
 
   EmptyListEl() {
-    return (<Alert bsStyle="warning">
-      still waiting for feedback
-    </Alert>);
+    return (
+      <Alert bsStyle="warning" className="no-margin">
+        still waiting for feedback
+      </Alert>
+    );
   }
 
   AddFeedbackFormEl() {
@@ -173,11 +182,11 @@ export default class SubmissionFeedbackList extends Component {
 
   render() {
     return (
-      <ListGroup>
+      <div>
         { this.AddButtonEl() }
         { this.AddFeedbackFormEl() }
         { this.hasFeedback && this.ListEl() || this.EmptyListEl() }
-      </ListGroup>
+      </div>
     );
   }
 };

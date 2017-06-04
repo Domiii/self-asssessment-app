@@ -71,14 +71,6 @@ export default class Header extends PureComponent {
     const { router, userInfoRef } = this.context;
     const { signOut } = this.props;
 
-    if (router.location.pathname === '/submissions') {
-      return (
-        <Alert bsStyle="danger">
-          This page is buggy :/
-        </Alert>
-      );
-    }
-
     const isAdminView = userInfoRef && userInfoRef.adminDisplayMode();
     const isLoading = !userInfoRef || !userInfoRef.isLoaded;
     const user = userInfoRef && userInfoRef.val;
@@ -124,7 +116,19 @@ export default class Header extends PureComponent {
       </MenuItem>
     );
 
-    return (
+    let warningEl;
+
+    if (router.location.pathname === '/submissions') {
+      warningEl = (
+        <Alert bsStyle="danger">
+          This page suffers from data inconsistency when clicking buttons/links.
+          Open links in new window instead.
+        </Alert>
+      );
+    }
+
+    return (<div>
+      { warningEl }
       <header className="header">
         <Navbar inverse collapseOnSelect className="no-margin">
           <Navbar.Header>
@@ -169,6 +173,6 @@ export default class Header extends PureComponent {
           </Navbar.Collapse>
         </Navbar>
       </header>
-    );
+    </div>);
   }
 };
