@@ -754,7 +754,10 @@ function createRefWrapperBase() {
           this.onUpdate(childValue) &&
           this.onFinalizeWrite(childValue) &&
           ref.set(childValue)
-          .then(() => this.onAfterWritePath('set', childValue, path))
+          .then(() => {
+            this.onAfterWritePath('set', childValue, path);
+            //console.log(`setChild: ${ref} = ${childValue}`);
+          })
         );
       }
       catch (err) {

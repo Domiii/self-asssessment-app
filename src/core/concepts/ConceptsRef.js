@@ -73,38 +73,21 @@ const ConceptsRef = makeRefWrapper({
     },
 
     getAllChildren(parentId) {
-      return this.val && _.pickBy(this.val, {parentId}) || {};
+      return this.val && _.pickBy(this.val, concept => concept.parentId === parentId) || {};
     },
 
     getPublicChildren(parentId) {
       return this.val && _.pickBy(this.val, {parentId, isPublic: true}) || {};
     },
 
-    deleteConcept(conceptId) {
-      if (!conceptId) {
-        throw new Error('missing conceptId');
-      }
-      return this.delete_concept(conceptId)
-      .then(() => {
-        // TODO: keep order after deleting
-        //return this.updateKeepOrder(parentId);
-      });
-    },
-
-    togglePublic(conceptId) {
-      const concept = this.concept(conceptId);
-      if (!concept) {
-          throw new Error('concept does not exist: ' + conceptId);
-      }
-      return this.set_isPublic(conceptId, !this.isPublic(conceptId));
-    },
-
     getFirstChild(parentId) {
+      // TODO: this assumes, we have all concepts cached!
       const firstChildId = this.getFirstChildId(parentId);
-      return firstChildId && this.concept(parentId, firstChildId);
+      return firstChildId && this.concept(firstChildId);
     },
 
     getFirstChildId(parentId) {
+      // TODO: this assumes, we have all concepts cached!
       // TODO: Make this more efficient
       const concepts = this.ofConcept(parentId);
       if (!concepts) {
@@ -123,6 +106,7 @@ const ConceptsRef = makeRefWrapper({
     },
 
     getLastChildId(parentId) {
+      // TODO: this assumes, we have all concepts cached!
       // TODO: Make this more efficient
       const concepts = this.ofConcept(parentId);
       if (!concepts) {
@@ -141,6 +125,7 @@ const ConceptsRef = makeRefWrapper({
     },
 
     getPreviousChildId(parentId, currentChildId) {
+      // TODO: this assumes, we have all concepts cached!
       const concepts = this.ofConcept(parentId);
       if (!concepts) {
         return null;
@@ -163,6 +148,7 @@ const ConceptsRef = makeRefWrapper({
     },
 
     getNextChildId: function(parentId, currentChildId) {
+      // TODO: this assumes, we have all concepts cached!
       const concepts = this.ofConcept(parentId);
       if (!concepts) {
         return null;
@@ -182,6 +168,67 @@ const ConceptsRef = makeRefWrapper({
         }
       }
       return newKey || this.getFirstChildId(parentId);
+    },
+
+    getConceptIdByOrder(parentId, num) {
+      return this.findKey(concept => Math.abs(concept.num - num) < 0.1 && concept.parentId === parentId);
+    },
+
+    changeOrder(conceptId, delta) {
+      const concept = this.concept(conceptId);
+      if (!concept) {
+          throw new Error('concept does not exist: ' + conceptId);
+      }
+      const oldOrder = Math.round(concept.num) | 0;
+      let newOrder = oldOrder + delta;
+
+      if (newOrder < 1) {
+        newOrder = 1;
+      }
+      else {
+        const allChildren = this.getAllChildren(concept.parentId);
+        const maxOrder = _.size(allChildren);
+        if (newOrder > maxOrder) {
+          newOrder = maxOrder;
+        }
+      }
+
+      if (oldOrder == newOrder) {
+        // nothing to do here
+        return Promise.resolve();
+      }
+
+      const promises = [
+        this.set_num(conceptId, newOrder)
+      ];
+
+      const replaceConceptId = this.getConceptIdByOrder(concept.parentId, newOrder);
+      if (replaceConceptId) {
+        // switch with concept that has the new id
+        promises.push(this.set_num(replaceConceptId, oldOrder));
+      }
+
+
+      return Promise.all(promises);
+    },
+
+    togglePublic(conceptId) {
+      const concept = this.concept(conceptId);
+      if (!concept) {
+          throw new Error('concept does not exist: ' + conceptId);
+      }
+      return this.set_isPublic(conceptId, !this.isPublic(conceptId));
+    },
+
+    deleteConcept(conceptId) {
+      if (!conceptId) {
+        throw new Error('missing conceptId');
+      }
+      return this.delete_concept(conceptId)
+      .then(() => {
+        // TODO: keep order after deleting
+        //return this.updateKeepOrder(parentId);
+      });
     }
   },
 
@@ -197,7 +244,8 @@ const ConceptsRef = makeRefWrapper({
         title_zh: 'title_zh',
         description_en: 'description_en',
         description_zh: 'description_zh',
-        expectsSubmission: 'expectsSubmission'
+        expectsSubmission: 'expectsSubmission',
+        num: 'num'
       }
     }
   }

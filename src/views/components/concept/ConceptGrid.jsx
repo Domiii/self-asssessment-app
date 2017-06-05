@@ -21,7 +21,8 @@ export default class ConceptGrid extends Component {
 
     toggleConceptPublic: PropTypes.func.isRequired,
     deleteConcept: PropTypes.func.isRequired,
-    updateConcept: PropTypes.func.isRequired
+    updateConcept: PropTypes.func.isRequired,
+    changeOrder: PropTypes.func.isRequired
   };
 
   render() {
@@ -33,7 +34,8 @@ export default class ConceptGrid extends Component {
 
       toggleConceptPublic,
       deleteConcept,
-      updateConcept
+      updateConcept,
+      changeOrder
     } = this.props;
 
     // actions
@@ -53,7 +55,8 @@ export default class ConceptGrid extends Component {
         
         toggleConceptPublic,
         deleteConcept,
-        updateConcept
+        updateConcept,
+        changeOrder
       })
     );
 

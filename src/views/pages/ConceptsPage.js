@@ -274,12 +274,15 @@ export default class ConceptsPage extends Component {
 
   // ###################################################
   // Privileged actions
+  //
+  // TODO: Put all these actions into their corresponding core files
+  // TODO: Provide some sort of action decorator, so that all actions on this page are decorated in a certain way?
   // ###################################################
 
   // all kinds of action wrappers
   addConcept({ concept }) {
     const { conceptsRef } = this.props;
-    const parentId = this.currentConceptId;
+    const parentId = this.currentConceptId || null;
     const siblings = conceptsRef.getAllChildren(parentId);
 
     // TODO: Use transaction to avoid race condition
@@ -319,6 +322,13 @@ export default class ConceptsPage extends Component {
     }
 
     return this.wrapPromise(Promise.all(actions));
+  }
+
+
+  changeOrder(conceptId, delta) {
+    const { conceptsRef } = this.props;
+
+    return this.wrapPromise(conceptsRef.changeOrder(conceptId, delta));
   }
 
   deleteConcept(deleteConceptId) {
@@ -548,7 +558,8 @@ export default class ConceptsPage extends Component {
 
         toggleConceptPublic: this.toggleConceptPublic,
         deleteConcept: this.deleteConcept,
-        updateConcept: this.updateConcept
+        updateConcept: this.updateConcept,
+        changeOrder: this.changeOrder
       }} />
     );
 

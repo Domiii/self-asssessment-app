@@ -50,9 +50,9 @@ export default class ConceptViewSmall extends Component {
     concept: PropTypes.object.isRequired,
     conceptProgress: PropTypes.object.isRequired,
     
-    toggleConceptPublic: PropTypes.func.isRequired,
-    deleteConcept: PropTypes.func.isRequired,
-    updateConcept: PropTypes.func.isRequired
+    toggleConceptPublic: PropTypes.func,
+    deleteConcept: PropTypes.func,
+    changeOrder: PropTypes.func
   };
 
   constructor(...args) {
@@ -70,7 +70,7 @@ export default class ConceptViewSmall extends Component {
     const {
       busy, parentId, conceptId,
       concept, conceptProgress,
-      toggleConceptPublic, deleteConcept, updateConcept, 
+      toggleConceptPublic, deleteConcept, changeOrder,
       mayEdit
     } = this.props;
     
@@ -120,16 +120,16 @@ export default class ConceptViewSmall extends Component {
     // element: edit buttons
     const editToolsEl = mayEdit && (
       <Row>
-        <Col xs={8} />
-        <Col xs={4} className="inline-vcentered" style={{textAlign: 'left'}}>
+        <span className="inline-vcentered" style={{textAlign: 'left', float: 'right'}}>
           <ConceptEditTools
             {...conceptArgs}
             {...{ 
               toggleConceptPublic,
               deleteConcept,
+              changeOrder,
               editing: false,
               toggleEdit: this.toggleEdit }} />
-        </Col>
+        </span>
       </Row>
     );
 
