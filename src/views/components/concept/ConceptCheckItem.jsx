@@ -4,6 +4,7 @@ import {
   Alert, ListGroupItem, ListGroup, ButtonGroup, Button,
   OverlayTrigger, Tooltip
 } from 'react-bootstrap';
+import Markdown from 'src/views/components/markdown';
 import { Flex, Item } from 'react-flex';
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 
@@ -130,16 +131,25 @@ export default class ConceptCheckItem extends Component {
     const { lookupLocalized } = this.context;
     const { check } = this.props;
 
-    const styleOverride = !check && { backgroundColor: 'lightgray' } || EmptyObject;
+    const content = lookupLocalized(check, 'title');
+    const contentEl = !content ? null : (
+      <span className="concept-check-content">
+        <Markdown source={content} />
+      </span>
+    );
+
+    const noContentEl = check ? null : (
+      <span className="concept-check-deleted">
+        { '<deleted check>' }
+      </span>
+    );
 
     return (
       <ListGroupItem className="no-padding concept-check-item">
         { this.CheckButton }
-        <span className="margin" />
-        <span style={styleOverride} className="concept-check-description">
-          { check && lookupLocalized(check, 'title') || '' }
-          { !check && '<deleted check>' }
-        </span>
+        <span className="margin-half" />
+        { contentEl }
+        { noContentEl }
       </ListGroupItem>
     );
   }

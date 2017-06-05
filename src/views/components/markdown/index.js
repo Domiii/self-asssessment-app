@@ -16,6 +16,6 @@ export default class Markdown extends Component {
   }
 
   render() {
-    return (<ReactMarkdown source={this.props.source} renderers={this.renderers} />);
+    return (<ReactMarkdown className="markdown" source={this.props.source} renderers={this.renderers} />);
   }
 }

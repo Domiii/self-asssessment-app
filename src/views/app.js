@@ -100,6 +100,7 @@ export class App extends Component {
   signOut() {
     try {
       this.props.firebase.logout();
+      setTimeout(() => window.location.reload());
     }
     catch (err) {
       console.error(err.stack);

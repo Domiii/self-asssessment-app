@@ -214,14 +214,16 @@ class ConceptChecksSection extends FormSection {
       //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
       <ListGroupItem key={checkId}>
         <FormInputField name={`${checkId}.title_en`} label="Check description (EN)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
+        component="textarea"
+        inputProps={{rows: 5}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
         />
         <FormInputField name={`${checkId}.title_zh`} label="Check description (中文)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
+        component="textarea"
+        inputProps={{rows: 5}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
         />
         <FormInputField name={`${checkId}.num`} label="Num"
           type="text" component="input"

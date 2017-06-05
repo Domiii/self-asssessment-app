@@ -32,52 +32,6 @@ export default class SubmissionEntry extends PureComponent {
     return !isEqual(nextProps, this.props);
   }
 
-  ConceptEl(conceptId, concept) {
-    const {
-      lookupLocalized
-    } = this.context;
-
-    return (
-      <pre style={{display: 'inline', fontSize: '1.2em'}}
-        className="margin-half no-padding">
-        <Link className="margin"
-          to={hrefConceptView(concept.ownerId, conceptId)}>
-          {lookupLocalized(concept, 'title')}
-        </Link>
-      </pre>
-    );
-  }
-
-  UserEl(uid, user) {
-    const iconSize = '2em';
-
-    const name = user && user.data && user.data.displayName || '<unknown>';
-    const email = user && user.data && user.data.email || '<unknown>';
-    const userIcon = user && user.data &&
-      <img style={{maxWidth: iconSize}} src={user.data.photoURL} /> || 
-      <FAIcon style={{fontSize: iconSize}} name="user" />;
-
-    return (<span className="submission-user">
-      <span className="submission-user-icon">{ userIcon }</span> <span
-        className="submission-user-name">{ name }</span> <span
-          className="submission-user-email">({ email })</span>
-    </span>);
-  }
-
-  UpdatedAtEl(timestamp) {
-    // return (
-    //   <span>hi</span>
-    //   (<span>world</span>)
-    // );
-
-    return (
-      <span>
-        <Moment fromNow>{timestamp}</Moment> (
-          <Moment format="ddd, MMMM Do YYYY, h:mm:ss a">{timestamp}</Moment>)
-      </span>
-    );
-  }
-
   SubmissionContentEl() {
     const { 
       submission: {
