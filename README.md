@@ -32,8 +32,15 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
-* migrate to https://github.com/prescottprue/react-redux-firebase
-** http://react-redux-firebase.com/docs/populate
+* create + edit groups
+* assign students to group
+* setup explicitIndices for many-to-many relationships
+* setup group<->user many-to-many relationship
+* let students of same group create + edit teams
+* create + edit learnerCheckListTemplates
+* create learnerCheckLists from learnerCheckListTemplates
+* add students/teams/groups to learnerCheckLists
+* be able to work through learnerCheckLists
 
 * layout: change layout of "done" items: background = grey-ish, change button color (red -> green)
 * bug: Safari layouting is broken!!!!

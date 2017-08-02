@@ -67,6 +67,7 @@ const UserInfoRef = makeRefWrapper({
         displayName: 'data/displayName',
         email: 'data/email',
         locale: 'data/locale',
+        gids: 'gids',
 
         // TODO: Put this into a different path. Personal user settings don't belong with account data.
         prefs: {    // some UI user preferences

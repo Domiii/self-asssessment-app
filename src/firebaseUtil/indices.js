@@ -5,16 +5,25 @@ const defaultConfig = {
   keys: [],
 
   // Whether to automatically update the index at all.
-  // Difference to `writeAlways` is that if `autoUpdate` is set to `false`, the index will never be written,
-  //    if `writeAlways` is set to `false`, it will at least be written initially.
+  // Difference to `writeAlways` is that: 
+  // If `autoUpdate` is set to `false`, 
+  //    the index will never be written.
+  // If `autoUpdate` is `true` and `writeAlways` is `false`, 
+  //    it will at least be written initially.
   autoUpdate: true,
 
-  // Whether to update the index on every write operation (given it's keys are present).
-  // If this is set to false, it will only try to write the index when it has not previously been written.
+  // Whether to update the index on every 
+  // write operation (given it's keys are present).
+  // If this is set to false, it will only try 
+  // to write the index when it has not previously 
+  // been written.
   writeAlways: false,
 
-  // Whether to show a warning when an index cannot be updated due to missing key data.
-  // You only want to set this to true when you are sure that all required key data will be written for every possible index update.
+  // Whether to show a warning when an index cannot 
+  // be updated due to missing key data.
+  // You only want to set this to true when you are sure 
+  // that all required key data will be written for 
+  // every possible index update.
   isRequired: false,
 
   // Whether the encoded values should be simplified.
@@ -28,34 +37,36 @@ export function makeIndices(cfg) {
 
 const IndexUtils = {
   sanitizeConfig(cfg) {
-    return _.zipObject(_.keys(cfg), _.map(cfg, (indexCfg, indexName) => {
-      let cfgEntry;
-      if (_.isArray(indexCfg)) {
-        // only provide array of keys
-        cfgEntry = { 
-          keys: indexCfg
-        };
-      }
-      else if (_.isString(indexCfg)) {
-        // only provide name of single key
-        cfgEntry = {
-          keys: [indexCfg]
-        };
-      }
-      else if (_.isPlainObject(indexCfg)) {
-        // provide full configuration for index
-        if (!_.isArray(indexCfg.keys)) {
-          //console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
+    return _.zipObject(_.keys(cfg), 
+      _.map(cfg, (indexCfg, indexName) => {
+        let cfgEntry;
+        if (_.isArray(indexCfg)) {
+          // only provide array of keys
+          cfgEntry = { 
+            keys: indexCfg
+          };
         }
-        cfgEntry = indexCfg;
-      }
-      else {
-        //console.warn('Invalid index config has invalid entry: ' + indexName);
-        cfgEntry = {};
-      }
+        else if (_.isString(indexCfg)) {
+          // only provide name of single key
+          cfgEntry = {
+            keys: [indexCfg]
+          };
+        }
+        else if (_.isPlainObject(indexCfg)) {
+          // provide full configuration for index
+          if (!_.isArray(indexCfg.keys)) {
+            //console.warn('Invalid index config missing or invalid keys property (should be array): ' + JSON.stringify(cfg));
+          }
+          cfgEntry = indexCfg;
+        }
+        else {
+          //console.warn('Invalid index config has invalid entry: ' + indexName);
+          cfgEntry = {};
+        }
 
-      return Object.assign({}, defaultConfig, cfgEntry);
-    }));
+        return Object.assign({}, defaultConfig, cfgEntry);
+      })
+    );
   },
 
   convertToSortedValueSet(val, nDepth) {
@@ -220,17 +231,22 @@ class IndexSet {
     return this.cfg[indexName];
   }
 
-  // update indices in given val before writing
+  // called before write to any object of indexed path
   updateIndices(val) {
     if (!_.isObject(val)) return;
     
     for (var indexName in this.keysByIndexName) {
       const cfg = this.getCfg(indexName);
       if (cfg.autoUpdate && (cfg.writeAlways || !val[indexName])) {
+        // either writeAlways is true, 
+        //    or index has not been written yet
         const keys = this.keysByIndexName[indexName];
-        if (keys.length < 2) continue;  // only need to handle composed keys
+
+        // simple keys are don't need explicit writes
+        if (keys.length < 2) continue;
 
         if (_.some(keys, key => !_.has(val, key))) {
+          // problem: at least one of the participating keys is missing!
           if (this.cfg[indexName].isRequired) {
             console.warn(`Updated value did not define index "${indexName}", and is also missing some of its keys: 
               [${keys}]\n${JSON.stringify(val)}`);

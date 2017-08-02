@@ -2,13 +2,26 @@ import _ from 'lodash';
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import { helpers, getFirebase } from 'react-redux-firebase';
-import { makeIndices } from './indices';
 import { EmptyObject } from 'src/util';
 import Immutable from 'immutable';
 
 import isEqual from 'lodash/isEqual';
 
-const { pathToJS, isLoaded, isEmpty, dataToJS, populatedDataToJS } = helpers;
+import { makeIndices } from './indices';
+import { 
+  createPathGetterFromTemplate,
+  createPathGetterFromTemplateProps,
+  createPathGetterFromTemplateArray,
+  parseTemplateString
+} from './dataUtil';
+import {
+  createDataAccessors
+} from './dataAccess';
+
+const { 
+  pathToJS, isLoaded, isEmpty, dataToJS, 
+  populatedDataToJS
+} = helpers;
 
 const defaultConfig = {
   pushedAt(val) {
@@ -49,6 +62,9 @@ export function isAuthenticated(firebaseApp) {
 };
 
 
+// this "cache" is a first attempt at 
+//    minimizing react re-render calls by
+//    always returning the same instance at a given path
 const dataCache = {};
 
 function _cachePut(path, args, data) {
@@ -182,7 +198,8 @@ function _buildQueryFinal(path, args) {
   }
 }
 
-// converts query objects into propriotory `redux-react-firebase` query syntax
+// returns a function which converts query objects 
+//    into propriotory `redux-react-firebase` query syntax
 // see: https://github.com/tiberiuc/redux-react-firebase/blob/master/API.md#examples
 function _makeMakeQuery(getPath, queryString) {
   let queryArgsFunc = queryString instanceof Function && queryString;
@@ -322,142 +339,6 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
   return func;
 }
 
-function createDataAccessors(prototype, children, variableTransform) {
-  // add all children
-  createChildDataAccessors(prototype, children, '', variableTransform);
-}
-
-function createChildDataAccessors(prototype, children, parentPathTemplate, variableTransform) {
-  if (!children) {
-    return;
-  }
-
-  for (let wrapperName in children) {
-    const childCfgOrPath = children[wrapperName];
-    const childPath = _.isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.pathTemplate || '');
-    if (!childPath) {
-      throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPathTemplate}'`);
-    }
-
-    // the path is the relative path from the node of given prototype to current child
-    // NOTE: The path is NOT the full path.
-    // NOTE2: The path for `push` is actually the path up to and including the parent only.
-    const pathTemplate = pathJoin(parentPathTemplate, childPath);
-    const getPath = createPathGetterFromTemplateArray(pathTemplate, variableTransform);
-    const addGetPath = createPathGetterFromTemplateArray(parentPathTemplate, variableTransform);
-
-    if (prototype[wrapperName]) {
-      throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPathTemplate}'`);
-    }
-
-    // get
-    prototype[wrapperName] = createChildDataGet(getPath);
-
-    // add
-    prototype['push_' + wrapperName] = createChildDataPush(addGetPath);
-
-    // set
-    prototype['set_' + wrapperName] = createChildDataSet(getPath);
-
-    // update
-    prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
-
-    // batch update (add to a single bigger update, instead of sending out multiple smaller updates individually)
-    prototype['batchUpdate_' + wrapperName] = createAddChildDataUpdate(getPath);
-
-    // delete
-    prototype['delete_' + wrapperName] = createChildDataDelete(getPath);
-
-    // keep going
-    createChildDataAccessors(prototype, childCfgOrPath.children, pathTemplate);
-  }
-}
-
-function createChildDataGet(getPath) {
-  return function _get(...args) {
-    const path = getPath(...args);
-    return this.getData(path);
-  };
-}
-function createChildDataPush(getPath) {
-  if (getPath.hasVariables) {
-    return function _push(...args) {
-      const pathArgs = _.initial(args);
-      const data = _.last(args);
-      const path = getPath(...pathArgs);
-      return this.pushChild(path, data);
-    };
-  }
-  else {
-    const path = getPath();
-    return function _push(data) {
-      return this.pushChild(path, data);
-    };
-  }
-}
-function createChildDataSet(getPath) {
-  if (getPath.hasVariables) {
-    return function _set(...args) {
-      const pathArgs = _.initial(args);
-      const data = _.last(args);
-      const path = getPath(...pathArgs);
-      return this.setChild(path, data);
-    };
-  }
-  else {
-    const path = getPath();
-    return function _set(data) {
-      return this.setChild(path, data);
-    };
-  }
-}
-function createChildDataUpdate(getPath) {
-  if (getPath.hasVariables) {
-    return function _update(...args) {
-      const pathArgs = _.initial(args);
-      const data = _.last(args);
-      const path = getPath(...pathArgs);
-      return this.updateChild(path, data);
-    };
-  }
-  else {
-    const path = getPath();
-    return function _update(data) {
-      return this.updateChild(path, data);
-    };
-  }
-}
-function createAddChildDataUpdate(getPath) {
-  if (getPath.hasVariables) {
-    return function _update(update, ...args) {
-      const pathArgs = _.initial(args);
-      const data = _.last(args);
-      const path = getPath(...pathArgs);
-      update[path] = update[path] && _.merge(update[path], data) || data;
-    };
-  }
-  else {
-    const path = getPath();
-    return function _update(update, data) {
-      update[path] = update[path] && _.merge(update[path], data) || data;
-    };
-  }
-}
-function createChildDataDelete(getPath) {
-  if (getPath.hasVariables) {
-    return function _delete(...args) {
-      const path = getPath(...args);
-      return this.setChild(path, null);
-    };
-  }
-  else {
-    const path = getPath();
-    return function _delete() {
-      return this.setChild(path, null);
-    };
-  }
-}
-
 
 // function getVariablesFromPath(path) {
 //   const vars = [];
@@ -471,112 +352,7 @@ function createChildDataDelete(getPath) {
 //   return vars;
 // }
 
-// see: http://codepen.io/Domiii/pen/zNOEaO?editors=0010
-function parseTemplateString(text, varLookup) {
-  const varRe = /\$\(([^)]+)\)/g;
 
-  text = text || '';
-  let nVars = 0, nTexts = 0;
-  function textNode(text) {
-    ++nTexts;
-    return props => text;
-  }
-  function varNode(varName) {
-    const iVar = nVars;
-    ++nVars;
-    return args => {
-      return varLookup(args, varName, iVar);
-    };
-  }
-
-  const nodes = [];
-  const varNames = [];
-  let lastIndex = 0;
-  let match;
-  while ((match = varRe.exec(text)) != null) {
-    const matchStart = match.index, matchEnd = varRe.lastIndex;
-    let prevText = text.substring(lastIndex, matchStart);
-    let varName = match[1];
-    varNames.push(varName);
-
-    if (prevText.length > 0) {
-      nodes.push(textNode(prevText));
-    }
-    nodes.push(varNode(varName));
-
-    lastIndex = matchEnd;
-  }
-
-  let prevText = text.substring(lastIndex, text.length);
-  if (prevText.length > 0) {
-    nodes.push(textNode(prevText));
-  }
-
-  return {
-    nVars,
-    nTexts,
-    varNames,
-    nodes
-  };
-}
-
-function _makePathVariable(val, variableTransform) {
-  if (_.isPlainObject(val)) {
-    // use index transformation for variable
-    return variableTransform(val);
-  }
-  return val;
-}
-
-// creates a function that plugs in path variables from a single plain object argument that names variables explicitely
-function createPathGetterFromTemplateProps(pathTemplate, variableTransform) {
-  const varLookup = (props, varName, iArg) => {
-    if (!props || props[varName] === undefined) {
-      throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
-    }
-
-    return _makePathVariable(props[varName], variableTransform);
-  }
-
-  const getPathWithVariables = function getPathWithVariables(props) {
-    return getPathWithVariables.pathInfo.nodes.map(node => node(props)).join('');
-  };
-
-  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables);
-}
-
-// creates a function that plugs in path variables from the function's arguments
-function createPathGetterFromTemplateArray(pathTemplate, variableTransform) {
-  const varLookup = (args, varName, iArg) => {
-    if (!args || iArg >= args.length) {
-      throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
-    }
-
-    return _makePathVariable(args[iArg], variableTransform);
-  };
-  const getPathWithVariables = function getPathWithVariables(...args) {
-    return getPathWithVariables.pathInfo.nodes.map(node => node(args)).join('');
-  };
-  return createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables);
-}
-
-function createPathGetterFromTemplate(pathTemplate, varLookup, getPathWithVariables) {
-  const pathInfo = parseTemplateString(pathTemplate, varLookup);
-  let getPath;
-  if (pathInfo.nVars > 0) {
-    // template substitution from array
-    getPath = getPathWithVariables;
-    getPath.hasVariables = true;
-    getPath.pathInfo = pathInfo;
-  }
-  else {
-    // no variable substitution necessary
-    getPath = function getPath() { return pathTemplate; };
-    getPath.hasVariables = false;
-  }
-  getPath.pathTemplate = pathTemplate;
-  return getPath;
-}
 
 function createWrapperFunc(parent, WrapperClass, getPath) {
   const f = function wrapper(firebaseDataRoot, props, pathArgs, ...allQueryArgs) {
@@ -660,6 +436,7 @@ function createRefWrapperBase() {
     }
 
     getRef(path) {
+      // get firebase ref object at given path
       return path && this._ref.child(path) || this._ref;
     }
 
