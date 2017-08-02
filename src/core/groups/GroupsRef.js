@@ -4,7 +4,6 @@
 
 
 import { makeRefWrapper } from 'src/firebaseUtil';
-import _ from 'lodash';
 import { EmptyObject, EmptyArray } from 'src/util';
 
 const GroupsRef = makeRefWrapper({
@@ -14,12 +13,17 @@ const GroupsRef = makeRefWrapper({
 
   },
 
+  // TODO: need addUserToGroup + removeUserFromGroup methods!
+  hasMany: {
+    user: (usersRef) => usersRef
+  },
+
   children: {
     group: {
       pathTemplate: '$(groupId)',
 
       children: {
-        users: 'users'
+        title: 'title'
       }
     }
   }

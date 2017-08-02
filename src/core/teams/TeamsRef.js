@@ -19,7 +19,9 @@ const TeamsRef = makeRefWrapper({
       pathTemplate: '$(teamId)',
 
       children: {
-        users: 'users'
+        title: 'title',
+        iconUrl: 'iconUrl',
+        description: 'description'
       }
     }
   }

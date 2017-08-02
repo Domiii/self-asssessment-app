@@ -10,6 +10,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import ConceptsPage from './pages/ConceptsPage';
 import NotificationPage from './pages/NotificationPage';
 import SubmissionPage from './pages/SubmissionPage';
+import GroupPage from './pages/GroupPage';
 //import TestPage from './pages/TestPage';
 //import { ConceptPlayPage, ChildConcept } from './pages/ConceptPlayPage';
 
@@ -99,6 +100,14 @@ export const getRoutes = getState => {
         path: routeTemplates.SUBMISSIONS,
         indexRoute: {
           component: SubmissionPage,
+          onEnter: requireAuth(getState)
+        }
+      },
+      {
+        name: routeNames.GROUPS,
+        path: routeTemplates.GROUPS,
+        indexRoute: {
+          component: GroupPage,
           onEnter: requireAuth(getState)
         }
       },

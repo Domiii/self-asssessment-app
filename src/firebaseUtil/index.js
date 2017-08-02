@@ -1,11 +1,14 @@
 import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
+
+import autoBind from 'auto-bind';
+
 import { pathJoin } from 'src/util/pathUtil';
 import { createSelector } from 'reselect';
 import { helpers, getFirebase } from 'react-redux-firebase';
 import { EmptyObject } from 'src/util';
 import Immutable from 'immutable';
 
-import isEqual from 'lodash/isEqual';
 
 import { makeIndices } from './indices';
 import { 
@@ -105,7 +108,8 @@ function _cachedFetchPlain(firebaseDataRoot, path) {
   return _cacheLookup(path, null, newData);
 }
 
-// get data at given path from current state in store
+// return function to get data at given path 
+// from current state in store
 export function makeGetDataDefault(firebaseDataRoot, path, queryArgs) {
   if (_.isPlainObject(queryArgs) && queryArgs.populates) {
     return () => _cachedFetchPopulate(firebaseDataRoot, path, queryArgs);
@@ -353,7 +357,6 @@ function _makeRefWrapper(inheritedSettings, parent, cfgOrPath) {
 // }
 
 
-
 function createWrapperFunc(parent, WrapperClass, getPath) {
   const f = function wrapper(firebaseDataRoot, props, pathArgs, ...allQueryArgs) {
     pathArgs = pathArgs || props || EmptyObject;
@@ -370,7 +373,7 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
     const db = props.db || getFirebase().database();
     const ref = db.ref(path);
     const refWrapper = new WrapperClass();
-    refWrapper.__init(parent, getPath.pathTemplate, db, getData, ref, props);
+    refWrapper.__init(parent, path, db, getData, ref, props);
     return refWrapper;
   };
   return f;
@@ -378,9 +381,13 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    __init(parent, pathTemplate, db, getData, ref, props) {
+    constructor() {
+      autoBind(this);
+    }
+
+    __init(parent, path, db, getData, ref, props) {
       this.parent = parent;
-      this.pathTemplate = pathTemplate;
+      this.path = path;
 
       //this._clazz = clazz;
       this._db = db;
@@ -397,9 +404,6 @@ function createRefWrapperBase() {
       else {
         this.props = props;
       }
-
-      this.onAfterWrite = this.onAfterWrite.bind(this);
-      this.onAfterWritePath = this.onAfterWritePath.bind(this);
     }
 
     get val() {

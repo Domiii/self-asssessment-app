@@ -84,6 +84,13 @@
           ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
         }
       }
+    },
+
+    "groups": {
+      "$groupId": {
+        ".read": "auth !== null",
+        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+      }
     }
   }
 }
