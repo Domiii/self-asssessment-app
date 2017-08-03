@@ -1,5 +1,6 @@
 import { makeRefWrapper } from 'src/firebaseUtil';
-import _ from 'lodash';
+
+import keyBy from 'lodash/keyBy';
 
 // TODO: Define dataProvider settings, 
 //    so we can easily batch/add requests for all the context data?
@@ -67,7 +68,7 @@ export const NotificationTypeSettings = {
   ]
 };
 
-NotificationTypeSettings.byName = _.keyBy(NotificationTypeSettings.list, 'name');
+NotificationTypeSettings.byName = keyBy(NotificationTypeSettings.list, 'name');
 
 function makeNotificationEntrySpecs(prefix) {
   return { 

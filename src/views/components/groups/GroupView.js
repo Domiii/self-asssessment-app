@@ -11,16 +11,6 @@ import {
 import ConfirmModal from 'src/views/components/util/ConfirmModal';
 import UserList from 'src/views/components/users/UserList';
 
-@connect({({ firebase }, props) => {
-  const groupsRef = GroupsRef(firebase);
-  return {
-    // userInfoRef: UserInfoRef(firebase),
-    // groupsRef,
-    
-    addUserToGroup: groupsRef.addUserToGroup,
-    removeUserFromGroup: groupsRef.removeUserFromGroup
-  };
-})
 export default class GroupView extends Component {
   static propTypes = {
     group: PropTypes.object.isRequired,

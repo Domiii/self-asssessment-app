@@ -3,19 +3,16 @@
  */
 
 
-import { makeRefWrapper } from 'src/firebaseUtil';
+import { makeRefWrapper, m2mIndex } from 'src/firebaseUtil';
 import { EmptyObject, EmptyArray } from 'src/util';
+
+import UserInfoRef from 'src/core/users/UserInfoRef';
 
 const GroupsRef = makeRefWrapper({
   pathTemplate: '/groups',
 
   methods: {
 
-  },
-
-  // TODO: need addUserToGroup + removeUserFromGroup methods!
-  hasMany: {
-    user: (usersRef) => usersRef
   },
 
   children: {
@@ -28,5 +25,16 @@ const GroupsRef = makeRefWrapper({
     }
   }
 });
+
+
+export const UserGroupIndex = m2mIndex((firebaseRoot) => [
+  'userGroups',
+
+  'user',
+  'group',
+  
+  UserInfoRef(firebaseRoot),
+  GroupsRef(firebaseRoot)
+]);
 
 export default GroupsRef;

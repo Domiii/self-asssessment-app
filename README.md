@@ -139,6 +139,13 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 * Estimate size of entire "learning space"
 
 
+# Some component design strategies
+* make sure, all queries are executed on page level (for now)
+* pass down modifier actions to let children make changes to query parameters
+* actions and accessors can be on lower (but not too often used) components
+* components that are created a lot should not define their own data accessors (because they are not performance-optimizied, for now)
+
+
 
 # More References
 * https://github.com/vacuumlabs/firebase-transactions/blob/master/wiki/tutorial.md

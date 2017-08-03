@@ -1,7 +1,5 @@
-import { GroupsRef } from 'src/core/groups';
-import { UserInfoRef } from 'src/core/users';
-
-// import _ from 'lodash';
+import GroupsRef, { UserGroupIndex } from 'src/core/groups/GroupsRef';
+import UserInfoRef from 'src/core/users/UserInfoRef';
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
@@ -19,7 +17,6 @@ import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 
 import { GroupList } from 'src/views/components/groups';
-import UserInfoRef from 'src/views/components/users/UserInfoRef';
 
 
 @firebaseConnect((props, firebase) => {

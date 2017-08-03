@@ -4,15 +4,24 @@ import {
   ListGroup, ListGroupItem
 } from 'react-bootstrap';
 
-@connect(({ firebase }, props) => {
+
+@connect({({ firebase }, props) => {
+  const groupsRef = GroupsRef(firebase);
   return {
-    userInfoRef: UserInfoRef(firebase),
-    groupsRef: GroupsRef(firebase)
+    // userInfoRef: UserInfoRef(firebase),
+    // groupsRef,
+    
+    addUserToGroup: groupsRef.addUserToGroup,
+    removeUserFromGroup: groupsRef.removeUserFromGroup
   };
 })
 export default class GroupList extends Component {
   static propTypes = {
-    groups: PropTypes.object.isRequired
+    groups: PropTypes.object.isRequired,
+    users: PropTypes.object.isRequired,
+
+    addUserToGroup: PropTypes.func.isRequired,
+    removeUserFromGroup: PropTypes.func.isRequired
   };
 
   render() {
