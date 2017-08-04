@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 
 import autoBind from 'auto-bind';
@@ -177,7 +178,7 @@ function _buildQueryFinal(path, args) {
   else if (_.isString(args)) {
     return `${path}#${args}`;
   }
-  else if (_.isArray(args)) {
+  else if (isArray(args)) {
     return ({
       path,
       queryParams: args
@@ -420,6 +421,27 @@ function createRefWrapperBase() {
       }
 
       return this.getDataIn(obj, path, defaultValue);
+    }
+
+    getAllChildData(pathPrefix, idOrIds, defaultValue = null) {
+      const ids = isArray(idOrIds) ? idOrIds : [idOrIds];
+
+      const paths = ids.map(id => 
+        pathJoin(pathPrefix, id)
+      );
+
+      return this.getAllData(paths, defaultValue);
+    }
+
+    getAllData(pathOrPaths, defaultValue = null) {
+      const paths = isArray(pathOrPaths) ? 
+        pathOrPaths : [pathOrPaths];
+
+      const children = paths.map(path => 
+        getData(path)
+      );
+
+      return children;
     }
 
     getRef(path) {

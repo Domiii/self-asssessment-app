@@ -4,6 +4,8 @@ import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
 
+import autoBind from 'auto-bind';
+
 import { pathJoin } from 'src/util/pathUtil';
 
 import { 
@@ -14,6 +16,37 @@ import {
 const staticConfig = {
   indexRoot: '_index'
 };
+
+/**
+ * ========================
+ * Usage Steps
+ * ========================
+ * 1. make queries on page level
+ * 2. create index ref object in @connect on list level
+ * 3. access dependent refs from index ref
+ *
+ * ========================
+ * Init Example
+ * ========================
+
+     export const UserGroupRef = m2mIndex((firebaseRoot) => [
+      'userGroups',
+
+      'user',
+      'group',
+      
+      UserInfoRef(firebaseRoot),
+      GroupsRef(firebaseRoot),
+
+      customMembers
+    ]);
+ *  
+ *
+ * ========================
+ * Usage Example
+ * ========================
+ * const userGroupRef = UserGroupRef(firebase);
+ */
 
 export function m2mIndex(argsCreator) {
   return (...args) => {
@@ -72,9 +105,9 @@ const m2mExplicitIndexRef = makeRefWrapper({
 });
 
 
-function addM2MIndexRef(indexName, leftRef, rightRef) {
-  const leftPath = leftRef.path;
-  const rightPath = rightRef.path;
+function addM2MIndexRef(indexName, leftEntryRef, rightEntryRef) {
+  const leftPath = leftEntryRef.path;
+  const rightPath = rightEntryRef.path;
 
   addChildrenToRefWrapper(m2mExplicitIndexRef, {
     [indexName]: {
@@ -92,24 +125,48 @@ function addM2MIndexRef(indexName, leftRef, rightRef) {
 
 /**
  * Many-to-many explicit index.
- * Structure example:
+ * Structure layout:
  *  _index.<m2mindexName>.<leftName> -> <leftId>: <rightIds>*
  *  _index.<m2mindexName>.<rightName> -> <rightId>: <leftIds>*
+ *
+ * Note: the "left" index maps "left ids" to "right data"
+ *    This means that if your left index is "user",
+ *    and the right is "group", then the left index stores
+ *    userId -> { groupIds }, and vice versa.
  */
 class M2MExplicitIndex {
-  constructor(indexName, leftName, rightName, leftRef, rightRef) {
+  constructor(
+      indexName, 
+      leftName, rightName, 
+      leftEntryRef, rightEntryRef,
+      members
+    ) {
     this.indexName = indexName;
-    this.leftRef = leftRef;
-    this.rightRef = rightRef;
+    this.leftEntryRef = leftEntryRef;
+    this.rightEntryRef = rightEntryRef;
+
     this.leftName = leftName;
     this.rightName = rightName;
-    this._firebaseDataRoot = leftRef._firebaseDataRoot;
 
-    const IndexRef = addM2MIndexRef(indexName, leftRef, rightRef);
+    this._firebaseDataRoot = leftEntryRef._firebaseDataRoot;
+
+    this.refs = {
+      [leftName]: leftEntryRef,
+      [rightName]: rightEntryRef
+    };
+
+    this.[`get_${leftName}_by_${rightName}`] = this.getLeftEntriesByRightId;
+    this.[`get_${rightName})_by_${rightName}`] = this.getRightEntriesByLeftId;
+
+    Object.assign(this, members);
+
+    const IndexRef = addM2MIndexRef(indexName, leftEntryRef, rightEntryRef);
 
     //this.indexRef = IndexRef(this._firebaseDataRoot);
     this.leftIndexRef = IndexRef.left(this._firebaseDataRoot);
     this.rightIndexRef = IndexRef.right(this._firebaseDataRoot);
+
+    autoBind(this);
   }
 
   _addQuery(queryArr, basePath, id) {
@@ -144,13 +201,33 @@ class M2MExplicitIndex {
     }
   }
 
+  getLeftIdsByRightId(rightIds) {
+    const leftIds = this.rightIndexRef.getAllData(rightIds);
+    return Object.keys(leftIds);
+  }
+
+  getRightIdsByLeftId(leftIds) {
+    const rightIds = this.leftIndexRef.getAllData(leftIds);
+    return Object.keys(rightIds);
+  }
+
+  getLeftEntriesByRightId(rightIds) {
+    const leftIds = this.getLeftIdsByRightId(rightIds);
+    return this.leftEntryRef.getAllData(leftIds);
+  }
+
+  getRightEntriesByLeftId(leftIds) {
+    const rightIds = this.getRightIdsByLeftId(leftIds);
+    return this.rightEntryRef.getAllData(rightIds);
+  }
+
   addEntry(entry) {
     const leftId = entry[this.leftName];
     const rightId = entry[this.rightName];
 
     return Promise.all([
-      this.rightIndexRef.pushChild(pathJoin(rightId, leftId), 1),
-      this.leftIndexRef.pushChild(pathJoin(leftId, rightId), 1)
+      this.rightIndexRef.setChild(pathJoin(rightId, leftId), 1),
+      this.leftIndexRef.setChild(pathJoin(leftId, rightId), 1)
     ]);
   }
 
@@ -172,44 +249,39 @@ class M2MExplicitIndex {
     if (this.filter && !isEmpty(this.filter)) {
       throw new Error('cannot validate index when filter is active');
     }
-    const leftPath = this.getLeftPath();
-    const rightPath = this.getRightPath();
+    const leftData = this.leftIndexRef.val;
+    const rightData = this.rightIndexRef.val;
     
-    return Promise.all([
-      this.getData(leftPath),
-      this.getData(rightPath),
-    ]).then([leftData, rightData] => {
-      const inconsistencies = [];
+    const inconsistencies = [];
 
-      // for every right id R added to the left id L,
-      //    L must also be added to R
-      for (let leftId in leftData) {
-        const rightIds = leftData[leftId];
-        for (let rightId in rightIds) {
-          const rightEntry = rightData[rightId];
-          if (!rightEntry[leftId]) {
-            inconsistencies.push([leftId, rightId]);
-          }
+    // for every right id R added to the left id L,
+    //    L must also be added to R
+    for (let leftId in leftData) {
+      const rightIds = leftData[leftId];
+      for (let rightId in rightIds) {
+        const rightEntry = rightData[rightId];
+        if (!rightEntry[leftId]) {
+          inconsistencies.push([leftId, rightId]);
         }
       }
+    }
 
-      // for every L added to R,
-      //    R must also be added to L
-      for (let rightId in rightData) {
-        const leftIds = rightData[rightId];
-        for (let leftId in leftIds) {
-          const leftEntry = leftData[leftId];
-          if (!leftEntry[rightId]) {
-            inconsistencies.push([leftId, rightId]);
-          }
+    // for every L added to R,
+    //    R must also be added to L
+    for (let rightId in rightData) {
+      const leftIds = rightData[rightId];
+      for (let leftId in leftIds) {
+        const leftEntry = leftData[leftId];
+        if (!leftEntry[rightId]) {
+          inconsistencies.push([leftId, rightId]);
         }
       }
+    }
 
 
-      // TODO: check if all indexed objects actually exist in leftRef + rightRef
+    // TODO: check if all indexed objects actually exist in leftEntryRef + rightEntryRef
 
-      return inconsistencies;
-    });
+    return inconsistencies;
   }
 
   // used to rebuild given index
