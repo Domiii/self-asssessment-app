@@ -5,25 +5,40 @@ import React, { Component, PropTypes } from 'react';
 import autoBind from 'react-autobind';
 import Moment from 'react-moment';
 import {
-  Alert, Badge, ListGroup, ListGroupItem
+  Alert, Badge, ListGroup, ListGroupItem,
+  Well
 } from 'react-bootstrap';
 
-import ConfirmModal from 'src/views/components/util/ConfirmModal';
+
+import GroupEditTools from './GroupEditTools';
 import UserList from 'src/views/components/users/UserList';
 
+
+
 export default class GroupView extends Component {
+  static contextTypes = {
+    currentUserRef: PropTypes.object,
+    lookupLocalized: PropTypes.func.isRequired
+  };
+
   static propTypes = {
     group: PropTypes.object.isRequired,
-    users: PropTypes.object.isRequired,
-
-    addUserToGroup: PropTypes.func.isRequired,
-    removeUserFromGroup: PropTypes.func.isRequired
+    users: PropTypes.object.isRequired
   };
 
   constructor() {
     super();
 
+    this.state = {
+      editing: null
+    };
+
     autoBind(this);
+  }
+
+  get IsAdmin() {
+    const { currentUserRef } = this.context;
+    return currentUserRef && currentUserRef.adminDisplayMode() || false;
   }
 
   get EmptyEl() {
@@ -34,47 +49,72 @@ export default class GroupView extends Component {
     );
   }
 
-  removeUserEl(open) {
-    return (<Button onClick={open} className="color-red" bsSize="small">
-      <FAIcon name="trash" />
-    </Button>);
+  get IsEditing() {
+    return this.state.editing;
   }
 
-  userEl(user, uid) {
-    return (<span>
-      <span>user.displayName</span>
+  toggleEdit() {
+    this.setState({
+      editing: !this.IsEditing
+    });
+  }
 
-      <ConfirmModal
-        header="Remove user from group?"
-        body={(<span>{user.displayName}</span>)}
-        buttonFn={this.removeUserEl}
-        onConfirm={() => console.log('delete user ' + user.displayName);}
-      />
-    </span>);
+  deleteThisGroup() {
+    this.props.deleteGroup();
+  }
+
+  editorHeader() {
+    const { 
+      group
+    } = this.props;
+
+    return !this.IsAdmin ? null : (
+      <div>
+        <GroupEditTools {...{
+          entryInfo: group.title,
+
+          //changeOrder: 
+
+          editing: this.IsEditing,
+          toggleEdit: this.toggleEdit,
+
+          deleteEntry: deleteGroup
+        }}/>
+      </div>
+    );
   }
 
   render() {
     const {
-      group: {
-        title,
-        updatedAt
-      },
-      users
+      lookupLocalized
+    } = this.context;
+
+    const {
+      group,
+      users,
+      groupEditor
     } = this.props;
 
     const userEls = isEmpty(users) ? 
       this.EmptyEl : 
-      (<UserList users={users} 
-          renderUser={this.userEl} />);
+      (<UserList users={users} />);
 
-    return (
+    return (<div>
+      { this.editorHeader() }
+
       <li className="list-group-item">
         <h4 className="list-group-item-heading">
-          {`${title}`}
+          { lookupLocalized(group, 'title') }
         </h4>
+        <Well>
+          { lookupLocalized(group, 'description') }
+        </Well>
         <Moment fromNow>{updatedAt}</Moment>
-        { userEls }
+        <div>
+          { userEls }
+        </div>
+        { groupEditor }
       </li>
-    );
+    </div>);
   }
 }

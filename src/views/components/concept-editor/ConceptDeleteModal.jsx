@@ -9,7 +9,7 @@ import {
   ConceptPreview
 } from 'src/views/components/concept';
 
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { FAIcon } from 'src/views/components/util';
 
 
 export default class ConceptDeleteModal extends Component {

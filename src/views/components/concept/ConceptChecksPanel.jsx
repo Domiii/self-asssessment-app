@@ -5,7 +5,6 @@ import {
 
 import { EmptyObject } from 'src/util';
 
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { ConceptCheckItem } from '.';
 
 const EmptyArray = Object.freeze([]);

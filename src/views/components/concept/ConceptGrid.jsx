@@ -4,7 +4,7 @@ import {
   Grid, Row, Col,
   Popover, Tooltip
 } from 'react-bootstrap';
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { SimpleGrid } from 'src/views/components/util';
 
 import {
   ConceptViewSmall

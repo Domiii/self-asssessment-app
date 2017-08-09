@@ -109,7 +109,9 @@ export class ConceptPlayViewControls extends Component {
       <Button bsStyle="primary" 
         active={conceptPlayViewWideScreen}
         onClick={() => 
-          updateUserPrefs({conceptPlayViewWideScreen: !conceptPlayViewWideScreen})
+          updateUserPrefs({
+            conceptPlayViewWideScreen: !conceptPlayViewWideScreen
+          })
         }>
         <FAIcon name="arrows-h" />
       </Button>

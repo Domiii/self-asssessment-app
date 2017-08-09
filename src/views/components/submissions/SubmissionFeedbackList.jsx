@@ -17,7 +17,7 @@ import SubmissionFeedbackForm from './SubmissionFeedbackForm';
 
 export default class SubmissionFeedbackList extends Component {
   static contextTypes = {
-    userInfoRef: PropTypes.object
+    currentUserRef: PropTypes.object
   };
 
   static propTypes = {
@@ -44,8 +44,8 @@ export default class SubmissionFeedbackList extends Component {
   // ###########################################################
 
   get isAdmin() {
-    const { userInfoRef } = this.context;
-    return userInfoRef && userInfoRef.adminDisplayMode() || false;
+    const { currentUserRef } = this.context;
+    return currentUserRef && currentUserRef.adminDisplayMode() || false;
   }
 
   get hasFeedback() {

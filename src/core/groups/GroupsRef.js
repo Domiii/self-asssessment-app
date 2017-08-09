@@ -20,7 +20,9 @@ const GroupsRef = makeRefWrapper({
       pathTemplate: '$(groupId)',
 
       children: {
-        title: 'title'
+        title: 'title',
+        description: 'description',
+        isPublic: 'isPublic'
       }
     }
   }

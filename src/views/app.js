@@ -44,8 +44,8 @@ console.log('starting app...');
   if (auth && auth.uid) {
     // TODO: Move this to componentWillMount
     //    see: https://firebase.google.com/docs/reference/node/firebase.auth.Auth#onAuthStateChanged
-    props.userInfoRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
-    props.userInfoRef.ensureUserInitialized();
+    props.currentUserRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
+    props.currentUserRef.ensureUserInitialized();
   }
 
   return props;
@@ -57,27 +57,27 @@ export class App extends Component {
 
   static propTypes = {
     firebase: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object,
+    currentUserRef: PropTypes.object,
     //dBStatusRef: PropTypes.object.isRequired,
 
     children: PropTypes.object
   };
 
   static childContextTypes = {
-    userInfoRef: PropTypes.object,
+    currentUserRef: PropTypes.object,
     lookupLocalized: PropTypes.func
   };
 
   getChildContext() {
     return {
-      userInfoRef: this.props.userInfoRef,
+      currentUserRef: this.props.currentUserRef,
       lookupLocalized: this.lookupLocalized
     }
   }
 
   constructor(...args) {
     super(...args);
-    this.state = {wasBusy: false};
+    this.state = { wasBusy: false };
 
     autoBind(this);
   }
@@ -87,7 +87,7 @@ export class App extends Component {
   // }
 
   componentDidMount() {
-    //const { userInfoRef } = this.props;
+    //const { currentUserRef } = this.props;
 
     // TODO: Remember whether we added the logging hook already, and only add one if not done yet
     // TODO: log new visit
@@ -108,12 +108,12 @@ export class App extends Component {
   }
 
   lookupLocalized(obj, entry) {
-    const lang = this.props.userInfoRef && this.props.userInfoRef.locale() || 'en';
+    const lang = this.props.currentUserRef && this.props.currentUserRef.locale() || 'en';
     return lookupLocalized(lang, obj, entry);
   }
 
   render() {
-    const { userInfoRef, children } = this.props;
+    const { currentUserRef, children } = this.props;
     const { router } = this.context;
 
     //const notYetLoaded = !dBStatusRef.isLoaded;
@@ -123,7 +123,7 @@ export class App extends Component {
     //   return (<LoadOverlay />);
     // }
 
-    // if (!userInfoRef && router.location.pathname !== '/sign-in') {
+    // if (!currentUserRef && router.location.pathname !== '/sign-in') {
     //   setTimeout(() => router.replace('/sign-in'), 50);
     //   return (<FAIcon name="cog" spinning={true} />);
     // }
@@ -131,7 +131,7 @@ export class App extends Component {
     return (
       <div className="app container max-height">
         <Header
-          currentUser={userInfoRef && userInfoRef.val}
+          currentUser={currentUserRef && currentUserRef.val}
           signOut={this.signOut}
         />
 

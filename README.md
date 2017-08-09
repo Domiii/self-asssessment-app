@@ -32,7 +32,9 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 
 ## TODO
-* create + edit groups
+* User "groups"
+* self-assessment system
+* skill trees
 * assign students to group
 * setup explicitIndices for many-to-many relationships
 * setup group<->user many-to-many relationship
@@ -53,27 +55,21 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 ** create a batch request for all notification-related data, possibly using simpler syntax
 ** render notifications properly
 
-* Better submission + progress overview
-** need submission progress bar
-** need single (admin-only?) view over everyone's current submission status (of a specific concept + child concepts)
 
 * feedback system
 ** teacher/admin can give written feedback on all submissions
-** add submission feedback page route
 ** add notification for feedback entry
 ** can see all feedback given to self on one page
 
-* submission progress bar
-** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
 
-* better submission system + advanced response (not just vanilla text)
-** simple YSIWYG MD editor
+* Better submission + progress overview
+** submission progress bar
+*** three-colored bar: A x (not done), B x (submitted + unchecked), C x (submitted + checked)
+** need single (admin-only?) view over everyone's current submission status (of a specific concept + child concepts)
+** submission: simple YSIWYG MD editor
 ** add new symbols to markdown: link, google drive/slides, youtube video, scratch project (can easily choose: embed mode and/or code)
 
-* Will need test database anytime soon...
-
-* User "groups"
-** Used to limit what activity other users see
+* proper error handling
 
 * stats + "evaluation system"
 ** Visualize data and evaluate first results, after Wed class

@@ -155,9 +155,6 @@ class M2MExplicitIndex {
       [rightName]: rightEntryRef
     };
 
-    this.[`get_${leftName}_by_${rightName}`] = this.getLeftEntriesByRightId;
-    this.[`get_${rightName})_by_${rightName}`] = this.getRightEntriesByLeftId;
-
     Object.assign(this, members);
 
     const IndexRef = addM2MIndexRef(indexName, leftEntryRef, rightEntryRef);
@@ -165,6 +162,14 @@ class M2MExplicitIndex {
     //this.indexRef = IndexRef(this._firebaseDataRoot);
     this.leftIndexRef = IndexRef.left(this._firebaseDataRoot);
     this.rightIndexRef = IndexRef.right(this._firebaseDataRoot);
+
+
+    this.[`get_${leftName}_by_${rightName}`] = this.getLeftEntriesByRightId;
+    this.[`get_${rightName})_by_${rightName}`] = this.getRightEntriesByLeftId;
+    this.[`findUnassigned_${leftName}_ids`] = this.findUnassignedLeftIds;
+    this.[`findUnassigned_${leftName}_entries`] = this.findUnassignedLeftEntries;
+    this.[`findUnassigned_${rightName}_ids`] = this.findUnassignedRightIds;
+    this.[`findUnassigned_${rightName}_entries`] = this.findUnassignedRightEntries
 
     autoBind(this);
   }
@@ -201,6 +206,62 @@ class M2MExplicitIndex {
     }
   }
 
+  * findUnassignedLeftIds() {
+    const leftIndexData = this.leftIndexRef.val;
+    const leftData = this.leftRef.val;
+
+    for (let leftId in leftData) {
+      if (isEmpty(leftIndexData[leftId])) {
+        yield leftId;
+      }
+    }
+  }
+
+  * findUnassignedLeftEntries() {
+    const leftIndexData = this.leftIndexRef.val;
+    const leftData = this.leftRef.val;
+    const leftName = this.leftName
+
+    for (let leftId in leftData) {
+      if (isEmpty(leftIndexData[leftId])) {
+        yield {
+          id: leftId,
+          [leftName]: leftData[leftId]
+        };
+      }
+    }
+  }
+
+  * findUnassignedRightIds() {
+    const rightIndexData = this.rightIndexRef.val;
+    const rightData = this.rightRef.val;
+
+    for (let rightId in rightData) {
+      if (isEmpty(rightIndexData[rightId])) {
+        yield rightId;
+      }
+    }
+  }
+
+  * findUnassignedRightEntries() {
+    const rightIndexData = this.rightIndexRef.val;
+    const rightData = this.rightRef.val;
+    const rightName = this.rightName;
+
+    for (let rightId in rightData) {
+      if (isEmpty(rightIndexData[rightId])) {
+        yield {
+          id: rightId,
+          [rightName]: rightData[rightId]
+        };
+      }
+    }
+  }
+
+  findUnassignedLeftEntries() {
+    const leftData = this.leftIndexRef.val;
+  }
+
   getLeftIdsByRightId(rightIds) {
     const leftIds = this.rightIndexRef.getAllData(rightIds);
     return Object.keys(leftIds);
@@ -231,7 +292,7 @@ class M2MExplicitIndex {
     ]);
   }
 
-  removeEntry(entry) {
+  deleteEntry(entry) {
     const leftId = entry[this.leftName];
     const rightId = entry[this.rightName];
     

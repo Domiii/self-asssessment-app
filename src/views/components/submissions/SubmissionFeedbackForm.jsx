@@ -88,15 +88,7 @@ export class StatusPanel extends Component {
         text
         */
 class _SubmissionFeedbackForm extends Component {
-  static contextTypes = {
-    userInfoRef: PropTypes.object.isRequired
-  };
-
   render() {
-    const {
-      userInfoRef
-    } = this.context;
-
     const { 
       handleSubmit, reset, pristine, submitting
     } = this.props;

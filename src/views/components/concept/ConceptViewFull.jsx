@@ -13,8 +13,6 @@ import { FAIcon } from 'src/views/components/util';
 import { getProgressColor } from 'src/views/components/ProgressBar';
 
 import ConceptPreview from './ConceptPreview';
-import ConceptEditTools from 'src/views/components/concept-editor/ConceptEditTools';
-
 
 export default class ConceptViewFull extends Component {
   render() {

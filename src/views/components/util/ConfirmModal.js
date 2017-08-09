@@ -6,14 +6,24 @@ import {
 } from 'react-bootstrap';
 import autoBind from 'react-autobind';
 
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+
+export function DefaultButtonCreator({open, iconName, className}) {
+  return (
+    <Button onClick={open} 
+      className={className}
+      bsSize="small">
+
+      <FAIcon name={iconName || 'trash'} />
+    </Button>
+  );
+}
 
 
-export default class ConceptDeleteModal extends Component {
+export default class ConfirmModal extends Component {
   static propTypes = {
     header: Proptypes.element,
     body: Proptypes.element,
-    buttonFn: Proptypes.func.isRequired,
+    buttonCreator: Proptypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired
   };
 
@@ -26,6 +36,7 @@ export default class ConceptDeleteModal extends Component {
 
   open() { this.setState({ showModal: true }); }
   close() { this.setState({ showModal: false }); }
+
   onClickConfirm() {
     const {
       onConfirm
@@ -39,7 +50,8 @@ export default class ConceptDeleteModal extends Component {
     // data
     const { 
       header,
-      body
+      body,
+      buttonCreator
     } = this.props;
 
     // actions
@@ -61,7 +73,7 @@ export default class ConceptDeleteModal extends Component {
             bsStyle="danger">
             Yes
           </Button>
-          <Button onClick={close}
+          <Button onClick={ close }
             bsStyle="primary"
             bsSize="large">
             Cancel
@@ -72,7 +84,7 @@ export default class ConceptDeleteModal extends Component {
 
     return (
       <span>
-        { buttonCreator(open) }
+        { <buttonCreator open={open} /> }
 
         { modalContents }
       </span>

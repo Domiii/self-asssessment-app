@@ -15,7 +15,7 @@ import { FAIcon } from 'src/views/components/util';
 export default class Header extends PureComponent {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object
+    currentUserRef: PropTypes.object
   };
 
   static propTypes = {
@@ -52,30 +52,30 @@ export default class Header extends PureComponent {
   }
 
   switchToEn() {
-    const { userInfoRef } = this.context;
-    userInfoRef.set_locale('en');
+    const { currentUserRef } = this.context;
+    currentUserRef.set_locale('en');
   }
 
   switchToZh() {
-    const { userInfoRef } = this.context;
-    userInfoRef.set_locale('zh');
+    const { currentUserRef } = this.context;
+    currentUserRef.set_locale('zh');
   }
 
   toggleAdminView() {
-    const { userInfoRef } = this.context;
-    userInfoRef.set_adminDisplayMode(!userInfoRef.adminDisplayMode());
+    const { currentUserRef } = this.context;
+    currentUserRef.set_adminDisplayMode(!currentUserRef.adminDisplayMode());
   }
 
   render() {
     //console.log('header');
-    const { router, userInfoRef } = this.context;
+    const { router, currentUserRef } = this.context;
     const { signOut } = this.props;
 
-    const isAdminView = userInfoRef && userInfoRef.adminDisplayMode();
-    const isLoading = !userInfoRef || !userInfoRef.isLoaded;
-    const user = userInfoRef && userInfoRef.val;
-    const userData = userInfoRef && userInfoRef.data();
-    const lang = userInfoRef && userInfoRef.locale() || 'en';
+    const isAdminView = currentUserRef && currentUserRef.adminDisplayMode();
+    const isLoading = !currentUserRef || !currentUserRef.isLoaded;
+    const user = currentUserRef && currentUserRef.val;
+    const userData = currentUserRef && currentUserRef.data();
+    const lang = currentUserRef && currentUserRef.locale() || 'en';
 
     // elements
     const adminToolsEL = (!user || !user.isAdmin) ? null : (

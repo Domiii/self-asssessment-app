@@ -97,7 +97,7 @@ import { EmptyObject, EmptyArray } from 'src/util';
 export default class ConceptsPage extends Component {
   static contextTypes = {
     router: PropTypes.object.isRequired,
-    userInfoRef: PropTypes.object
+    currentUserRef: PropTypes.object
   };
 
   static propTypes = {
@@ -129,8 +129,10 @@ export default class ConceptsPage extends Component {
   // ###################################################
   
   get userPrefs() {
-    const { userInfoRef } = this.context;
-    return userInfoRef && userInfoRef.prefs() || EmptyObject;
+    const { currentUserRef } = this.context;
+    return currentUserRef && 
+      currentUserRef.prefs() || 
+      EmptyObject;
   }
 
   get currentConceptId() {
@@ -227,8 +229,8 @@ export default class ConceptsPage extends Component {
   }
 
   get isAdmin() {
-    const { userInfoRef } = this.context;
-    return userInfoRef && userInfoRef.adminDisplayMode() || false;
+    const { currentUserRef } = this.context;
+    return currentUserRef && currentUserRef.adminDisplayMode() || false;
   }
 
   get mayEdit() {
@@ -386,12 +388,12 @@ export default class ConceptsPage extends Component {
   // ###################################################
 
   updateUserPrefs(prefs){
-    const { userInfoRef } = this.context;
-    if (!userInfoRef) {
+    const { currentUserRef } = this.context;
+    if (!currentUserRef) {
       console.error(new Error("tried to update prefs before login"));
       return;
     }
-    return this.wrapPromise(userInfoRef.update_prefs(prefs));
+    return this.wrapPromise(currentUserRef.update_prefs(prefs));
   }
 
   updateCheckResponse(conceptId, checkId, checkStillExists, response) {

@@ -1,10 +1,15 @@
 import map from 'lodash/map';
+
+import React, { Component, PropTypes } from 'react';
 import {
   Badge
 } from 'react-bootstrap';
 
-import React, { Component, PropTypes } from 'react';
 
+
+function RenderUserDefault(user) {
+  return (<Badge>user.displayName</Badge>);
+}
 
 export default class UserList extends Component {
   static propTypes = {
@@ -12,23 +17,19 @@ export default class UserList extends Component {
     renderUser: PropTypes.element.isRequired
   };
 
-  renderUser(user) {
-    return user.displayName;
-  }
-
   render() {
     let {
       users,
       renderUser
     } = this.props;
 
-    renderUser = renderUser || this.renderUser;
+    renderUser = renderUser || RenderUserDefault;
 
     return (
       return map(users, (user, uid) => (
-        <Badge key={user.displayName}>
-          { this.renderUser(user, uid) }
-        </Badge>
+        <span key={uid}>
+          { <renderUser user={user} uid={uid} /> }
+        </span>
       ));
     );
   }

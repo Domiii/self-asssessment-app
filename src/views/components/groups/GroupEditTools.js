@@ -8,19 +8,24 @@ import {
 
 import { FAIcon } from 'src/views/components/util';
 
-import ConceptDeleteModal from './ConceptDeleteModal';
+import ConfirmModal, {
+  DefaultButtonCreator
+} from 'src/views/components/util/ConfirmModal';
 
-export default class ConceptEditTools extends Component {
+export default class GroupEditTools extends Component {
   static propTypes = {
-    conceptId: PropTypes.string.isRequired,
-    concept: PropTypes.object.isRequired,
+    entryInfo: Proptypes.string,
 
-    toggleConceptPublic: PropTypes.func.isRequired,
-    deleteConcept: PropTypes.func.isRequired,
     changeOrder: PropTypes.func,
 
     editing: PropTypes.bool,
     toggleEdit: PropTypes.func.isRequired
+
+    //deleteHeader: PropTypes.string,
+    deleteEntry: PropTypes.func.isRequired,
+
+    isPublic: Proptypes.bool,
+    setPublic: PropTypes.func,
   };
 
   constructor(...args) {
@@ -59,33 +64,36 @@ export default class ConceptEditTools extends Component {
 
   get EditButton() {
     const { editing, toggleEdit } = this.props;
-    return (<Button onClick={toggleEdit} 
-      className="" bsSize="small" active={editing}>
-      <FAIcon name="edit" />
-    </Button>);
+    return (
+      <Button onClick={toggleEdit} 
+        className="" bsSize="small" active={editing}>
+          <FAIcon name="edit" />
+      </Button>
+    );
   }
 
   get DeleteButton() {
-    const { conceptId, concept, deleteConcept } = this.props;
+    const { entryInfo, deleteEntry } = this.props;
     const modalProps = {
-      conceptId,
-      concept,
-      deleteConcept
+      header: 'Delete Group?',
+      body: entryInfo,
+      buttonCreator: DefaultButtonCreator,
+      onConfirm: deleteEntry
     };
 
     return (
-      <ConceptDeleteModal {...modalProps}  />
+      <ConfirmModal {...modalProps}  />
     );
   }
 
   get TogglePublicButton() {
-    const { conceptId, concept, toggleConceptPublic } = this.props;
-    const icon = concept.isPublic ? 'unlock' : 'lock';
-    const className = concept.isPublic ? 'color-green' : 'color-red';
+    const { setPublic, isPublic } = this.props;
+    const icon = isPublic ? 'unlock' : 'lock';
+    const className = isPublic ? 'color-green' : 'color-red';
     return (
-      <Button onClick={() => toggleConceptPublic(conceptId)}
+      <Button onClick={ setPublic(!isPublic) }
         className={className} bsSize="small" active={false}>
-        <FAIcon name={icon} />
+          <FAIcon name={icon} />
       </Button>
     );
   }
@@ -95,10 +103,10 @@ export default class ConceptEditTools extends Component {
       whiteSpace: 'nowrap',
       overflow: 'hidden'
     };
-
+    
     return (<span style={styles}>
-      { this.ChangeOrderButtons }
-      { this.TogglePublicButton }
+      { !!this.props.changeOrder && this.ChangeOrderButtons }
+      { !!this.props.setPublic && this.TogglePublicButton }
       { this.EditButton }
       { this.DeleteButton }
     </span>);

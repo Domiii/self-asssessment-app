@@ -11,7 +11,7 @@ import {
   Field, reduxForm, FormSection, FieldArray
 } from 'redux-form';
 import { FAIcon } from 'src/views/components/util';
-import _ from 'lodash';
+import merge from 'lodash/merge';
 
 const lang = {
 
@@ -43,7 +43,7 @@ class _ConceptSubmissionForm extends Component {
       if (isSubmitButton && submit && !trimmedText.length) {
         return false;
       }
-      const newValues = _.merge({}, values, {
+      const newValues = merge({}, values, {
         conceptSubmission: { 
           hasSubmitted: submit,
           text: trimmedText

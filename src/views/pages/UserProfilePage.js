@@ -18,14 +18,13 @@ import _ from 'lodash';
 
 class _UserForm extends Component {
   static contextTypes = {
-    userInfoRef: PropTypes.object
+    currentUserRef: PropTypes.object
   };
 
-
   render() {
-    const { userInfoRef } = this.context;
+    const { currentUserRef } = this.context;
     const { handleSubmit, pristine, reset, submitting } = this.props;
-    const isAdmin = userInfoRef && userInfoRef.isAdmin();
+    const isAdmin = currentUserRef && currentUserRef.isAdmin();
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
@@ -68,7 +67,7 @@ export const UserForm = reduxForm({ form: 'user_info', enableReinitialize: true 
 
 export default class UserProfilePage extends Component {
   static contextTypes = {
-    userInfoRef: PropTypes.object.isRequired
+    currentUserRef: PropTypes.object.isRequired
   };
 
   constructor(...args) {
@@ -78,14 +77,14 @@ export default class UserProfilePage extends Component {
   }
 
   updateUser(...args) {
-    const { userInfoRef } = this.context;
-    return userInfoRef && userInfoRef.updateUser(...args);
+    const { currentUserRef } = this.context;
+    return currentUserRef && currentUserRef.updateUser(...args);
   }
 
   render() {
     // data
-    const { userInfoRef } = this.context;
-    const isBusy = userInfoRef && !userInfoRef.isLoaded || false;
+    const { currentUserRef } = this.context;
+    const isBusy = currentUserRef && !currentUserRef.isLoaded || false;
 
     // go render!
     if (isBusy) {
@@ -93,7 +92,7 @@ export default class UserProfilePage extends Component {
       return (<LoadOverlay />);
     }
 
-    const userInfo = userInfoRef && userInfoRef.val;
+    const userInfo = currentUserRef && currentUserRef.val;
     return (
       <UserForm onSubmit={this.updateUser} initialValues={userInfo} />
     );
