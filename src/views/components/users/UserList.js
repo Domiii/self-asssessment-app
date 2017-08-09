@@ -25,12 +25,11 @@ export default class UserList extends Component {
 
     renderUser = renderUser || RenderUserDefault;
 
-    return (
-      return map(users, (user, uid) => (
+    return (map(users, (user, uid) => (
         <span key={uid}>
           { <renderUser user={user} uid={uid} /> }
         </span>
-      ));
+      ))
     );
   }
 }

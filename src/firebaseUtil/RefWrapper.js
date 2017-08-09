@@ -19,9 +19,10 @@ import {
   createPathGetterFromTemplateArray,
   parseTemplateString
 } from './dataUtil';
+
 import {
   createDataAccessors
-} from './dataAccess';
+} from './dataAccessors';
 
 const { 
   pathToJS, isLoaded, isEmpty, dataToJS, 
@@ -127,7 +128,7 @@ export function addChildrenToRefWrapper(parent, children, inheritedSettings, cas
   for (let wrapperName in children) {
       const childCfg = children[wrapperName];
 
-      WrapperClass._ChildWrappers = parent[wrapperName] = 
+      parent[wrapperName] = 
         _makeRefWrapper(parent, inheritedSettings, childCfg);
 
       if (cascadingMethods && childCfg.cascadingMethods) {
@@ -274,7 +275,6 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
 
   // recurse and add all children
   cascadingMethods = cascadingMethods || {};
-  WrapperClass._ChildWrappers = {};
   if (children) {
     addChildrenToRefWrapper(func, children, inheritedSettings, cascadingMethods);
   }
@@ -355,8 +355,10 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
     const db = props.db || getFirebase().database();
     const ref = db.ref(path);
-    const refWrapper = new WrapperClass();
-    refWrapper.__init(parent, path, firebaseDataRoot, db, getData, ref, props);
+    const refWrapper = new WrapperClass(
+      parent, path, firebaseDataRoot, 
+      db, getData, ref, props
+    );
     return refWrapper;
   };
   return f;
@@ -364,11 +366,7 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    constructor() {
-      autoBind(this);
-    }
-
-    __init(parent, path, firebaseDataRoot, db, getData, ref, props) {
+    constructor(parent, path, firebaseDataRoot, db, getData, ref, props) {
       this.parent = parent;
       this.path = path;
 
@@ -388,6 +386,8 @@ function createRefWrapperBase() {
       else {
         this.props = props;
       }
+
+      autoBind(this);
     }
 
     get val() {

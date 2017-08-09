@@ -225,8 +225,8 @@ export default class GroupEditor extends Component {
           existingUsers,
           addableUsers,
 
-          this.addUserToGroup,
-          this.deleteUserFromGroup
+          addUserToGroup: this.addUserToGroup,
+          deleteUserFromGroup: this.deleteUserFromGroup
         }} />
       </div>
     );

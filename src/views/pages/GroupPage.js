@@ -1,8 +1,9 @@
 import GroupsRef, { UserGroupIndex } from 'src/core/groups/GroupsRef';
 import UserInfoRef from 'src/core/users/UserInfoRef';
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { firebaseConnect } from 'react-redux-firebase'
 import { 
   Alert, Button, Jumbotron, Well
@@ -16,7 +17,7 @@ import {
 import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 
-import { GroupList } from 'src/views/components/groups';
+import GroupList from 'src/views/components/groups/GroupList';
 
 
 @firebaseConnect((props, firebase) => {

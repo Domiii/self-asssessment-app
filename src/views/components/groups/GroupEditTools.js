@@ -14,17 +14,17 @@ import ConfirmModal, {
 
 export default class GroupEditTools extends Component {
   static propTypes = {
-    entryInfo: Proptypes.string,
+    entryInfo: PropTypes.string,
 
     changeOrder: PropTypes.func,
 
     editing: PropTypes.bool,
-    toggleEdit: PropTypes.func.isRequired
+    toggleEdit: PropTypes.func.isRequired,
 
     //deleteHeader: PropTypes.string,
     deleteEntry: PropTypes.func.isRequired,
 
-    isPublic: Proptypes.bool,
+    isPublic: PropTypes.bool,
     setPublic: PropTypes.func,
   };
 

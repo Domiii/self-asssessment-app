@@ -1,8 +1,8 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
-  Alert, Button, Jumbotron, Well,
-  Grid, Row, Col,
-  Popover, Tooltip, Modal
+  Alert, Button, Modal
 } from 'react-bootstrap';
 import autoBind from 'react-autobind';
 
@@ -21,9 +21,9 @@ export function DefaultButtonCreator({open, iconName, className}) {
 
 export default class ConfirmModal extends Component {
   static propTypes = {
-    header: Proptypes.element,
-    body: Proptypes.element,
-    buttonCreator: Proptypes.func.isRequired,
+    header: PropTypes.element,
+    body: PropTypes.element,
+    buttonCreator: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired
   };
 

@@ -3,7 +3,10 @@
  */
 
 
-import { makeRefWrapper, m2mIndex } from 'src/firebaseUtil';
+import { 
+  makeRefWrapper,
+  m2mIndex
+} from 'src/firebaseUtil';
 import { EmptyObject, EmptyArray } from 'src/util';
 
 import UserInfoRef from 'src/core/users/UserInfoRef';

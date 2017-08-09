@@ -29,5 +29,5 @@ export {
 } from './RefWrapper';
 
 export {
-  makeIndices
+  m2mIndex
 } from './explicitIndices';

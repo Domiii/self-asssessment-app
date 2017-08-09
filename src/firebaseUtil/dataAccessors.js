@@ -5,6 +5,10 @@ import merge from 'lodash/merge';
 
 import { pathJoin } from 'src/util/pathUtil';
 
+import {
+  createPathGetterFromTemplateArray
+} from './dataUtil';
+
 export function createDataAccessors(prototype, children, variableTransform) {
   // add all children
   createChildDataAccessors(prototype, children, '', variableTransform);

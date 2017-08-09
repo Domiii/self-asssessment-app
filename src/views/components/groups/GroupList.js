@@ -1,6 +1,7 @@
 import GroupsRef, { UserGroupRef } from 'src/core/groups/GroupsRef';
 
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import autoBind from 'react-autobind';
 import {
   Button, ListGroup, ListGroupItem
@@ -10,7 +11,7 @@ import GroupView from './GroupView';
 import GroupEditor from './GroupEditor';
 
 
-@connect({({ firebase }, props) => {
+@connect(({ firebase }, props) => {
   const userGroupRef = UserGroupRef(firebase);
   const userRef = userGroupRef.refs.user;
   const groupRef = userGroupRef.refs.group;
@@ -138,7 +139,7 @@ export default class GroupList extends Component {
 
       return (<GroupView key={groupId + ''} 
         {...{
-          groupId
+          groupId,
           group,
 
           users: existingUsers,
@@ -150,9 +151,7 @@ export default class GroupList extends Component {
           groupEditor: this.makeGroupEditorEl(group, groupId, 
             existingUsers, addableUsers)
         }} />);
-      };
-    }
-    );
+    });
 
     return (<div>
       { this.editorHeader() }
