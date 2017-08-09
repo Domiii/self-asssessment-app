@@ -350,6 +350,8 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
     //console.log('creating wrapper at: ' + path);
     const makeQuery = f.makeQuery;
+
+    // we need queryArgs when getting data for populate (et al)
     const queryArgs = allQueryArgs.length && makeQuery(...allQueryArgs) || null;
     const getData = makeGetDataDefault(firebaseDataRoot, path, queryArgs);
 

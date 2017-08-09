@@ -48,11 +48,68 @@ const staticConfig = {
  * const userGroupRef = UserGroupRef(firebase);
  */
 
-export function m2mIndex(argsCreator) {
-  return (...args) => {
-    const indexArgs = argsCreator(...args);
-    return new M2MExplicitIndex(...indexArgs);
+
+export function m2mIndex(
+    indexName, 
+    leftName, rightName, 
+    LeftEntryRef, RightEntryRef,
+    
+    members) {
+  const f = (firebaseRoot, leftEntryRefArgs, rightEntryRefArgs) => {
+    const leftEntryRef = LeftEntryRef(firebaseRoot, leftEntryRefArgs);
+    const rightEntryRef = RightEntryRef(firebaseRoot, rightEntryRefArgs);
+    const IndexRef = addM2MIndexRef(indexName, leftName, rightName);
+    return new M2MExplicitIndex(indexName, leftName, rightName,
+      leftEntryRef, rightEntryRef, IndexRef, members);
   };
+
+  Object.assign(f, {
+    _addQuery(queryArr, basePath, id) {
+      if (isArray(id)) {
+        for (var i = 0; i < id.length; ++i) {
+          queryArr.push(pathJoin(basePath, id[i]));
+        }
+      }
+      else if (!isEmpty(id)) {
+        queryArr.push(pathJoin(basePath, id));
+      }
+      else {
+        queryArr.push(basePath);
+      }
+    },
+
+    // TODO: add limits + other kinds of queries
+    addIndexQueries(queryArr, leftQueryArgs, rightQueryArgs) {
+      queryArr.push(IndexRef.left.makeQuery(leftQueryArgs));
+      queryArr.push(IndexRef.right.makeQuery(rightQueryArgs));
+      // const newFilter = { leftId, rightId };
+      // //if (this.filter) {
+      //   // if (!isEqual(this.filter, newFilter)) {
+      //   //   throw new Error('tried to initialize same index with different configurations');
+      //   // }
+      //   this.filter = newFilter;
+      // //}
+
+      // const leftPath = ;
+      // const rightPath = ;
+
+      // if (!isEmpty(leftId)) {
+      //   this._addQuery(queryArr, leftPath, leftId);
+      // }
+      // else {
+      //   this._addQuery(queryArr, leftPath);
+      // }
+
+      // if (!isEmpty(rightId)) {
+      //   this._addQuery(queryArr, rightPath, rightId);
+      // }
+      // else {
+      //   this._addQuery(queryArr, rightPath);
+      // }
+    }
+  });
+
+  return f;
 }
 
 function sanitizeExplicitIndexConfig(cfg) {
@@ -105,17 +162,14 @@ const m2mExplicitIndexRef = makeRefWrapper({
 });
 
 
-function addM2MIndexRef(indexName, leftEntryRef, rightEntryRef) {
-  const leftPath = leftEntryRef.path;
-  const rightPath = rightEntryRef.path;
-
+function addM2MIndexRef(indexName, leftName, rightName) {
   addChildrenToRefWrapper(m2mExplicitIndexRef, {
     [indexName]: {
       pathTemplate: indexName,
 
       children: {
-        left: leftPath,
-        right: rightPath
+        left: leftName,
+        right: rightName
       }
     }
   });
@@ -139,6 +193,8 @@ class M2MExplicitIndex {
       indexName, 
       leftName, rightName, 
       leftEntryRef, rightEntryRef,
+      IndexRef,
+
       members
     ) {
     this.indexName = indexName;
@@ -157,8 +213,6 @@ class M2MExplicitIndex {
 
     Object.assign(this, members);
 
-    const IndexRef = addM2MIndexRef(indexName, leftEntryRef, rightEntryRef);
-
     //this.indexRef = IndexRef(this._firebaseDataRoot);
     this.leftIndexRef = IndexRef.left(this._firebaseDataRoot);
     this.rightIndexRef = IndexRef.right(this._firebaseDataRoot);
@@ -172,38 +226,6 @@ class M2MExplicitIndex {
     this[`findUnassigned_${rightName}_entries`] = this.findUnassignedRightEntries
 
     autoBind(this);
-  }
-
-  _addQuery(queryArr, basePath, id) {
-    if (isArray(id)) {
-      for (var i = 0; i < id.length; ++i) {
-        queryArr.push(pathJoin(basePath, id[i]));
-      }
-    }
-    else {
-      queryArr.push(pathJoin(basePath, id));
-    }
-  }
-
-  // TODO: add limits + other kinds of queries
-  addQueries(queryArr, { leftId, rightId }) {
-    const newFilter = { leftId, rightId };
-    if (this.filter) {
-      // if (!isEqual(this.filter, newFilter)) {
-      //   throw new Error('tried to initialize same index with different configurations');
-      // }
-      this.filter = newFilter;
-    }
-
-    const leftPath = this.getLeftPath();
-    const rightPath = this.getRightPath();
-
-    if (leftId) {
-      this._addQuery(queryArr, leftPath, leftId);
-    }
-    if (rightId) {
-      this._addQuery(queryArr, rightPath, rightId);
-    }
   }
 
   * findUnassignedLeftIds() {
@@ -307,9 +329,9 @@ class M2MExplicitIndex {
   // returns a promise which eventually returns a set
   //    of inconsistencies (if any)
   validateIndex() {
-    if (this.filter && !isEmpty(this.filter)) {
-      throw new Error('cannot validate index when filter is active');
-    }
+    // if (this.filter && !isEmpty(this.filter)) {
+    //   throw new Error('cannot validate index when filter is active');
+    // }
     const leftData = this.leftIndexRef.val;
     const rightData = this.rightIndexRef.val;
     

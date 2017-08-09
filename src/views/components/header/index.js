@@ -144,6 +144,9 @@ export default class Header extends PureComponent {
                 <LinkContainer to='/submissions' onClick={ this.gotoSubmissions }>
                   <NavItem eventKey={1}>Submissions</NavItem>
                 </LinkContainer>
+                <LinkContainer to='/groups'>
+                  <NavItem eventKey={1}>Groups</NavItem>
+                </LinkContainer>
               </Nav>
             }
           </Navbar.Header>

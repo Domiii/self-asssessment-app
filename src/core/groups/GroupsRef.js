@@ -32,16 +32,14 @@ const GroupsRef = makeRefWrapper({
 });
 
 
-export const UserGroupRef = m2mIndex((firebaseRoot) => [
+export const UserGroupRef = m2mIndex(
   'userGroups',
 
   'user',
   'group',
   
-  UserInfoRef(firebaseRoot),
-  GroupsRef(firebaseRoot),
-  {
-  }
-]);
+  UserInfoRef,
+  GroupsRef
+);
 
 export default GroupsRef;

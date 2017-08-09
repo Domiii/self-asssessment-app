@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import GroupsRef, { UserGroupRef } from 'src/core/groups/GroupsRef';
 
 import React, { Component, PropTypes } from 'react';
@@ -130,6 +132,15 @@ export default class GroupList extends Component {
       addUserToGroup,
       deleteUserFromGroup
     } = this.props;
+
+
+    if (isEmpty(groups)) {
+      return (
+        <Alert bsStyle="warning">
+          <span>there are no groups</span>
+        </Alert>
+      );
+    }
 
     const list = _.sortBy(groups, group => -group.updatedAt);
     const addableUsers = findUnassignedUsers();
