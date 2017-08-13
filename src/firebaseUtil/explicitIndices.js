@@ -14,7 +14,7 @@ import {
 } from 'src/firebaseUtil';
 
 const staticConfig = {
-  indexRoot: '_index'
+  indexRoot: '/_index'
 };
 
 /**
@@ -55,13 +55,14 @@ export function m2mIndex(
     LeftEntryRef, RightEntryRef,
     
     members) {
+  const IndexRef = addM2MIndexRef(indexName, leftName, rightName);
   const f = (firebaseRoot, leftEntryRefArgs, rightEntryRefArgs) => {
     const leftEntryRef = LeftEntryRef(firebaseRoot, leftEntryRefArgs);
     const rightEntryRef = RightEntryRef(firebaseRoot, rightEntryRefArgs);
-    const IndexRef = addM2MIndexRef(indexName, leftName, rightName);
     return new M2MExplicitIndex(indexName, leftName, rightName,
       leftEntryRef, rightEntryRef, IndexRef, members);
   };
+  f.IndexRef = IndexRef;
 
   Object.assign(f, {
     _addQuery(queryArr, basePath, id) {

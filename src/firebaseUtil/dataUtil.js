@@ -8,10 +8,12 @@ export function _makePathVariable(val, variableTransform) {
   return val;
 }
 
-// creates a function that plugs in path variables from a single plain object argument that names variables explicitely
+// creates a function that plugs in path variables 
+//  from a single plain object argument that names variables explicitely
 export function createPathGetterFromTemplateProps(pathTemplate, variableTransform) {
   const varLookup = (props, varName, iArg) => {
     if (!props || props[varName] === undefined) {
+        debugger;
       throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
 
@@ -29,6 +31,7 @@ export function createPathGetterFromTemplateProps(pathTemplate, variableTransfor
 export function createPathGetterFromTemplateArray(pathTemplate, variableTransform) {
   const varLookup = (args, varName, iArg) => {
     if (!args || iArg >= args.length) {
+        debugger;
       throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
     }
 
@@ -105,5 +108,17 @@ export function parseTemplateString(text, varLookup) {
     nTexts,
     varNames,
     nodes
+  };
+}
+
+export function createChildVarGetterFromTemplateProps(pathTemplate, varNames) {
+  return props => {
+    return varNames.map(varName => {
+      if (!props || props[varName] === undefined) {
+        debugger;
+        throw new Error(`invalid arguments: ${varName} was not provided for path ${pathTemplate}`);
+      }
+      return props[varName];
+    });
   };
 }

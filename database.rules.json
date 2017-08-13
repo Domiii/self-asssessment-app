@@ -3,25 +3,25 @@
     "dbState": {
       "current": {
         ".read": "auth !== null",
-        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+        ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
       }
     },
 
     "concepts": {
       ".indexOn": ["ownerId", "parentId"],
       ".read": "auth !== null",
-      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+      ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
     },
     "conceptChecks": {
       ".read": "auth !== null",
-      ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+      ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
     },
     "conceptResponses": {
       ".indexOn": ["updatedAt", "hasSubmitted", "uid", "conceptId", "uid_conceptId"],
       ".read": "auth !== null",
       
       "$submissionId" : {
-        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
+        ".write": "auth !== null && ((root.child('users').child('public').child(auth.uid).child('role').val() >= 5) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
       }
     },
     "submissionFeedback": {
@@ -29,7 +29,7 @@
       ".read": "auth !== null",
       
       "$submissionId" : {
-        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
+        ".write": "auth !== null && ((root.child('users').child('public').child(auth.uid).child('role').val() >= 5) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
       }
     },
     "conceptCheckResponses": {
@@ -37,13 +37,13 @@
       ".read": "auth !== null",
       
       "$responseId" : {
-        ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
+        ".write": "auth !== null && ((root.child('users').child('public').child(auth.uid).child('role').val() >= 5) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && newData.child('uid').val() === auth.uid))"
       }
     },
     "conceptCheckResponseDetails": {      
       ".indexOn": ["uid", "conceptId", "uid_conceptId"],
       ".read": "auth !== null",
-      ".write": "auth !== null && ((root.child('users').child(auth.uid).child('isAdmin').val() == true) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && data.child('uid').val() === auth.uid))"
+      ".write": "auth !== null && ((root.child('users').child('public').child(auth.uid).child('role').val() >= 5) || (!newData.exists() && data.exists()  && data.child('uid').val() === auth.uid) || (newData.exists()  && !data.exists() && newData.child('uid').val() === auth.uid) ||(newData.exists()  && data.exists()  && data.child('uid').val() === newData.child('uid').val() && data.child('uid').val() === auth.uid))"
     },
     "notifications": {
       ".read": "auth !== null",
@@ -65,31 +65,59 @@
       }
     },
     "users": {
-      "$uid" : {
-        ".read": "auth !== null",
-        
-        "isAdmin" : {
-          ".write": "false"
+      "public": {
+        ".read": "true",
+
+        "$uid" : {
+          "role" : {
+            ".write": "false"
+          },
+          "displayName": {
+            ".write": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)"
+          },
+          "updatedAt": {
+            ".write": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)"
+          }
         },
-        "adminDisplayMode" : {
-          ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
-        },
-        "data": {
-          ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
-        },
-        "prefs": {
-          ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
-        },
-        "updatedAt": {
-          ".write": "auth !== null && (((root.child('users').child(auth.uid).child('isAdmin').val() == true)) || $uid === auth.uid)"
+      },
+      "private": {
+        "$uid" : {
+          ".read": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)",
+
+          "displayRole" : {
+            ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
+          },
+          "prefs": {
+            ".write": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)"
+          },
+          "updatedAt": {
+            ".write": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)"
+          },
+          "data": {
+            ".write": "auth !== null && (((root.child('users').child('public').child(auth.uid).child('role').val() >= 5)) || $uid === auth.uid)"
+          }
         }
       }
     },
 
     "groups": {
+      ".read": "auth !== null",
+
       "$groupId": {
-        ".read": "auth !== null",
-        ".write": "auth !== null && (root.child('users').child(auth.uid).child('isAdmin').val() == true)"
+        ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
+      }
+    },
+
+    "_index": {
+      "userGroups": {
+        "user": {
+          ".read": "auth !== null",
+          ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
+        },
+        "group": {
+          ".read": "auth !== null",
+          ".write": "auth !== null && (root.child('users').child('public').child(auth.uid).child('role').val() >= 5)"
+        }
       }
     }
   }

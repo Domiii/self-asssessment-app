@@ -145,3 +145,18 @@ Built with React, Redux, Firebase and [redux-react-firebase](https://github.com/
 
 # More References
 * https://github.com/vacuumlabs/firebase-transactions/blob/master/wiki/tutorial.md
+
+
+
+group plan:
+
+
+* get all paths from group ref wrapper entries
+  if (groupBy) {
+    paths = children.map(getVariables(groupBy))...
+  }
+
+* paths of children of groups should all feed from group variables
+
+* func of group has no pathTemplate or path argument, but needs to act as a path argument propagater
+  * When calling child func of group, need to pull arguments from group

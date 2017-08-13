@@ -6,8 +6,9 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import autoBind from 'react-autobind';
 import {
-  Button, ListGroup, ListGroupItem
+  Button, ListGroup, ListGroupItem, Alert
 } from 'react-bootstrap';
+import { FAIcon } from 'src/views/components/util';
 
 import GroupView from './GroupView';
 import GroupEditor from './GroupEditor';
@@ -16,16 +17,16 @@ import GroupEditor from './GroupEditor';
 @connect(({ firebase }, props) => {
   const userGroupRef = UserGroupRef(firebase);
   const userRef = userGroupRef.refs.user;
-  const groupRef = userGroupRef.refs.group;
+  const groupsRef = userGroupRef.refs.group;
 
   return {
     // userInfoRef: UserInfoRef(firebase),
     // groupsRef,
     //userRef,
-    groupRef: groupRef && groupRef.val,
+    groupsRef: groupsRef && groupsRef.val,
     //userGroupRef,
     
-    addGroup: groupRef.push_group,
+    addGroup: groupsRef.push_group,
     updateGroup: groupsRef.update_group,
     deleteGroup: groupsRef.delete_group,
 
@@ -41,7 +42,7 @@ export default class GroupList extends Component {
   };
 
   static propTypes = {
-    groups: PropTypes.object.isRequired,
+    groups: PropTypes.object,
     //users: PropTypes.object.isRequired,
 
     addGroup: PropTypes.func.isRequired,
@@ -79,7 +80,7 @@ export default class GroupList extends Component {
     });
   }
 
-  editorHeader() {
+  makeEditorHeader() {
     return !this.IsAdmin ? null : (
       <div>
         <Button active={this.IsAdding}
@@ -115,6 +116,40 @@ export default class GroupList extends Component {
     }} />);
   }
 
+  makeEmptyGroupsEl() {
+    return (
+      <Alert bsStyle="warning">
+        <span>there are no groups</span>
+      </Alert>
+    );
+  }
+
+  makeGroupsList() {
+    const list = _.sortBy(groups, group => -group.updatedAt);
+    const addableUsers = findUnassignedUsers();
+
+    return (<ListGroup> {
+      _.map(list, (group, groupId) => {
+        const existingUsers = getUsersByGroup(id);
+
+        return (<GroupView key={groupId + ''} 
+          {...{
+            groupId,
+            group,
+
+            users: existingUsers,
+            //groupsRef,
+
+            addUserToGroup,
+            deleteUserFromGroup,
+
+            groupEditor: this.makeGroupEditorEl(group, groupId, 
+              existingUsers, addableUsers)
+          }} />);
+      })
+    } </ListGroup>);
+  }
+
   render() {
     const { 
       groups,
@@ -134,41 +169,17 @@ export default class GroupList extends Component {
     } = this.props;
 
 
+    let groupListEl;
     if (isEmpty(groups)) {
-      return (
-        <Alert bsStyle="warning">
-          <span>there are no groups</span>
-        </Alert>
-      );
+      groupListEl = this.makeEmptyGroupsEl();
+    }
+    else {
+      groupListEl = this.makeGroupsList();
     }
 
-    const list = _.sortBy(groups, group => -group.updatedAt);
-    const addableUsers = findUnassignedUsers();
-
-    const groupEls = _.map(list, (group, groupId) => {
-      const existingUsers = getUsersByGroup(id);
-
-      return (<GroupView key={groupId + ''} 
-        {...{
-          groupId,
-          group,
-
-          users: existingUsers,
-          //groupsRef,
-
-          addUserToGroup,
-          deleteUserFromGroup,
-
-          groupEditor: this.makeGroupEditorEl(group, groupId, 
-            existingUsers, addableUsers)
-        }} />);
-    });
-
     return (<div>
-      { this.editorHeader() }
-      <ListGroup>
-        {groupEls}
-      </ListGroup>
+      { this.makeEditorHeader() }
+      { groupListEl }
     </div>);
   }
 }

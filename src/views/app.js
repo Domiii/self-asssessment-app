@@ -28,8 +28,9 @@ console.log('starting app...');
   
   const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
   if (uid) {
-    paths.push(UserInfoRef.user.makeQuery({uid}));
+    UserInfoRef.user.addQuery(paths, {uid});
   }
+  //paths.push(UserInfoRef.makeQuery());
   return paths;
 })
 @connect(({ firebase }, ownProps) => {
@@ -47,6 +48,8 @@ console.log('starting app...');
     props.currentUserRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
     props.currentUserRef.ensureUserInitialized();
   }
+
+  //console.log(UserInfoRef(firebase).val);
 
   return props;
 })

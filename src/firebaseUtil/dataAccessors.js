@@ -4,6 +4,7 @@ import last from 'lodash/last';
 import merge from 'lodash/merge';
 
 import { pathJoin } from 'src/util/pathUtil';
+import { EmptyArray } from 'src/util';
 
 import {
   createPathGetterFromTemplateArray
@@ -23,7 +24,8 @@ function createChildDataAccessors(prototype, children, parentPathTemplate, varia
     const childCfgOrPath = children[wrapperName];
     const childPath = isString(childCfgOrPath) && childCfgOrPath || (childCfgOrPath && childCfgOrPath.pathTemplate || '');
     if (!childPath) {
-      throw new Error(`invalid: no path given for '${wrapperName}' under '${parentPathTemplate}'`);
+      // TODO: fix for groups
+      continue;
     }
 
     // the path is the relative path from the node of given prototype to current child
@@ -31,7 +33,7 @@ function createChildDataAccessors(prototype, children, parentPathTemplate, varia
     // NOTE2: The path for `push` is actually the path up to and including the parent only.
     const pathTemplate = pathJoin(parentPathTemplate, childPath);
     const getPath = createPathGetterFromTemplateArray(pathTemplate, variableTransform);
-    const addGetPath = createPathGetterFromTemplateArray(parentPathTemplate, variableTransform);
+    const parentGetPath = createPathGetterFromTemplateArray(parentPathTemplate, variableTransform);
 
     if (prototype[wrapperName]) {
       throw new Error(`invalid: duplicate path name '${wrapperName}' under '${parentPathTemplate}'`);
@@ -41,7 +43,7 @@ function createChildDataAccessors(prototype, children, parentPathTemplate, varia
     prototype[wrapperName] = createChildDataGet(getPath);
 
     // add
-    prototype['push_' + wrapperName] = createChildDataPush(addGetPath);
+    prototype['push_' + wrapperName] = createChildDataPush(parentGetPath);
 
     // set
     prototype['set_' + wrapperName] = createChildDataSet(getPath);
@@ -60,9 +62,16 @@ function createChildDataAccessors(prototype, children, parentPathTemplate, varia
   }
 }
 
+function _getChildPath(getPath, args, childArgs) {
+  if (childArgs) {
+    return getPath(...[...childArgs, ...args]);
+  }
+  return getPath(...args);
+}
+
 function createChildDataGet(getPath) {
   return function _get(...args) {
-    const path = getPath(...args);
+    const path = _getChildPath(getPath, args, this._childArgs);
     return this.getData(path);
   };
 }
@@ -71,13 +80,13 @@ function createChildDataPush(getPath) {
     return function _push(...args) {
       const pathArgs = initial(args);
       const data = last(args);
-      const path = getPath(...pathArgs);
+      const path = _getChildPath(getPath, pathArgs, this._childArgs);
       return this.pushChild(path, data);
     };
   }
   else {
-    const path = getPath();
     return function _push(data) {
+      const path = _getChildPath(getPath, EmptyArray, this._childArgs);
       return this.pushChild(path, data);
     };
   }
@@ -87,13 +96,13 @@ function createChildDataSet(getPath) {
     return function _set(...args) {
       const pathArgs = initial(args);
       const data = last(args);
-      const path = getPath(...pathArgs);
+      const path = _getChildPath(getPath, pathArgs, this._childArgs);
       return this.setChild(path, data);
     };
   }
   else {
-    const path = getPath();
     return function _set(data) {
+      const path = _getChildPath(getPath, EmptyArray, this._childArgs);
       return this.setChild(path, data);
     };
   }
@@ -103,13 +112,13 @@ function createChildDataUpdate(getPath) {
     return function _update(...args) {
       const pathArgs = initial(args);
       const data = last(args);
-      const path = getPath(...pathArgs);
+      const path = _getChildPath(getPath, pathArgs, this._childArgs);
       return this.updateChild(path, data);
     };
   }
   else {
-    const path = getPath();
     return function _update(data) {
+      const path = _getChildPath(getPath, EmptyArray, this._childArgs);
       return this.updateChild(path, data);
     };
   }
@@ -119,13 +128,13 @@ function createAddChildDataUpdate(getPath) {
     return function _update(update, ...args) {
       const pathArgs = initial(args);
       const data = last(args);
-      const path = getPath(...pathArgs);
+      const path = _getChildPath(getPath, pathArgs, this._childArgs);
       update[path] = update[path] && merge(update[path], data) || data;
     };
   }
   else {
-    const path = getPath();
     return function _update(update, data) {
+      const path = _getChildPath(getPath, EmptyArray, this._childArgs);
       update[path] = update[path] && merge(update[path], data) || data;
     };
   }
@@ -133,13 +142,13 @@ function createAddChildDataUpdate(getPath) {
 function createChildDataDelete(getPath) {
   if (getPath.hasVariables) {
     return function _delete(...args) {
-      const path = getPath(...args);
+      const path = _getChildPath(getPath, args, this._childArgs);
       return this.setChild(path, null);
     };
   }
   else {
-    const path = getPath();
     return function _delete() {
+      const path = _getChildPath(getPath, EmptyArray, this._childArgs);
       return this.setChild(path, null);
     };
   }

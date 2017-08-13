@@ -8,7 +8,14 @@ import size from 'lodash/size';
 // get started, define some data
 // ########################################
 
-const secretPath = 'secret.json';
+const enableLogging = false;
+
+const secretPath = './secret.json';
+
+const appSettings = {
+  credential: admin.credential.cert(require(secretPath)),
+  databaseURL: "https://super-awesome-buffet.firebaseio.com"
+};
 
 import fs from 'fs';
 import process from 'process';
@@ -25,12 +32,12 @@ if (!fs.existsSync(secretPath)) {
 
 let isInitialized = false;
 
-const app = admin.initializeApp({
-  credential: admin.credential.cert(secretPath),
-  databaseURL: "https://super-awesome-buffet.firebaseio.com"
-});
+if (enableLogging) {
+  admin.database.enableLogging(true);
+}
 
-const db = admin.database();
+global.app = admin.initializeApp(appSettings);
+global.db = admin.database();
 
 
 // ########################################
@@ -38,6 +45,7 @@ const db = admin.database();
 // ########################################
 
 db.ref('.info/connected').on('value', function(connectedSnap) {
+  //console.log('CONNECTION STATUS: ' + connectedSnap.val());
   if (connectedSnap.val() === true) {
     isInitialized = true;
     console.log('#####################Connected#####################');
@@ -48,15 +56,38 @@ db.ref('.info/connected').on('value', function(connectedSnap) {
   }
 });
 
+function migration(name) {
+  const migration = require('./migrations/' + name);
+  console.log('##############################');
+  console.log('migration: ' + name);
 
-// ########################################
-// Go!
-// ########################################
+  const res = migration().
+    then(() => {
+      console.log();
+    });
+  return res;
+}
 
-const usersRef = db.ref('users');
-usersRef.once('value')
-  .then(snapshot => {
-    const users = snapshot.val();
-    console.log('There are ' + size(users) + ' users!');
-  })
-  .catch(err => console.error(err.stack));
+function runScripts() {
+  return Promise.all([
+    //migration('2017_08_10_users');
+  ]);
+}
+
+try {
+  console.log('Starting admin scripts...');
+  
+  runScripts().
+    catch(err => {
+      console.error(err.stack);
+      process.exit(-1);
+    }).
+    then(() => {
+      console.log('Finished.');
+      process.exit(0);
+    });
+}
+catch (err) {
+  console.error(err.stack);
+  process.exit(-1);
+}

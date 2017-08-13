@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _ from 'lodash'
+import forEach from 'lodash/forEach';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 
@@ -14,9 +15,8 @@ import Immutable from 'immutable';
 
 import { makeIndices } from './indices';
 import { 
-  createPathGetterFromTemplate,
   createPathGetterFromTemplateProps,
-  createPathGetterFromTemplateArray,
+  createChildVarGetterFromTemplateProps,
   parseTemplateString
 } from './dataUtil';
 
@@ -25,7 +25,7 @@ import {
 } from './dataAccessors';
 
 const { 
-  pathToJS, isLoaded, isEmpty, dataToJS, 
+  isLoaded, isEmpty, dataToJS, 
   populatedDataToJS
 } = helpers;
 
@@ -125,17 +125,21 @@ export function makeRefWrapper(cfgOrPath) {
 
 export function addChildrenToRefWrapper(parent, children, inheritedSettings, cascadingMethods) {
   inheritedSettings = inheritedSettings || defaultConfig;
+  const childrenWrappers = [];
+
   for (let wrapperName in children) {
-      const childCfg = children[wrapperName];
+    const childCfg = children[wrapperName];
+    const childWrapper = parent[wrapperName] = 
+      _makeRefWrapper(parent, inheritedSettings, childCfg);
 
-      parent[wrapperName] = 
-        _makeRefWrapper(parent, inheritedSettings, childCfg);
-
-      if (cascadingMethods && childCfg.cascadingMethods) {
-        // add all descendant cascading methods as well
-        Object.assign(cascadingMethods, childCfg.cascadingMethods);
-      }
+    if (cascadingMethods && childCfg.cascadingMethods) {
+      // add all descendant cascading methods as well
+      Object.assign(cascadingMethods, childCfg.cascadingMethods);
     }
+    childrenWrappers.push(childWrapper);
+  }
+
+  return childrenWrappers;
 }
 
 // TODO: currently unused
@@ -224,6 +228,33 @@ function _makeMakeQuery(getPath, queryString) {
     _defaultMakeQueryNoVariables;
 }
 
+function _addQueries(makeQuery, paths, ...args) {
+  const newPaths = makeQuery(...args);
+  if (isArray(newPaths)) {
+    paths.push.apply(paths, newPaths);
+  }
+  else {
+    paths.push(newPaths)
+  }
+};
+
+// if this level is group, add queries of children
+function _makeAddQuery(makeQuery, groupBy, childrenWrappers) {
+  if (!isEmpty(groupBy)) {
+    // when groupBy is given, we actually want to query all children instead
+    return (paths, ...args) => {
+      // TODO: redo childrenWrappers as name -> content objects
+      forEach(childrenWrappers, child => {
+        _addQueries(child.makeQuery, paths, ...args);
+      });
+    };
+  }
+  else {
+    // just add the query at this level
+    return _addQueries.bind(null, makeQuery);
+  }
+}
+
 function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
   let cfg;
   if (_.isString(cfgOrPath)) {
@@ -234,13 +265,17 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
   }
   console.assert(!!cfg, 'config was not provided under: ' + (parent && parent.pathTemplate));
 
+  // groupBy needs special treatment
+  //const groupBy = (inheritedSettings.groupBy || []).concat(cfg.groupBy || []);
   inheritedSettings = Object.assign({}, inheritedSettings, cfg);
+  //inheritedSettings.groupBy = groupBy;
 
   // some configuration parameters only affect the current config node
   let { 
     pathTemplate, children,
     // static, // cannot get static here because it's a reserved keyword
-    methods, inheritedMethods, cascadingMethods
+    methods, inheritedMethods, cascadingMethods,
+    groupBy
   } = cfg;
 
   // some configuration parameters are inherited down the chain
@@ -251,33 +286,43 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
     makeQuery
   } = inheritedSettings;
 
+  const relativePathTemplate = pathTemplate || '';
   pathTemplate = parent && 
-    pathJoin(parent.pathTemplate, pathTemplate) || 
-    pathTemplate;
+    pathJoin(parent.pathTemplate, relativePathTemplate) || 
+    relativePathTemplate;
 
   indices = makeIndices(indices || {});
 
   const variableTransform = indices.encodeQueryValue.bind(indices);
   const getPath = createPathGetterFromTemplateProps(pathTemplate, variableTransform);
+  const getChildVars = createChildVarGetterFromTemplateProps(pathTemplate, groupBy);
   const WrapperClass = createRefWrapperBase();
 
   // create the factory function
-  const func = createWrapperFunc(parent, WrapperClass, getPath);
+  const func = createWrapperFunc(parent, WrapperClass, getPath, groupBy, getChildVars);
   if (cfg.static) {
     Object.assign(func, cfg.static);
   }
   func.parent = parent;
   func.getPath = getPath;
+  func.getChildVars = getChildVars;
+  func.relativePathTemplate = relativePathTemplate;
   func.pathTemplate = pathTemplate;
   func.inheritedMethods = inheritedMethods;
   func.indices = indices;
+  func.groupBy = groupBy;
   func.makeQuery = (makeQuery || _makeMakeQuery.call(func, getPath, queryString)).bind(func);
 
   // recurse and add all children
   cascadingMethods = cascadingMethods || {};
+
+  let childrenWrappers;
   if (children) {
-    addChildrenToRefWrapper(func, children, inheritedSettings, cascadingMethods);
+    childrenWrappers = addChildrenToRefWrapper(func, children, inheritedSettings, cascadingMethods);
   }
+
+  func.childrenWrappers = childrenWrappers = childrenWrappers || {};
+  func.addQuery = _makeAddQuery(func.makeQuery, groupBy, childrenWrappers);
 
   // work out indices
   WrapperClass.prototype.indices = indices;
@@ -306,7 +351,9 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
   // add cascadingMethods
   const varNames = parseTemplateString(pathTemplate).varNames;
   cascadingMethods = _.mapValues(cascadingMethods, function(method, name) {
-    // replace path variables with props
+    // all arguments of cascading methods, are:
+    //  1. the arguments already stored in wrapper props
+    //  2. run-time supplied arguments
     return function (...args2) {
       const props = this.props;
       const args1 = varNames.map(varName => props[varName]);
@@ -322,6 +369,8 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
 
   // log all possible DB actions (that we are aware of)
   //logDecoratePrototype(pathTemplate, WrapperClass.prototype);
+
+  autoBind(func);
 
   return func;
 }
@@ -340,26 +389,40 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
 // }
 
 
-function createWrapperFunc(parent, WrapperClass, getPath) {
-  const f = function wrapper(firebaseDataRoot, props, pathArgs, ...allQueryArgs) {
+function createWrapperFunc(parent, WrapperClass, getPath, groupBy, getChildVars) {
+  const f = function wrapper(firebaseDataRoot, props, pathArgs, ...makeQueryArgs) {
     pathArgs = pathArgs || props || EmptyObject;
     props = props || EmptyObject;
     
     let path = getPath(pathArgs);
     path = path.endsWith('/') ? path.substring(0, path.length-1) : path;
 
+
     //console.log('creating wrapper at: ' + path);
     const makeQuery = f.makeQuery;
 
     // we need queryArgs when getting data for populate (et al)
-    const queryArgs = allQueryArgs.length && makeQuery(...allQueryArgs) || null;
+    const queryArgs = makeQueryArgs.length && makeQuery(...makeQueryArgs) || null;
+
     const getData = makeGetDataDefault(firebaseDataRoot, path, queryArgs);
 
+    // for groups, make sure, we get instance to chidren
+    let childArgs, childrenWrappers, children;
+    if (groupBy) {
+      childArgs = getChildVars(pathArgs);
+      childrenWrappers = f.childrenWrappers;
+      children = childrenWrappers.map(childF => {
+        return childF(firebaseDataRoot, props, pathArgs, ...makeQueryArgs);
+      });
+    }
+
+    // finally, create refWrapper object
     const db = props.db || getFirebase().database();
     const ref = db.ref(path);
     const refWrapper = new WrapperClass(
       parent, path, firebaseDataRoot, 
-      db, getData, ref, props
+      relativePathTemplate,
+      db, getData, groupBy, childArgs, children, ref, props
     );
     return refWrapper;
   };
@@ -368,7 +431,9 @@ function createWrapperFunc(parent, WrapperClass, getPath) {
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    constructor(parent, path, firebaseDataRoot, db, getData, ref, props) {
+    constructor(parent, path, firebaseDataRoot, relativePathTemplate, db, 
+      getData, groupBy, childArgs, children, ref, props) {
+
       this.parent = parent;
       this.path = path;
 
@@ -381,6 +446,10 @@ function createRefWrapperBase() {
 
       // getData(path) function returns data at given database path
       this._getData = getData;
+
+      this._groupBy = groupBy;
+      this._children = children;
+      this._childArgs = childArgs;
 
       if (_.isFunction(this.updateProps)) {
         this.updateProps(props);
@@ -409,6 +478,10 @@ function createRefWrapperBase() {
       return _.get(obj, path, defaultValue);
     }
 
+    /**
+     * Get the object stored at this wrapper's path,
+     * then get the value at the given relative path.
+     */
     getData(path, defaultValue = null) {
       if (!path) {
         path = '';
@@ -504,6 +577,12 @@ function createRefWrapperBase() {
     }
 
     push(newChild) {
+      if (this._children) {
+        const childPushs = this._children.map(child => {
+          return child
+        });
+        return Promise.all(childPushs);
+      }
       return this._doPush(this._ref, newChild);
     }
 

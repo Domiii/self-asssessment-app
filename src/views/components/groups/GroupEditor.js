@@ -33,7 +33,9 @@ class _GroupInfoForm extends Component {
       reset, 
       submitting 
     } = this.props;
-    const isAdmin = currentUserRef && currentUserRef.isAdmin();
+    
+    const isAdmin = currentUserRef && 
+      currentUserRef.isAdmin();
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>

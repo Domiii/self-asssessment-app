@@ -28,23 +28,26 @@ class _UserForm extends Component {
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
-        {(isAdmin && <FormInputField name="adminDisplayMode" label="admin view"
-          component="input"
-          inputProps={{
-            type: 'checkbox',
-            className: 'no-box-shadow'
-          }}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
-        />)}
-        <FormInputField name="data.displayName" label="display name"
+        <FormInputField name="public.displayName" label="display name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="data.email" label="email"
+        <FormInputField name="public.photoURL" label="photo URL"
+          inputProps={{type: 'text', component:'input'}}
+          labelProps={{xs: 2}} inputColProps={{xs: 10}}
+        />
+        {(isAdmin && <FormInputField name="private.displayRole" label="display role"
+          inputProps={{component:'select'}}
+          labelProps={{xs: 2}} inputColProps={{xs: 10}}
+        >
+          <option value="1">Student</option>
+          <option value="5">Admin</option>
+        </FormInputField>)}
+        <FormInputField name="private.data.email" label="email"
           inputProps={{type: 'email', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="data.locale" label="language"
+        <FormInputField name="private.locale" label="language"
           inputProps={{component:'select'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         >
@@ -77,8 +80,9 @@ export default class UserProfilePage extends Component {
   }
 
   updateUser(...args) {
+    // TODO: Fix the update function
     const { currentUserRef } = this.context;
-    return currentUserRef && currentUserRef.updateUser(...args);
+    //return currentUserRef && currentUserRef.updateUser(...args);
   }
 
   render() {
@@ -92,6 +96,7 @@ export default class UserProfilePage extends Component {
       return (<LoadOverlay />);
     }
 
+    // TODO: fix val getter
     const userInfo = currentUserRef && currentUserRef.val;
     return (
       <UserForm onSubmit={this.updateUser} initialValues={userInfo} />

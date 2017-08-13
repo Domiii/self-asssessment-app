@@ -19,21 +19,26 @@ import GroupList from 'src/views/components/groups/GroupList';
 
 
 @firebaseConnect((props, firebase) => {
-  console.log(GroupsRef.makeQuery());
   const queries = [
-    UserInfoRef.makeQuery(),
+    //UserInfoRef.makeQuery(),
     GroupsRef.makeQuery()
   ];
   UserGroupRef.addIndexQueries(queries);
   return queries;
 })
 @connect(({ firebase }, props) => {
+  const userGroupRef = UserGroupRef(firebase);
   return {
-    userInfoRef: UserInfoRef(firebase),
-    groupsRef: GroupsRef(firebase)
+    groupsRef: userGroupRef.refs.group,
+    userInfoRef: userGroupRef.refs.user,
+    userGroupRef
   };
 })
 class GroupPage extends Component {
+  static contextTypes = {
+    currentUserRef: PropTypes.object
+  };
+
   static propTypes = {
     userInfoRef: PropTypes.object.isRequired,
     groupsRef: PropTypes.object.isRequired
@@ -46,8 +51,8 @@ class GroupPage extends Component {
   }
 
   get IsNotLoadedYet() {
-    const { groupsRef } = this.props;
-    return !groupsRef.isLoaded;
+    const { userInfoRef } = this.props;
+    return !userInfoRef.isLoaded;
   }
 
   render() {
@@ -55,6 +60,8 @@ class GroupPage extends Component {
       // still loading
       return (<LoadOverlay />);
     }
+
+    //console.log(this.context.currentUserRef, this.context.currentUserRef.adminDisplayMode());
 
     return (
       <GroupList />

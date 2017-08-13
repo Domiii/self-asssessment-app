@@ -73,12 +73,11 @@ export default class Header extends PureComponent {
 
     const isAdminView = currentUserRef && currentUserRef.adminDisplayMode();
     const isLoading = !currentUserRef || !currentUserRef.isLoaded;
-    const user = currentUserRef && currentUserRef.val;
     const userData = currentUserRef && currentUserRef.data();
     const lang = currentUserRef && currentUserRef.locale() || 'en';
 
     // elements
-    const adminToolsEL = (!user || !user.isAdmin) ? null : (
+    const adminToolsEL = (!currentUserRef.isAdmin()) ? null : (
       <NavItem className='header-right'>
         <Button onClick={this.toggleAdminView} bsStyle={isAdminView && 'success' || 'danger'}
           className="header-gavel-button"
@@ -89,7 +88,7 @@ export default class Header extends PureComponent {
       </NavItem>
     );
 
-    const userToolsEl = !user ? null : (
+    const userToolsEl = !currentUserRef.val ? null : (
       <NavItem className='header-right'>
         <ButtonGroup>
           <Button active={lang === 'en'} onClick={this.switchToEn} bsSize="small">

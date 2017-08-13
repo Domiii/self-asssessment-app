@@ -161,13 +161,13 @@ export default class ConceptsPage extends Component {
 
   get currentLoadedConcepts() {
     const { conceptsRef } = this.props;
-    return conceptsRef.getLoadedConcepts(this.isAdmin);
+    return conceptsRef.getLoadedConcepts(this.IsAdmin);
   }
 
   get currentChildConcepts() {
     const { conceptsRef } = this.props;
     if (this.currentConceptId) {
-      return conceptsRef.getChildren(this.currentConceptId, this.isAdmin);
+      return conceptsRef.getChildren(this.currentConceptId, this.IsAdmin);
     }
     else {
       return this.currentLoadedConcepts;
@@ -228,13 +228,13 @@ export default class ConceptsPage extends Component {
     return this.state.busy;
   }
 
-  get isAdmin() {
+  get IsAdmin() {
     const { currentUserRef } = this.context;
     return currentUserRef && currentUserRef.adminDisplayMode() || false;
   }
 
   get mayEdit() {
-    return this.isAdmin;
+    return this.IsAdmin;
   }
 
   get areParamsValid() {
@@ -406,7 +406,7 @@ export default class ConceptsPage extends Component {
       conceptCheckResponsesRef.updateResponse(
         conceptId, checkId, checkStillExists, response)
       .then(done => {
-        if (!this.isAdmin) {
+        if (!this.IsAdmin) {
           return notificationsRef.addNotification('checkResponse', {
             conceptId,
             checkId,
@@ -426,7 +426,7 @@ export default class ConceptsPage extends Component {
     return this.wrapPromise(
       conceptSubmissionsRef.updateSubmission(conceptId, conceptSubmission)
       .then(() => {
-        if (!this.isAdmin) {
+        if (!this.IsAdmin) {
           return notificationsRef.addNotification('conceptSubmission', {
             conceptId,
             text: conceptSubmission.text,
