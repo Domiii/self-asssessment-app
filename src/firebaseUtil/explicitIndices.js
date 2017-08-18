@@ -4,7 +4,7 @@ import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
 
-import autoBind from 'auto-bind';
+import autoBind from 'src/util/auto-bind';
 
 import { pathJoin } from 'src/util/pathUtil';
 

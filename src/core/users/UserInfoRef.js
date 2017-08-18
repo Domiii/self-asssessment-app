@@ -24,18 +24,34 @@ const UserInfoRef = makeRefWrapper({
 
         isAdminDisplayMode() {
           return this.displayRole() >= 5;
-        }
+        },
 
         getLocalized(obj, entry) {
           return lookupLocalized(this.locale(), obj, entry);
         },
 
         setUserData(userData) {
-          return this.set_data(userData);
+          const updates = [];
+
+          if (!this.data()) {
+            updates.push(this.set_data(userData));
+          }
+
+          if (userData.photoURL) {
+            updates.push(this.set_photoURL(userData.photoURL));
+          }
+
+          if (userData.displayName) {
+            updates.push(this.set_displayName(userData.displayName));
+          }
+
+          return Promise.all(updates);
         },
 
         ensureUserInitialized() {
           const { auth } = this.props;
+
+          // TODO: Separate data writes
 
           if (this.isLoggedIn() && this.isLoaded && !this.data()) {
             // user logged in and but no record of user data
@@ -49,6 +65,7 @@ const UserInfoRef = makeRefWrapper({
                 email: auth.email
               };
             }
+
             console.log("Writing user data: " + JSON.stringify(userData));
             return this.setUserData(userData);
           }
@@ -57,7 +74,7 @@ const UserInfoRef = makeRefWrapper({
         updateUser(userFormData) {
           if (this.isAdmin()) {
             // admins can override other stuff as well
-            delete userFormData.public.role;
+            delete userFormData.role;
             return this.update(userFormData);
           }
           else {
@@ -85,7 +102,6 @@ const UserInfoRef = makeRefWrapper({
             displayRole: 'displayRole',
 
             data: 'data',   // personal user data (we copy this from firebase auth on first use)
-            email: 'data/email',
             locale: 'data/locale',
 
             // TODO: Put this into a different path. Personal user settings don't belong with account data.

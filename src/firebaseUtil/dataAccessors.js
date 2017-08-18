@@ -52,7 +52,7 @@ function createChildDataAccessors(prototype, children, parentPathTemplate, varia
     prototype['update_' + wrapperName] = createChildDataUpdate(getPath);
 
     // batch update (add to a single bigger update, instead of sending out multiple smaller updates individually)
-    prototype['batchUpdate_' + wrapperName] = createAddChildDataUpdate(getPath);
+    prototype['batchUpdate_' + wrapperName] = createChildDataBatchUpdate(getPath);
 
     // delete
     prototype['delete_' + wrapperName] = createChildDataDelete(getPath);
@@ -123,7 +123,7 @@ function createChildDataUpdate(getPath) {
     };
   }
 }
-function createAddChildDataUpdate(getPath) {
+function createChildDataBatchUpdate(getPath) {
   if (getPath.hasVariables) {
     return function _update(update, ...args) {
       const pathArgs = initial(args);

@@ -61,7 +61,7 @@ class GroupPage extends Component {
       return (<LoadOverlay />);
     }
 
-    //console.log(this.context.currentUserRef, this.context.currentUserRef.adminDisplayMode());
+    //console.log(this.context.currentUserRef, this.context.currentUserRef.isAdminDisplayMode());
 
     return (
       <GroupList />

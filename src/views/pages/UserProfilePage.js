@@ -28,22 +28,22 @@ class _UserForm extends Component {
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
-        <FormInputField name="public.displayName" label="display name"
+        <FormInputField name="displayName" label="display name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="public.photoURL" label="photo URL"
+        <FormInputField name="data.photoURL" label="photo URL"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        {(isAdmin && <FormInputField name="private.displayRole" label="display role"
+        {(isAdmin && <FormInputField name="data.displayRole" label="display role"
           inputProps={{component:'select'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         >
           <option value="1">Student</option>
           <option value="5">Admin</option>
         </FormInputField>)}
-        <FormInputField name="private.data.email" label="email"
+        <FormInputField name="data.email" label="email"
           inputProps={{type: 'email', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />

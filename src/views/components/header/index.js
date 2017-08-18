@@ -63,7 +63,7 @@ export default class Header extends PureComponent {
 
   toggleAdminView() {
     const { currentUserRef } = this.context;
-    currentUserRef.set_adminDisplayMode(!currentUserRef.adminDisplayMode());
+    currentUserRef.set_adminDisplayMode(!currentUserRef.isAdminDisplayMode());
   }
 
   render() {
@@ -71,13 +71,13 @@ export default class Header extends PureComponent {
     const { router, currentUserRef } = this.context;
     const { signOut } = this.props;
 
-    const isAdminView = currentUserRef && currentUserRef.adminDisplayMode();
+    const isAdminView = currentUserRef && currentUserRef.isAdminDisplayMode();
     const isLoading = !currentUserRef || !currentUserRef.isLoaded;
     const userData = currentUserRef && currentUserRef.data();
     const lang = currentUserRef && currentUserRef.locale() || 'en';
 
     // elements
-    const adminToolsEL = (!currentUserRef.isAdmin()) ? null : (
+    const adminToolsEL = (!currentUserRef || !currentUserRef.isAdmin()) ? null : (
       <NavItem className='header-right'>
         <Button onClick={this.toggleAdminView} bsStyle={isAdminView && 'success' || 'danger'}
           className="header-gavel-button"
@@ -88,7 +88,7 @@ export default class Header extends PureComponent {
       </NavItem>
     );
 
-    const userToolsEl = !currentUserRef.val ? null : (
+    const userToolsEl = (!currentUserRef || !currentUserRef.val) ? null : (
       <NavItem className='header-right'>
         <ButtonGroup>
           <Button active={lang === 'en'} onClick={this.switchToEn} bsSize="small">
@@ -157,15 +157,15 @@ export default class Header extends PureComponent {
                    <FAIcon name="cog" />
                 }>
                 { profileEl }
-                { user && <MenuItem divider /> }
+                { !!userData && <MenuItem divider /> }
                 <MenuItem eventKey="more-drop-sand" onClick={ this.gotoGit }>
                  <FAIcon name="github" /> View Source Code
                 </MenuItem>
                 <MenuItem eventKey="more-drop-sand" onClick={ this.gotoScratch3Sandbox }>
                   Scratch 3.0 Sandbox
                 </MenuItem>  
-                { user && <MenuItem divider /> }
-                { user && (
+                { !!userData && <MenuItem divider /> }
+                { !!userData && (
                   <MenuItem eventKey="user-drop-logout" onClick={signOut}>
                     <FAIcon name="close" className="color-red" /> Sign Out
                   </MenuItem>)

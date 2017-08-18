@@ -45,7 +45,7 @@ export default class SubmissionFeedbackList extends Component {
 
   get isAdmin() {
     const { currentUserRef } = this.context;
-    return currentUserRef && currentUserRef.adminDisplayMode() || false;
+    return currentUserRef && currentUserRef.isAdminDisplayMode() || false;
   }
 
   get hasFeedback() {

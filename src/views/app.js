@@ -46,7 +46,6 @@ console.log('starting app...');
     // TODO: Move this to componentWillMount
     //    see: https://firebase.google.com/docs/reference/node/firebase.auth.Auth#onAuthStateChanged
     props.currentUserRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
-    props.currentUserRef.ensureUserInitialized();
   }
 
   //console.log(UserInfoRef(firebase).val);
@@ -89,10 +88,13 @@ export class App extends Component {
   //   const { router } = this.context;
   // }
 
-  componentDidMount() {
-    //const { currentUserRef } = this.props;
+  componentWillReceiveProps(nextProps) {
+    const { currentUserRef } = nextProps;
 
-    // TODO: Remember whether we added the logging hook already, and only add one if not done yet
+    if (!!currentUserRef) {
+      currentUserRef.ensureUserInitialized();
+    }
+        
     // TODO: log new visit
     // TODO: add hook to browserhistory
     // browserHistory.listen( location =>  {

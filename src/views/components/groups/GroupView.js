@@ -38,7 +38,7 @@ export default class GroupView extends Component {
 
   get IsAdmin() {
     const { currentUserRef } = this.context;
-    return currentUserRef && currentUserRef.adminDisplayMode() || false;
+    return currentUserRef && currentUserRef.isAdminDisplayMode() || false;
   }
 
   get EmptyEl() {

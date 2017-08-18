@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router'
 import { reactReduxFirebase, getFirebase } from 'react-redux-firebase'
 import { version } from 'package.json'
 
-export default (firebaseConfig, reduxFirebaseConfig, initialState = {}, history) => {
+export default (firebaseConfigs, reduxFirebaseConfig, initialState = {}, history) => {
   // ======================================================
   // Window Vars Config
   // ======================================================
@@ -23,11 +23,18 @@ export default (firebaseConfig, reduxFirebaseConfig, initialState = {}, history)
   // Store Enhancers
   // ======================================================
   const enhancers = []
+
+  let firebaseConfig;
+
   if (process.env.NODE_ENV !== 'production') {
     const devToolsExtension = window.devToolsExtension
     if (typeof devToolsExtension === 'function') {
       enhancers.push(devToolsExtension())
     }
+    firebaseConfig = firebaseConfigs.test;
+  }
+  else {
+    firebaseConfig = firebaseConfigs.production;
   }
 
   // ======================================================

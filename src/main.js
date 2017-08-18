@@ -18,7 +18,7 @@ import { browserHistory } from 'react-router';
 import { 
   syncHistoryWithStore
 } from 'react-router-redux';
-import { firebaseConfig, reduxFirebaseConfig } from 'src/config/firebase.cfg'
+import { firebaseConfigs, reduxFirebaseConfig } from 'src/config/firebase.cfg'
 
 
 import configureStore from './core/store';
@@ -30,7 +30,7 @@ import { getFirebase } from 'react-redux-firebase';
 import { LoadOverlay } from 'src/views/components/overlays';
 
 // GO!
-const store = configureStore(firebaseConfig, reduxFirebaseConfig);
+const store = configureStore(firebaseConfigs, reduxFirebaseConfig);
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
 
