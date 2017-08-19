@@ -1,4 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import sortBy from 'lodash/sortBy';
 
 import GroupsRef, { UserGroupRef } from 'src/core/groups/GroupsRef';
 
@@ -80,11 +82,20 @@ export default class GroupList extends Component {
     });
   }
 
+  addNewGroup() {
+    const {
+      addGroup
+    } = this.props;
+
+    return addGroup({});
+  }
+
   makeEditorHeader() {
     return !this.IsAdmin ? null : (
       <div>
         <Button active={this.IsAdding}
-          bsStyle="success" bsSize="small" onClick={this.toggleAdding}>
+          bsStyle="success" bsSize="small"
+          onClick={this.addNewGroup}>
           <FAIcon name="plus" className="color-green" /> add new group
         </Button>
       </div>
@@ -125,12 +136,23 @@ export default class GroupList extends Component {
   }
 
   makeGroupsList() {
-    const list = _.sortBy(groups, group => -group.updatedAt);
+    const { 
+      groups,
+      findUnassignedUsers,
+      getUsersByGroup,
+
+      addUserToGroup,
+      deleteUserFromGroup
+    } = this.props;
+
+    const idList = sortBy(Object.keys(groups), 
+      groupId => -groups[groupId].updatedAt);
     const addableUsers = findUnassignedUsers();
 
     return (<ListGroup> {
-      _.map(list, (group, groupId) => {
-        const existingUsers = getUsersByGroup(id);
+      map(idList, (groupId) => {
+        const group = groups[groupId];
+        const existingUsers = getUsersByGroup(groupId);
 
         return (<GroupView key={groupId + ''} 
           {...{
@@ -143,7 +165,8 @@ export default class GroupList extends Component {
             addUserToGroup,
             deleteUserFromGroup,
 
-            groupEditor: this.makeGroupEditorEl(group, groupId, 
+            groupEditor: this.makeGroupEditorEl(
+              group, groupId, 
               existingUsers, addableUsers)
           }} />);
       })
@@ -157,12 +180,10 @@ export default class GroupList extends Component {
       //userInfoRef,
       //groupsRef,
 
-      addGroup,
       updateGroup,
       deleteGroup,
 
       getUsersByGroup,
-      findUnassignedUsers,
 
       addUserToGroup,
       deleteUserFromGroup

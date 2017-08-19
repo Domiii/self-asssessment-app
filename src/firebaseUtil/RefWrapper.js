@@ -552,7 +552,7 @@ function createRefWrapperBase() {
         pathOrPaths : [pathOrPaths];
 
       const children = paths.map(path => 
-        getData(path)
+        this.getData(path)
       );
 
       return children;

@@ -64,7 +64,7 @@ class GroupPage extends Component {
     //console.log(this.context.currentUserRef, this.context.currentUserRef.isAdminDisplayMode());
 
     return (
-      <GroupList />
+      <GroupList groups={this.props.groupsRef.val} />
     );
   }
 }

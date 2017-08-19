@@ -218,6 +218,7 @@ class M2MExplicitIndex {
     this.leftIndexRef = IndexRef.left(this._firebaseDataRoot);
     this.rightIndexRef = IndexRef.right(this._firebaseDataRoot);
 
+    autoBind(this);
 
     this[`get_${leftName}_by_${rightName}`] = this.getLeftEntriesByRightId;
     this[`get_${rightName})_by_${rightName}`] = this.getRightEntriesByLeftId;
@@ -225,8 +226,6 @@ class M2MExplicitIndex {
     this[`findUnassigned_${leftName}_entries`] = this.findUnassignedLeftEntries;
     this[`findUnassigned_${rightName}_ids`] = this.findUnassignedRightIds;
     this[`findUnassigned_${rightName}_entries`] = this.findUnassignedRightEntries
-
-    autoBind(this);
   }
 
   * findUnassignedLeftIds() {
@@ -281,9 +280,7 @@ class M2MExplicitIndex {
     }
   }
 
-  findUnassignedLeftEntries() {
-    const leftData = this.leftIndexRef.val;
-  }
+  // TODO: These are all wrong!
 
   getLeftIdsByRightId(rightIds) {
     const leftIds = this.rightIndexRef.getAllData(rightIds);
