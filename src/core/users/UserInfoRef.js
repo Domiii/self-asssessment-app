@@ -57,22 +57,24 @@ const UserInfoRef = makeRefWrapper({
 
           // TODO: Separate data writes
 
-          if (this.isLoggedIn() && this.isLoaded && !this.data()) {
-            // user logged in and but no record of user data
-            // -> get user data and add to userInfo DB
-            // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
-            let userData = auth.providerData && auth.providerData.length && 
-              auth.providerData[0];
-            if (!userData) {
-              userData = {
-                displayName: auth.displayName || 'unknown',
-                email: auth.email
-              };
-            }
+          setTimeout(() => {
+            if (this.isLoggedIn() && this.isLoaded && !this.data()) {
+              // user logged in and but no record of user data
+              // -> get user data and add to userInfo DB
+              // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
+              let userData = auth.providerData && auth.providerData.length && 
+                auth.providerData[0];
+              if (!userData) {
+                userData = {
+                  displayName: auth.displayName || 'unknown',
+                  email: auth.email
+                };
+              }
 
-            console.log("Writing user data: " + JSON.stringify(userData));
-            return this.setUserData(userData);
-          }
+              console.log("Writing user data: " + JSON.stringify(userData));
+              return this.setUserData(userData);
+            }
+          });
         },
 
         updateUser(userFormData) {

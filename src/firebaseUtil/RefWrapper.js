@@ -493,7 +493,7 @@ function createRefWrapperBase() {
 
     get val() {
       let val = this._getData();
-      if (this._groupBy) {
+      if (isLoaded(val) && this._groupBy) {
         // for groups, get data from all children and merge them together
         val = mapValues(this._childrenGetPaths, getChildPath => {
             // TODO: get correct child path
