@@ -653,19 +653,33 @@ function createRefWrapperBase() {
       return this._doPush(this.getRef(path), newChild);
     }
 
-    set(val) {
+    _doSet(val) {
       const ref = this._ref;
       try {
         return (
           this.onBeforeWrite(val) &&
           this.onUpdate(val) &&
           this.onFinalizeWrite(val) &&
+
           ref.set(val)
-          .then(() => this.onAfterWrite('set', this.val))
+            .then(() => this.onAfterWrite('set', this.val))
         );
       }
       catch (err) {
         this._onError('set', ref, err);
+      }
+    }
+
+    set(val) {
+      if (this._groupBy) {
+        return Promise.all(map(this._childrenGetPushPaths, 
+          (childPath, childName) => 
+            val[childName] && this[`set_${childName}`](val[childName])
+          ).filter(promise => !!promise)
+        );
+      }
+      else {
+        return this._doSet(val);
       }
     }
 
@@ -694,7 +708,7 @@ function createRefWrapperBase() {
       }
     }
 
-    update(val) {
+    _doUpdate(val) {
       const ref = this._ref;
       try {
         return (
@@ -715,6 +729,18 @@ function createRefWrapperBase() {
       }
       catch (err) {
         this._onError('update', ref, err);
+      }
+    }
+
+    update(val) {
+      if (this._groupBy) {
+        return Promise.all(map(this._childrenGetPushPaths, 
+          (childPath, childName) => 
+            val[childName] && this[`update_${childName}`](val[childName])
+        ).filter(promise => !!promise));
+      }
+      else {
+        return this._doUpdate(val);
       }
     }
 

@@ -28,26 +28,15 @@ class _UserForm extends Component {
 
     return (
       <form className="form-horizontal" onSubmit={handleSubmit}>
-        {(isAdmin && <FormInputField name="private.displayRole" label="display role"
-          inputProps={{component:'select'}}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
-        >
-          <option value={1}>Student</option>
-          <option value={5}>Admin</option>
-        </FormInputField>)}
-        <FormInputField name="private.data.displayName" label="display name"
+        <FormInputField name="public.displayName" label="display name"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="private.data.photoURL" label="photo URL"
+        <FormInputField name="public.photoURL" label="photo URL"
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="private.data.email" label="email"
-          inputProps={{type: 'email', component:'input'}}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
-        />
-        <FormInputField name="private.locale" label="language"
+        <FormInputField name="public.locale" label="language"
           inputProps={{component:'select'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         >
@@ -96,8 +85,11 @@ export default class UserProfilePage extends Component {
     }
 
     const userInfo = currentUserRef && currentUserRef.val;
+    const userVals = {
+      public: userInfo.public
+    };
     return (
-      <UserForm onSubmit={this.updateUser} initialValues={userInfo} />
+      <UserForm onSubmit={this.updateUser} initialValues={userVals} />
     );
   }
 }

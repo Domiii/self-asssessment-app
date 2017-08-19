@@ -58,7 +58,7 @@ const UserInfoRef = makeRefWrapper({
           // TODO: Separate data writes
 
           setTimeout(() => {
-            if (this.isLoggedIn() && this.isLoaded && !this.data()) {
+            if (this.isLoggedIn() && this.isLoaded && !this.public() && !this.private()) {
               // user logged in and but no record of user data
               // -> get user data and add to userInfo DB
               // see: https://firebase.google.com/docs/reference/js/firebase.UserInfo
@@ -96,9 +96,9 @@ const UserInfoRef = makeRefWrapper({
           pushPathTemplate: 'public',
 
           children: {
-            role: 'role',
             displayName: 'displayName',
-            photoURL: 'photoURL'
+            photoURL: 'photoURL',
+            locale: 'locale'
           }
         },
 
@@ -107,10 +107,10 @@ const UserInfoRef = makeRefWrapper({
           pushPathTemplate: 'private',
 
           children: {
+            role: 'role',
             displayRole: 'displayRole',
 
             data: 'data',   // personal user data (we copy this from firebase auth on first use)
-            locale: 'data/locale',
 
             // TODO: Put this into a different path. Personal user settings don't belong with account data.
             prefs: {    // some UI user preferences
