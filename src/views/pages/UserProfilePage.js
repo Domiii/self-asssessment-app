@@ -16,6 +16,8 @@ import { LoadOverlay } from 'src/views/components/overlays';
 
 import _ from 'lodash';
 
+//TODO: Fix this!
+
 class _UserForm extends Component {
   static contextTypes = {
     currentUserRef: PropTypes.object

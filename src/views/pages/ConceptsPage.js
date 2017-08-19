@@ -264,13 +264,13 @@ export default class ConceptsPage extends Component {
   wrapPromise(promise) {
     //this.setState({busy: true});
     return promise
-    .then(() => {
-      this.setState({busy: false, error: null});
-    })
-    .catch((err) => {
-      console.error(err);
-      this.setState({busy: false, error: err});
-    });
+      .then(() => {
+        this.setState({busy: false, error: null});
+      })
+      .catch((err) => {
+        console.error(err);
+        this.setState({busy: false, error: err});
+      });
   }
 
 

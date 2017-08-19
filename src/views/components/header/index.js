@@ -63,7 +63,7 @@ export default class Header extends PureComponent {
 
   toggleAdminView() {
     const { currentUserRef } = this.context;
-    currentUserRef.set_adminDisplayMode(!currentUserRef.isAdminDisplayMode());
+    currentUserRef.setAdminDisplayMode(!currentUserRef.isAdminDisplayMode());
   }
 
   render() {

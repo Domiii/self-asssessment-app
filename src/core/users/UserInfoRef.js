@@ -30,6 +30,10 @@ const UserInfoRef = makeRefWrapper({
           return lookupLocalized(this.locale(), obj, entry);
         },
 
+        setAdminDisplayMode(enabled) {
+          return this.set_displayRole(enabled ? 5 : 1);
+        },
+
         setUserData(userData) {
           const updates = [];
 
@@ -87,6 +91,7 @@ const UserInfoRef = makeRefWrapper({
       children: {
         public: {
           pathTemplate: 'public/$(uid)',
+          pushPathTemplate: 'public',
 
           children: {
             role: 'role',
@@ -97,6 +102,7 @@ const UserInfoRef = makeRefWrapper({
 
         private: {
           pathTemplate: 'private/$(uid)',
+          pushPathTemplate: 'private',
 
           children: {
             displayRole: 'displayRole',

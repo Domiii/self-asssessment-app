@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 function validate(users) {
   if (!!users.public || !!users.private) {
-    throw new Error('Migration already finished');
+    throw new Error('Migration already finished: "public" or "private" children already exist');
   }
 }
 

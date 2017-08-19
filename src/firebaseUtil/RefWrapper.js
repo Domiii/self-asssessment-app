@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import forEach from 'lodash/forEach';
+import first from 'lodash/first';
+import tail from 'lodash/tail';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import isArray from 'lodash/isArray';
@@ -275,7 +277,7 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
 
   // some configuration parameters only affect the current config node
   let { 
-    pathTemplate, children,
+    pathTemplate, pushPathTemplate, children,
     // static, // cannot get static here because it's a reserved keyword
     methods, inheritedMethods, cascadingMethods,
     groupBy
@@ -294,11 +296,14 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
     pathJoin(parent.pathTemplate, relativePathTemplate) || 
     relativePathTemplate;
 
+  pushPathTemplate = pushPathTemplate || pathTemplate;
+
   indices = makeIndices(indices || {});
 
   const variableTransform = indices.encodeQueryValue.bind(indices);
   const getPath = createPathGetterFromTemplateProps(pathTemplate, variableTransform);
   const getRelativePath = createPathGetterFromTemplateArray(relativePathTemplate, variableTransform);
+  const getRelativePushPath = createPathGetterFromTemplateArray(pushPathTemplate, variableTransform);
   const getChildVars = createChildVarGetterFromTemplateProps(pathTemplate, groupBy);
   const WrapperClass = createRefWrapperBase();
 
@@ -309,7 +314,9 @@ function _makeRefWrapper(parent, inheritedSettings, cfgOrPath) {
   }
   func.parent = parent;
   func.getPath = getPath;
+  func.getPushPath = getRelativePushPath;
   func.getRelativePath = getRelativePath;
+  func.getRelativePushPath = getRelativePushPath;
   func.getChildVars = getChildVars;
   func.relativePathTemplate = relativePathTemplate;
   func.pathTemplate = pathTemplate;
@@ -413,15 +420,20 @@ function createWrapperFunc(parent, WrapperClass, getPath, groupBy, getChildVars)
     const queryArgs = makeQueryArgs.length && makeQuery(...makeQueryArgs) || null;
 
     // for groups, make sure, we get instance to chidren
-    let childArgs, childrenWrappers, children;
+    let childArgs, childrenWrappers, 
+      childrenGetPaths, childrenGetPushPaths;
+
     if (groupBy) {
       childArgs = getChildVars(pathArgs);
       childrenWrappers = f.childrenWrappers;
       childrenGetPaths = mapValues(childrenWrappers, childF => {
         return childF.getRelativePath;
       });
+      childrenGetPushPaths = mapValues(childrenWrappers, childF => {
+        return childF.getRelativePushPath;
+      });
 
-      // children = childrenWrappers.map(childF => {
+      // childrenGetPaths = childrenWrappers.map(childF => {
       //   return childF(firebaseDataRoot, props, pathArgs, ...makeQueryArgs);
       // });
     }
@@ -435,7 +447,8 @@ function createWrapperFunc(parent, WrapperClass, getPath, groupBy, getChildVars)
     const refWrapper = new WrapperClass(
       parent, path, firebaseDataRoot, 
       relativePathTemplate,
-      db, getData, groupBy, childArgs, childrenGetPaths, ref, props
+      db, getData, groupBy, childArgs,
+      childrenGetPaths, childrenGetPushPaths, ref, props
     );
     return refWrapper;
   };
@@ -444,8 +457,11 @@ function createWrapperFunc(parent, WrapperClass, getPath, groupBy, getChildVars)
 
 function createRefWrapperBase() {
   class RefWrapperBase {
-    constructor(parent, path, firebaseDataRoot, relativePathTemplate, db, 
-      getData, groupBy, childArgs, childrenGetPaths, ref, props) {
+    constructor(parent, path, firebaseDataRoot, 
+      relativePathTemplate, db, 
+      getData, groupBy, childArgs, 
+      childrenGetPaths, childrenGetPushPaths, 
+      ref, props) {
 
       this.parent = parent;
       this.path = path;
@@ -462,6 +478,7 @@ function createRefWrapperBase() {
 
       this._groupBy = groupBy;
       this._childrenGetPaths = childrenGetPaths;
+      this._childrenGetPushPaths = childrenGetPushPaths;
       this._childArgs = childArgs;
 
       if (_.isFunction(this.updateProps)) {
@@ -480,7 +497,7 @@ function createRefWrapperBase() {
         // for groups, get data from all children and merge them together
         val = mapValues(this._childrenGetPaths, getChildPath => {
             // TODO: get correct child path
-            const path = getChildPath(this._childArgs);
+            const path = getChildPath(...this._childArgs);
             return this.getDataIn(val, path);
           });
       }
@@ -583,14 +600,22 @@ function createRefWrapperBase() {
       throw new Error(`${action} (at ${ref})\n${err.stack}`);
     }
 
+    _doPushChild(val, childName, childPath) {
+      const ref = this.getRef(childPath);
+      return this._doPush(ref, val[childName]);
+    }
+
     _doPush(ref, newChild) {
       try {
-        const newRef = this.onBeforeWrite() && 
+        const pushCheck = this.onBeforeWrite() && 
           this.onPush(newChild) &&
-          this.onFinalizeWrite(newChild) &&
-          ref.push(newChild);
+          this.onFinalizeWrite(newChild);
 
-        //newRef.then(() => this.onAfterWrite('push', newChild));
+        if (pushCheck) {
+          const newRef = ref.push(newChild);
+          //newRef.then(() => this.onAfterWrite('push', newChild));
+          return newRef;
+        }
         return newRef;
       }
       catch (err) {
@@ -599,7 +624,28 @@ function createRefWrapperBase() {
     }
 
     push(newChild) {
-      return this._doPush(this._ref, newChild);
+      if (this._groupBy) {
+        const childrenPathsArr = Object.entries(this._childrenGetPushPaths);
+        const firstEntry = first(childrenPathsArr);
+        const otherEntries = tail(childrenPathsArr);
+
+        return this._doPushChild(newChild, ...firstEntry).
+          then(childRef => {
+            // TODO: Handle more complex grouping scenarios
+            const newId = childRef.key;
+            const otherChildren = 
+              otherEntries.map(([childName, childPath]) => 
+                this[`set_${childName}`](newChild[childName])
+              );
+            return Promise.all([
+              childRef,
+              ...otherChildren
+            ]);
+          });
+      }
+      else {
+        return this._doPush(this._ref, newChild);
+      }
     }
 
     pushChild(path, newChild) {
