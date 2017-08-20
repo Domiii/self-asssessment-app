@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import autoBind from 'react-autobind';
 import Moment from 'react-moment';
 import {
-  Alert, Badge, ListGroup, ListGroupItem,
+  Alert, Button, Badge, ListGroup, ListGroupItem,
   Grid, Row, Col
 } from 'react-bootstrap';
 
@@ -16,11 +16,15 @@ import ConfirmModal from 'src/views/components/util/ConfirmModal';
 import UserList from 'src/views/components/users/UserList';
 
 import { 
-  Field, reduxForm, FormSection, FieldArray
+  Field, reduxForm, FormSection
 } from 'redux-form';
 
+import { 
+  FormInputField, FormInputFieldArray, FAIcon
+} from 'src/views/components/util';
 
-class _GroupInfoForm extends Component {
+
+class _GroupInfoFormContent extends Component {
   static contextTypes = {
     currentUserRef: PropTypes.object
   };
@@ -37,43 +41,41 @@ class _GroupInfoForm extends Component {
     const isAdmin = currentUserRef && 
       currentUserRef.isAdmin();
 
-    return (
-      <form className="form-horizontal" onSubmit={handleSubmit}>
-        <FormInputField name="title_en" label="Title (English)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="title_zh" label="Title (中文)"
-          type="text" component="input"
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="description_en" label="Description (English)"
-          component="textarea"
-          inputProps={{rows: '15'}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name="description_zh" label="Description (中文)"
-          component="textarea"
-          inputProps={{rows: '15'}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
-        />
+    return (<form className="form-horizontal" onSubmit={handleSubmit}>
+      <FormInputField name="title_en" label="Title (English)"
+        type="text" component="input"
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="title_zh" label="Title (中文)"
+        type="text" component="input"
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="description_en" label="Description (English)"
+        component="textarea"
+        inputProps={{rows: '15'}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
+      <FormInputField name="description_zh" label="Description (中文)"
+        component="textarea"
+        inputProps={{rows: '15'}}
+        labelProps={{xs: 2, className: 'no-padding'}}
+        inputColProps={{xs: 10, className: 'no-padding'}}
+      />
 
-        <div>
-          <Button type="submit" disabled={pristine || submitting}>
-            {<span><FAIcon name="upload" className="color-green" /> save</span>}
-          </Button>
-          <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
-        </div>
-      </form>
-    );
+      <div>
+        <Button type="submit" disabled={pristine || submitting}>
+          {<span><FAIcon name="upload" className="color-green" /> save</span>}
+        </Button>
+        <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
+      </div>
+    </form>);
   }
 }
 
-_GroupInfoForm = reduxForm({ enableReinitialize: true })(_GroupInfoForm);
+const _GroupInfoForm = reduxForm({ enableReinitialize: true })(_GroupInfoFormContent);
 
 export const GroupInfoForm = connect(
   (state, { group, groupId }) => {

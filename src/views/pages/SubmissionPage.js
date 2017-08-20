@@ -12,11 +12,10 @@ import autoBind from 'react-autobind';
 import { 
   Alert, Button, Jumbotron, Well, Panel
 } from 'react-bootstrap';
-import { Field, reduxForm } from 'redux-form';
 import {
   LinkContainer
 } from 'react-router-bootstrap';
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { SimpleGrid, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 import { SubmissionList } from 'src/views/components/submissions';
 

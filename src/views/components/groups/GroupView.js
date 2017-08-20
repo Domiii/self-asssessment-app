@@ -59,10 +59,6 @@ export default class GroupView extends Component {
     });
   }
 
-  deleteThisGroup() {
-    this.props.deleteGroup();
-  }
-
   editorHeader() {
     const { 
       group
@@ -100,8 +96,6 @@ export default class GroupView extends Component {
       (<UserList users={users} />);
 
     return (<div>
-      { this.editorHeader() }
-
       <li className="list-group-item">
         <h4 className="list-group-item-heading">
           { lookupLocalized(group, 'title') }
@@ -109,7 +103,7 @@ export default class GroupView extends Component {
         <Well>
           { lookupLocalized(group, 'description') }
         </Well>
-        <Moment fromNow>{updatedAt}</Moment>
+        <Moment fromNow>{group.updatedAt}</Moment>
         <div>
           { userEls }
         </div>

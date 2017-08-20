@@ -280,26 +280,22 @@ class M2MExplicitIndex {
     }
   }
 
-  // TODO: These are all wrong!
-
   getLeftIdsByRightId(rightIds) {
-    const leftIds = this.rightIndexRef.getAllData(rightIds);
-    return Object.keys(leftIds);
+    return this.rightIndexRef.getAllData(rightIds);
   }
 
   getRightIdsByLeftId(leftIds) {
-    const rightIds = this.leftIndexRef.getAllData(leftIds);
-    return Object.keys(rightIds);
+    return this.leftIndexRef.getAllData(leftIds);
   }
 
   getLeftEntriesByRightId(rightIds) {
     const leftIds = this.getLeftIdsByRightId(rightIds);
-    return this.leftEntryRef.getAllData(leftIds);
+    return this.leftEntryRef.getAllData(Object.values(leftIds));
   }
 
   getRightEntriesByLeftId(leftIds) {
     const rightIds = this.getRightIdsByLeftId(leftIds);
-    return this.rightEntryRef.getAllData(rightIds);
+    return this.rightEntryRef.getAllData(Object.values(rightIds));
   }
 
   addEntry(entry) {

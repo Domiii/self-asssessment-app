@@ -7,14 +7,27 @@ import {
 
 
 
-function RenderUserDefault(user) {
-  return (<Badge>user.displayName</Badge>);
+class RenderUserDefault extends Component {
+  static propTypes = {
+    user: PropTypes.object.isRequired,
+    uid: PropTypes.string.isRequired,
+    childProps: PropTypes.any
+  }
+
+  render() {
+    const {
+      user,
+      childProps
+    } = this.props;
+
+    return (<Badge {...childProps}>{user.displayName}</Badge>);
+  }
 }
 
 export default class UserList extends Component {
   static propTypes = {
     users: PropTypes.object.isRequired,
-    renderUser: PropTypes.element.isRequired
+    renderUser: PropTypes.element
   };
 
   render() {
@@ -23,13 +36,16 @@ export default class UserList extends Component {
       renderUser
     } = this.props;
 
-    renderUser = renderUser || RenderUserDefault;
+    //const RenderUser = renderUser || RenderUserDefault;
+    const RenderUser = RenderUserDefault;
+    console.log(users);
 
-    return (map(users, (user, uid) => (
-        <span key={uid}>
-          { <renderUser user={user} uid={uid} /> }
+    return (<div>
+      {map(users, (user, uid) => (
+        !user ? null : <span key={uid}>
+          { <RenderUser user={user} uid={uid} /> }
         </span>
-      ))
-    );
+      ))}
+    </div>);
   }
 }

@@ -6,6 +6,8 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
+import reduce from 'lodash/reduce';
+import extend from 'lodash/extend';
 
 import autoBind from 'src/util/auto-bind';
 
@@ -551,11 +553,15 @@ function createRefWrapperBase() {
       const paths = isArray(pathOrPaths) ? 
         pathOrPaths : [pathOrPaths];
 
-      const children = paths.map(path => 
-        this.getData(path)
-      );
+      // TODO: getData not quite working here?
+      console.log(this.getData(paths[0]));
 
-      return children;
+      // create object where paths as keys and data as values
+      return reduce(paths, 
+        (returnObj, path) => 
+          extend(returnObj, {
+            [path]: this.getData(path)
+          }), {});
     }
 
     getRef(path) {

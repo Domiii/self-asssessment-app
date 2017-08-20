@@ -8,11 +8,10 @@ import { connect } from 'react-redux';
 import { 
   Alert, Button, Jumbotron, Well
 } from 'react-bootstrap';
-import { Field, reduxForm } from 'redux-form';
 import {
   LinkContainer
 } from 'react-router-bootstrap';
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { SimpleGrid, FAIcon } from 'src/views/components/util';
 import { LoadOverlay } from 'src/views/components/overlays';
 import { NotificationList } from 'src/views/components/notifications';
 
