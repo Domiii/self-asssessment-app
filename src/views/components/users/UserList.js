@@ -27,7 +27,10 @@ class RenderUserDefault extends Component {
 export default class UserList extends Component {
   static propTypes = {
     users: PropTypes.object.isRequired,
-    renderUser: PropTypes.element
+    renderUser: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.element
+    ])
   };
 
   render() {
@@ -36,9 +39,7 @@ export default class UserList extends Component {
       renderUser
     } = this.props;
 
-    //const RenderUser = renderUser || RenderUserDefault;
-    const RenderUser = RenderUserDefault;
-    console.log(users);
+    const RenderUser = renderUser || RenderUserDefault;
 
     return (<div>
       {map(users, (user, uid) => (

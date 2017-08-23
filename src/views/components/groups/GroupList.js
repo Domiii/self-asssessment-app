@@ -29,7 +29,7 @@ import GroupEditor from './GroupEditor';
     //userGroupRef,
     
     addGroup: groupsRef.push_group,
-    updateGroup: groupsRef.update_group,
+    setGroup: groupsRef.set_group,
     deleteGroup: groupsRef.delete_group,
 
     getUsersByGroup: userGroupRef.get_user_by_group,
@@ -48,7 +48,7 @@ export default class GroupList extends Component {
     //users: PropTypes.object.isRequired,
 
     addGroup: PropTypes.func.isRequired,
-    updateGroup: PropTypes.func.isRequired,
+    setGroup: PropTypes.func.isRequired,
     deleteGroup: PropTypes.func.isRequired,
 
     getUsersByGroup: PropTypes.func.isRequired,
@@ -102,13 +102,13 @@ export default class GroupList extends Component {
     );
   }
 
-  makeGroupEditorEl(group, groupId, existingUsers, addableUsers) {
+  makeGroupEditorEl(groupId, group, existingUsers, addableUsers) {
     if (!this.IsAdmin) {
       return null;
     }
 
     const {
-        updateGroup,
+        setGroup,
         addUserToGroup,
         deleteUserFromGroup
       } = this.props;
@@ -119,8 +119,9 @@ export default class GroupList extends Component {
       existingUsers,
       addableUsers,
 
-      updateGroup: ({groupId, group}) => {
-        return updateGroup(groupId, group);
+      setGroup: ({groupId, group}) => {
+        console.log(groupId, group);
+        return setGroup(groupId, group);
       },
       addUserToGroup,
       deleteUserFromGroup
@@ -142,19 +143,22 @@ export default class GroupList extends Component {
       getUsersByGroup,
 
       addUserToGroup,
+      deleteGroup,
+      
       deleteUserFromGroup
     } = this.props;
 
     const idList = sortBy(Object.keys(groups), 
       groupId => -groups[groupId].updatedAt);
     const addableUsers = findUnassignedUsers();
+    console.log(addableUsers);
 
     return (<ListGroup> {
       map(idList, (groupId) => {
         const group = groups[groupId];
         const existingUsers = getUsersByGroup(groupId);
 
-        return (<GroupView key={groupId + ''} 
+        return (<GroupView key={groupId} 
           {...{
             groupId,
             group,
@@ -163,10 +167,12 @@ export default class GroupList extends Component {
             //groupsRef,
 
             addUserToGroup,
+            deleteGroup,
+
             deleteUserFromGroup,
 
             groupEditor: this.makeGroupEditorEl(
-              group, groupId, 
+              groupId, group,
               existingUsers, addableUsers)
           }} />);
       })
@@ -180,7 +186,7 @@ export default class GroupList extends Component {
       //userInfoRef,
       //groupsRef,
 
-      updateGroup,
+      setGroup,
       deleteGroup,
 
       getUsersByGroup,

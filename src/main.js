@@ -18,7 +18,10 @@ import { browserHistory } from 'react-router';
 import { 
   syncHistoryWithStore
 } from 'react-router-redux';
-import { firebaseConfigs, reduxFirebaseConfig } from 'src/config/firebase.cfg'
+import { 
+  firebaseConfigs, 
+  reduxFirebaseConfig
+} from 'src/config/firebase.cfg'
 
 
 import configureStore from './core/store';
@@ -29,10 +32,23 @@ import { getFirebase } from 'react-redux-firebase';
 
 import { LoadOverlay } from 'src/views/components/overlays';
 
+// choose config
+let firebaseConfig;
+
+if (process.env.NODE_ENV !== 'production') {
+  firebaseConfig = firebaseConfigs.test;
+}
+else {
+  firebaseConfig = firebaseConfigs.production;
+}
+
 // GO!
-const store = configureStore(firebaseConfigs, reduxFirebaseConfig);
+const store = configureStore(firebaseConfig, reduxFirebaseConfig);
 const syncedHistory = syncHistoryWithStore(browserHistory, store);
 const rootElement = document.getElementById('root');
+
+
+console.log(`starting app using database "${firebaseConfig.projectId}"`);
 
 
 if (module.hot) {

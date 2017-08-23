@@ -19,12 +19,12 @@ import GroupList from 'src/views/components/groups/GroupList';
 
 
 @firebaseConnect((props, firebase) => {
-  const queries = [
-    //UserInfoRef.makeQuery(),
+  const paths = [
     GroupsRef.makeQuery()
   ];
-  UserGroupRef.addIndexQueries(queries);
-  return queries;
+  UserInfoRef.addQuery(paths);
+  UserGroupRef.addIndexQueries(paths);
+  return paths;
 })
 @connect(({ firebase }, props) => {
   const userGroupRef = UserGroupRef(firebase);

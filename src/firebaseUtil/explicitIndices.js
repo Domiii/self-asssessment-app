@@ -3,10 +3,12 @@ import isString from 'lodash/isString';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
+import pickBy from 'lodash/pickBy';
 
 import autoBind from 'src/util/auto-bind';
 
 import { pathJoin } from 'src/util/pathUtil';
+import { EmptyObject, EmptyArray } from 'src/util';
 
 import { 
   makeRefWrapper,
@@ -228,56 +230,74 @@ class M2MExplicitIndex {
     this[`findUnassigned_${rightName}_entries`] = this.findUnassignedRightEntries
   }
 
-  * findUnassignedLeftIds() {
+  findUnassignedLeftIds() {
     const leftIndexData = this.leftIndexRef.val;
-    const leftData = this.leftRef.val;
+    const leftData = this.leftEntryRef.val;
 
-    for (let leftId in leftData) {
-      if (isEmpty(leftIndexData[leftId])) {
-        yield leftId;
-      }
+    if (!leftData) {
+      return EmptyArray;
     }
+
+    if (!leftIndexData) {
+      // no object indexed yet
+      return Object.keys(leftData);
+    }
+
+    return Object.keys(leftData).filter(leftId =>
+      isEmpty(leftIndexData[leftId]));
   }
 
-  * findUnassignedLeftEntries() {
+  findUnassignedLeftEntries() {
     const leftIndexData = this.leftIndexRef.val;
-    const leftData = this.leftRef.val;
-    const leftName = this.leftName
+    const leftData = this.leftEntryRef.val;
+    const leftName = this.leftName;
 
-    for (let leftId in leftData) {
-      if (isEmpty(leftIndexData[leftId])) {
-        yield {
-          id: leftId,
-          [leftName]: leftData[leftId]
-        };
-      }
+    if (!leftData) {
+      return EmptyObject;
     }
+
+    if (!leftIndexData) {
+      // no object indexed yet
+      return leftData;
+    }
+
+    return pickBy(leftData, (leftData, leftId) =>
+      isEmpty(leftIndexData[leftId]));
   }
 
-  * findUnassignedRightIds() {
+  findUnassignedRightIds() {
     const rightIndexData = this.rightIndexRef.val;
-    const rightData = this.rightRef.val;
+    const rightData = this.rightEntryRef.val;
 
-    for (let rightId in rightData) {
-      if (isEmpty(rightIndexData[rightId])) {
-        yield rightId;
-      }
+    if (!rightData) {
+      return EmptyArray;
     }
+
+    if (!rightIndexData) {
+      // no object indexed yet
+      return Object.keys(rightData);
+    }
+
+    return Object.keys(rightData).filter(rightId =>
+      isEmpty(rightIndexData[rightId]));
   }
 
-  * findUnassignedRightEntries() {
+  findUnassignedRightEntries() {
     const rightIndexData = this.rightIndexRef.val;
-    const rightData = this.rightRef.val;
+    const rightData = this.rightEntryRef.val;
     const rightName = this.rightName;
 
-    for (let rightId in rightData) {
-      if (isEmpty(rightIndexData[rightId])) {
-        yield {
-          id: rightId,
-          [rightName]: rightData[rightId]
-        };
-      }
+    if (!rightData) {
+      return EmptyObject;
     }
+
+    if (!rightIndexData) {
+      // no object indexed yet
+      return rightData;
+    }
+    
+    return pickBy(rightData, (rightData, rightId) =>
+      isEmpty(rightIndexData[rightId]));
   }
 
   getLeftIdsByRightId(rightIds) {
@@ -290,12 +310,20 @@ class M2MExplicitIndex {
 
   getLeftEntriesByRightId(rightIds) {
     const leftIds = this.getLeftIdsByRightId(rightIds);
-    return this.leftEntryRef.getAllData(Object.values(leftIds));
+    const leftValues = Object.values(leftIds).filter(v => !!v);
+    if (isEmpty(leftValues)) {
+      return EmptyObject;
+    }
+    return this.leftEntryRef.getAllData(leftValues);
   }
 
   getRightEntriesByLeftId(leftIds) {
     const rightIds = this.getRightIdsByLeftId(leftIds);
-    return this.rightEntryRef.getAllData(Object.values(rightIds));
+    const rightValues = Object.values(rightIds).filter(v => !!v);
+    if (isEmpty(rightValues)) {
+      return EmptyObject;
+    }
+    return this.rightEntryRef.getAllData(rightValues);
   }
 
   addEntry(entry) {

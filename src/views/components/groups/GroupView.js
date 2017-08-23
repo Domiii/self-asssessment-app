@@ -23,7 +23,8 @@ export default class GroupView extends Component {
 
   static propTypes = {
     group: PropTypes.object.isRequired,
-    users: PropTypes.object.isRequired
+    users: PropTypes.object.isRequired,
+    deleteGroup: PropTypes.func
   };
 
   constructor() {
@@ -61,7 +62,8 @@ export default class GroupView extends Component {
 
   editorHeader() {
     const { 
-      group
+      group,
+      deleteGroup
     } = this.props;
 
     return !this.IsAdmin ? null : (
@@ -98,8 +100,9 @@ export default class GroupView extends Component {
     return (<div>
       <li className="list-group-item">
         <h4 className="list-group-item-heading">
-          { lookupLocalized(group, 'title') }
+          { lookupLocalized(group, 'title') || '<unnamed group>' }
         </h4>
+        { this.editorHeader() }
         <Well>
           { lookupLocalized(group, 'description') }
         </Well>
@@ -107,7 +110,7 @@ export default class GroupView extends Component {
         <div>
           { userEls }
         </div>
-        { groupEditor }
+        { !this.IsEditing ? null : groupEditor }
       </li>
     </div>);
   }

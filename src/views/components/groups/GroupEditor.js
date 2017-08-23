@@ -29,11 +29,17 @@ class _GroupInfoFormContent extends Component {
     currentUserRef: PropTypes.object
   };
 
+  static propTypes = {
+    groupId: PropTypes.string.isRequired
+  };
+
   render() {
     const { currentUserRef } = this.context;
-    const { 
+    const {
+      groupId,
+
       handleSubmit,
-      pristine, 
+      pristine,
       reset, 
       submitting 
     } = this.props;
@@ -42,35 +48,38 @@ class _GroupInfoFormContent extends Component {
       currentUserRef.isAdmin();
 
     return (<form className="form-horizontal" onSubmit={handleSubmit}>
-      <FormInputField name="title_en" label="Title (English)"
-        type="text" component="input"
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-      />
-      <FormInputField name="title_zh" label="Title (中文)"
-        type="text" component="input"
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-      />
-      <FormInputField name="description_en" label="Description (English)"
-        component="textarea"
-        inputProps={{rows: '15'}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-      />
-      <FormInputField name="description_zh" label="Description (中文)"
-        component="textarea"
-        inputProps={{rows: '15'}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-      />
+      <Field name="groupId" value={groupId} component="input" type="hidden" />
+      <FormSection name="group">
+        <FormInputField name="title_en" label="Title (English)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name="title_zh" label="Title (中文)"
+          type="text" component="input"
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name="description_en" label="Description (English)"
+          component="textarea"
+          inputProps={{rows: '15'}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
+        <FormInputField name="description_zh" label="Description (中文)"
+          component="textarea"
+          inputProps={{rows: '15'}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+        />
 
-      <div>
-        <Button type="submit" disabled={pristine || submitting}>
-          {<span><FAIcon name="upload" className="color-green" /> save</span>}
-        </Button>
-        <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
-      </div>
+        <div>
+          <Button type="submit" disabled={pristine || submitting}>
+            {<span><FAIcon name="upload" className="color-green" /> save</span>}
+          </Button>
+          <Button disabled={pristine || submitting} onClick={reset}>reset</Button>
+        </div>
+      </FormSection>
     </form>);
   }
 }
@@ -101,8 +110,9 @@ function makeExistingUserEl(deleteUserFromGroup) {
     <ConfirmModal
       header="Delete user from group?"
       body={(<span>{user.displayName}</span>)}
-      buttonFn={DeleteUserButton}
-      onConfirm={() => deleteUserFromGroup(uid)}
+      ButtonCreator={DeleteUserButton}
+      onConfirm={deleteUserFromGroup}
+      confirmArgs={uid}
     />
   </Badge>);
 }
@@ -120,8 +130,9 @@ function makeAddUserEl(addUserToGroup) {
     <ConfirmModal
       header="Add user to group?"
       body={(<span>{user.displayName}</span>)}
-      buttonFn={AddUserButton}
-      onConfirm={() => addUserToGroup(uid)}
+      ButtonCreator={AddUserButton}
+      onConfirm={addUserToGroup}
+      confirmArgs={uid}
     />
   </Badge>);
 }
@@ -154,8 +165,9 @@ export function AddUserEl({user, uid}) {
       data={{user, uid}}
       header="Add user to group?"
       body={(<span>{user.displayName}</span>)}
-      buttonFn={this.deleteUserEl}
+      ButtonCreator={this.deleteUserEl}
       onConfirm={this.onUserDeleted}
+      confirmArgs={uid}
     />
   </span>);
 }
@@ -169,7 +181,7 @@ export default class GroupEditor extends Component {
     existingUsers: PropTypes.object.isRequired,
     addableUsers: PropTypes.object.isRequired,
 
-    updateGroup: PropTypes.func.isRequired,
+    setGroup: PropTypes.func.isRequired,
     addUserToGroup: PropTypes.func.isRequired,
     deleteUserFromGroup: PropTypes.func.isRequired
   };
@@ -212,18 +224,16 @@ export default class GroupEditor extends Component {
       existingUsers,
       addableUsers,
 
-      updateGroup
+      setGroup
     } = this.props;
-
 
 
     return (
       <div>
         <GroupInfoForm 
-          onSubmit={ updateGroup }
-          initialValues={ group, groupId } />
-
-        <Moment fromNow>{ group.updatedAt }</Moment>
+          onSubmit={ setGroup }
+          {...{ group, groupId }}
+        />
 
         <GroupUserEditor {...{
           existingUsers,

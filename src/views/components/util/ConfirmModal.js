@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { 
   Alert, Button, Modal
 } from 'react-bootstrap';
+import { FAIcon } from 'src/views/components/util';
 import autoBind from 'react-autobind';
 
 
@@ -11,9 +12,10 @@ export function DefaultButtonCreator({open, iconName, className}) {
   return (
     <Button onClick={open} 
       className={className}
-      bsSize="small">
+      bsSize="small"
+      bsStyle="danger">
 
-      <FAIcon name={iconName || 'trash'} />
+      <FAIcon name={iconName || 'trash'}  />
     </Button>
   );
 }
@@ -21,9 +23,15 @@ export function DefaultButtonCreator({open, iconName, className}) {
 
 export default class ConfirmModal extends Component {
   static propTypes = {
-    header: PropTypes.element,
-    body: PropTypes.element,
-    buttonCreator: PropTypes.func.isRequired,
+    header: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string
+    ]),
+    body: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string
+    ]),
+    ButtonCreator: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired
   };
 
@@ -39,10 +47,11 @@ export default class ConfirmModal extends Component {
 
   onClickConfirm() {
     const {
-      onConfirm
+      onConfirm,
+      confirmArgs
     } = this.props;
 
-    onConfirm();
+    onConfirm(confirmArgs);
     this.close();
   }
 
@@ -51,7 +60,7 @@ export default class ConfirmModal extends Component {
     const { 
       header,
       body,
-      buttonCreator
+      ButtonCreator
     } = this.props;
 
     // actions
@@ -84,7 +93,7 @@ export default class ConfirmModal extends Component {
 
     return (
       <span>
-        { <buttonCreator open={open} /> }
+        { <ButtonCreator open={open} /> }
 
         { modalContents }
       </span>

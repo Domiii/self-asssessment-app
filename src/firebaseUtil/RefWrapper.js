@@ -4,6 +4,7 @@ import first from 'lodash/first';
 import tail from 'lodash/tail';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
+import pickBy from 'lodash/pickBy';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 import reduce from 'lodash/reduce';
@@ -498,10 +499,10 @@ function createRefWrapperBase() {
       if (isLoaded(val) && this._groupBy) {
         // for groups, get data from all children and merge them together
         val = mapValues(this._childrenGetPaths, getChildPath => {
-            // TODO: get correct child path
             const path = getChildPath(...this._childArgs);
             return this.getDataIn(val, path);
           });
+        val = pickBy(val, (childVal, childName) => !!childVal);
       }
       return val;
     }
@@ -554,7 +555,7 @@ function createRefWrapperBase() {
         pathOrPaths : [pathOrPaths];
 
       // TODO: getData not quite working here?
-      console.log(this.getData(paths[0]));
+      //console.log(this.getData(paths[0]));
 
       // create object where paths as keys and data as values
       return reduce(paths, 

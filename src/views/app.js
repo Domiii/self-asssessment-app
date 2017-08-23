@@ -19,8 +19,6 @@ import { Overlay, LoadOverlay } from 'src/views/components/overlays';
 
 const { pathToJS } = helpers;
 
-console.log('starting app...');
-
 @firebaseConnect((props, firebase) => {
   const paths = [
     DBStatusRef.makeQuery()
@@ -28,7 +26,8 @@ console.log('starting app...');
   
   const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
   if (uid) {
-    UserInfoRef.user.addQuery(paths, {uid});
+    //UserInfoRef.user.addQuery(paths, {uid});
+    UserInfoRef.addQuery(paths);
   }
   //paths.push(UserInfoRef.makeQuery());
   return paths;
@@ -46,6 +45,7 @@ console.log('starting app...');
     // TODO: Move this to componentWillMount
     //    see: https://firebase.google.com/docs/reference/node/firebase.auth.Auth#onAuthStateChanged
     props.currentUserRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
+    props.users = UserInfoRef.user(firebase);
   }
 
   //console.log(UserInfoRef(firebase).val);
@@ -120,6 +120,8 @@ export class App extends Component {
   render() {
     const { currentUserRef, children } = this.props;
     const { router } = this.context;
+
+    console.log(this.props.users.val);
 
     //const notYetLoaded = !dBStatusRef.isLoaded;
 

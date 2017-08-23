@@ -77,7 +77,7 @@ export default class GroupEditTools extends Component {
     const modalProps = {
       header: 'Delete Group?',
       body: entryInfo,
-      buttonCreator: DefaultButtonCreator,
+      ButtonCreator: DefaultButtonCreator,
       onConfirm: deleteEntry
     };
 
