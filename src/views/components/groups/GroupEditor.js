@@ -62,13 +62,13 @@ class _GroupInfoFormContent extends Component {
         />
         <FormInputField name="description_en" label="Description (English)"
           component="textarea"
-          inputProps={{rows: '15'}}
+          inputProps={{rows: '3'}}
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />
         <FormInputField name="description_zh" label="Description (中文)"
           component="textarea"
-          inputProps={{rows: '15'}}
+          inputProps={{rows: '3'}}
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
         />
@@ -99,41 +99,49 @@ export const GroupInfoForm = connect(
 )(_GroupInfoForm);
 
 function DeleteUserButton({open}) {
-  return (<Button onClick={open} className="color-red" bsSize="small">
+  return (<Button onClick={open} bsSize="small"
+      className="color-red no-padding">
     <FAIcon name="trash" />
   </Button>);
 }
 function makeExistingUserEl(deleteUserFromGroup) {
   return ({user, uid}) => (<Badge>
-    <span>{user.displayName}</span>
-
-    <ConfirmModal
-      header="Delete user from group?"
-      body={(<span>{user.displayName}</span>)}
-      ButtonCreator={DeleteUserButton}
-      onConfirm={deleteUserFromGroup}
-      confirmArgs={uid}
-    />
+    <span className="user-tag">
+      <img src={user.photoURL} className="user-image-tiny" /> &nbsp;
+      {user.displayName} &nbsp;
+      <ConfirmModal
+        header="Delete user from group?"
+        body={(<span>{user.displayName}</span>)}
+        ButtonCreator={DeleteUserButton}
+        onConfirm={deleteUserFromGroup}
+        confirmArgs={uid}
+      />
+    </span>
   </Badge>);
 }
 
 
 function AddUserButton({open}) {
-  return (<Button onClick={open} className="color-green" bsSize="small">
+  return (<Button onClick={open}
+    className="color-green no-padding"
+    bsSize="small">
     <FAIcon name="plus" />
   </Button>);
 }
 function makeAddUserEl(addUserToGroup) {
   return ({user, uid}) => (<Badge>
-    <span>{user.displayName}</span>
+    <span className="user-tag">
+      <img src={user.photoURL} className="user-image-tiny" /> &nbsp;
+      {user.displayName} &nbsp;
 
-    <ConfirmModal
-      header="Add user to group?"
-      body={(<span>{user.displayName}</span>)}
-      ButtonCreator={AddUserButton}
-      onConfirm={addUserToGroup}
-      confirmArgs={uid}
-    />
+      <ConfirmModal
+        header="Add user to group?"
+        body={(<span>{user.displayName}</span>)}
+        ButtonCreator={AddUserButton}
+        onConfirm={addUserToGroup}
+        confirmArgs={uid}
+      />
+    </span>
   </Badge>);
 }
 
@@ -154,22 +162,6 @@ export function GroupUserEditor({
           renderUser={makeAddUserEl(addUserToGroup)} />
     </Item>
   </Flex>);
-}
-
-
-export function AddUserEl({user, uid}) {
-  return (<span>
-    <span>{user.displayName}</span>
-
-    <ConfirmModal
-      data={{user, uid}}
-      header="Add user to group?"
-      body={(<span>{user.displayName}</span>)}
-      ButtonCreator={this.deleteUserEl}
-      onConfirm={this.onUserDeleted}
-      confirmArgs={uid}
-    />
-  </span>);
 }
 
 

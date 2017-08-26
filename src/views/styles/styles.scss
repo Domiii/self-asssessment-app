@@ -194,6 +194,22 @@ button:active { outline:none !important; }
 
 /**
  * #######################################################
+ * App-specific classes: User Profile
+ * #######################################################
+ */
+
+ .user-image-tiny {
+  width: 1em;
+ }
+
+ .user-tag {
+  display: flex;
+  align-items: center; /* align vertical */
+ }
+
+
+/**
+ * #######################################################
  * App-specific classes: Concepts
  * #######################################################
  */

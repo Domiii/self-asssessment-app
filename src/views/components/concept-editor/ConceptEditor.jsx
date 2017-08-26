@@ -138,13 +138,13 @@ class ConceptSection extends FormSection {
       />
       <FormInputField name="description_en" label="Description (English)"
         component="textarea"
-        inputProps={{rows: '15'}}
+        inputProps={{rows: '5'}}
         labelProps={{xs: 2, className: 'no-padding'}}
         inputColProps={{xs: 10, className: 'no-padding'}}
       />
       <FormInputField name="description_zh" label="Description (中文)"
         component="textarea"
-        inputProps={{rows: '15'}}
+        inputProps={{rows: '5'}}
         labelProps={{xs: 2, className: 'no-padding'}}
         inputColProps={{xs: 10, className: 'no-padding'}}
       />

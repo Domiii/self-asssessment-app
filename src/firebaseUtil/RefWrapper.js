@@ -516,6 +516,8 @@ function createRefWrapperBase() {
     }
 
     getDataIn(obj, path, defaultValue = null) {
+      path = path || '';
+      path = path.toString();
       path = path.replace(/\//g, '.');    // lodash uses dot notation for path access
       return _.get(obj, path, defaultValue);
     }
@@ -525,10 +527,7 @@ function createRefWrapperBase() {
      * then get the value at the given relative path.
      */
     getData(path, defaultValue = null) {
-      if (!path) {
-        path = '';
-      }
-      // else if (path.startsWith('/')) {
+      // if (path.startsWith('/')) {
       //   console.warn('invalid path: should not start with slash (/): ' + path);
       // }
 
@@ -558,11 +557,16 @@ function createRefWrapperBase() {
       //console.log(this.getData(paths[0]));
 
       // create object where paths as keys and data as values
-      return reduce(paths, 
+      const result = reduce(paths, 
         (returnObj, path) => 
           extend(returnObj, {
             [path]: this.getData(path)
           }), {});
+
+      return result;
+      // return isArray(pathOrPaths) ?
+      //   result :
+      //   result[pathOrPaths];
     }
 
     getRef(path) {

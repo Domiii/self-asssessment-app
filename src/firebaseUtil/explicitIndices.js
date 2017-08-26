@@ -1,4 +1,6 @@
 import map from 'lodash/map';
+import filter from 'lodash/filter';
+import mapValues from 'lodash/mapValues';
 import isString from 'lodash/isString';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
@@ -310,11 +312,14 @@ class M2MExplicitIndex {
 
   getLeftEntriesByRightId(rightIds) {
     const leftIds = this.getLeftIdsByRightId(rightIds);
-    const leftValues = Object.values(leftIds).filter(v => !!v);
-    if (isEmpty(leftValues)) {
+    const result = mapValues(
+      pickBy(leftIds, v => !!v), 
+      v => this.leftEntryRef.getAllData(Object.keys(v)));
+
+    if (isEmpty(result)) {
       return EmptyObject;
     }
-    return this.leftEntryRef.getAllData(leftValues);
+    return result;
   }
 
   getRightEntriesByLeftId(leftIds) {

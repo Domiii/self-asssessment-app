@@ -38,7 +38,7 @@ export const UserGroupRef = m2mIndex(
   'user',
   'group',
   
-  UserInfoRef,
+  UserInfoRef.userList,
   GroupsRef
 );
 

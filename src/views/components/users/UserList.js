@@ -20,7 +20,13 @@ class RenderUserDefault extends Component {
       childProps
     } = this.props;
 
-    return (<Badge {...childProps}>{user.displayName}</Badge>);
+    const clazzes = (childProps && childProps.className || '')
+      + ' user-tag';
+
+    return (<Badge {...childProps} className={clazzes}>
+      <img src={user.photoURL} className="user-image-tiny" /> &nbsp;
+      {user.displayName}
+    </Badge>);
   }
 }
 

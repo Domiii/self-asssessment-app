@@ -68,9 +68,14 @@ export default class ConfirmModal extends Component {
       open, close, onClickConfirm
     } = this;
 
+    const modalStyle = {
+      display: 'inline'
+    };
+
     // modal setup
     const modalContents = this.state.showModal && (
-      <Modal show={this.state.showModal} onHide={close}>
+      <Modal style={modalStyle}
+          show={this.state.showModal} onHide={close}>
         <Modal.Header closeButton>
           <Modal.Title>{header}</Modal.Title>
         </Modal.Header>

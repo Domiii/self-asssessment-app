@@ -20,9 +20,9 @@ import GroupList from 'src/views/components/groups/GroupList';
 
 @firebaseConnect((props, firebase) => {
   const paths = [
-    GroupsRef.makeQuery()
+    GroupsRef.makeQuery(),
+    '/users/public'
   ];
-  UserInfoRef.addQuery(paths);
   UserGroupRef.addIndexQueries(paths);
   return paths;
 })

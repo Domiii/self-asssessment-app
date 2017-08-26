@@ -10,6 +10,8 @@ import autoBind from 'react-autobind';
 import {
   Button, ListGroup, ListGroupItem, Alert
 } from 'react-bootstrap';
+import { EmptyObject, EmptyArray } from 'src/util';
+
 import { FAIcon } from 'src/views/components/util';
 
 import GroupView from './GroupView';
@@ -151,12 +153,12 @@ export default class GroupList extends Component {
     const idList = sortBy(Object.keys(groups), 
       groupId => -groups[groupId].updatedAt);
     const addableUsers = findUnassignedUsers();
-    console.log(addableUsers);
 
     return (<ListGroup> {
       map(idList, (groupId) => {
         const group = groups[groupId];
-        const existingUsers = getUsersByGroup(groupId);
+        let existingUsers = getUsersByGroup(groupId);
+        existingUsers = existingUsers[groupId] || EmptyObject;
 
         return (<GroupView key={groupId} 
           {...{

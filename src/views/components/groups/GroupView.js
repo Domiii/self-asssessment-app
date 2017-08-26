@@ -23,7 +23,7 @@ export default class GroupView extends Component {
 
   static propTypes = {
     group: PropTypes.object.isRequired,
-    users: PropTypes.object.isRequired,
+    users: PropTypes.object,
     deleteGroup: PropTypes.func
   };
 

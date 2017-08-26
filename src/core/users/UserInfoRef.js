@@ -6,6 +6,10 @@ const UserInfoRef = makeRefWrapper({
   pathTemplate: '/users',
 
   children: {
+    userList: {
+      pathTemplate: 'public'
+    },
+
     user: {
       groupBy: ['uid'],
 

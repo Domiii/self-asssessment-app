@@ -1,6 +1,5 @@
 import DBStatusRef from 'src/core/DBStatusRef';
 import { UserInfoRef } from 'src/core/users';
-import { startLogging } from 'src/core/users';
 import { createSelector } from 'reselect';
 
 import React, { Component, PropTypes } from 'react';
@@ -26,8 +25,7 @@ const { pathToJS } = helpers;
   
   const uid = getFirebase().auth().currentUser && getFirebase().auth().currentUser.uid;
   if (uid) {
-    //UserInfoRef.user.addQuery(paths, {uid});
-    UserInfoRef.addQuery(paths);
+    UserInfoRef.user.addQuery(paths, {uid});
   }
   //paths.push(UserInfoRef.makeQuery());
   return paths;
@@ -45,7 +43,6 @@ const { pathToJS } = helpers;
     // TODO: Move this to componentWillMount
     //    see: https://firebase.google.com/docs/reference/node/firebase.auth.Auth#onAuthStateChanged
     props.currentUserRef = UserInfoRef.user(firebase, {auth, uid: auth.uid});
-    props.users = UserInfoRef.user(firebase);
   }
 
   //console.log(UserInfoRef(firebase).val);
@@ -120,8 +117,6 @@ export class App extends Component {
   render() {
     const { currentUserRef, children } = this.props;
     const { router } = this.context;
-
-    console.log(this.props.users.val);
 
     //const notYetLoaded = !dBStatusRef.isLoaded;
 
