@@ -1,6 +1,8 @@
 import { makeRefWrapper } from 'src/firebaseUtil';
 import { lookupLocalized } from 'src/util/localizeUtil';
 
+import pick from 'lodash/pick';
+
 // access to the current user's info
 const UserInfoRef = makeRefWrapper({
   pathTemplate: '/users',
@@ -27,7 +29,7 @@ const UserInfoRef = makeRefWrapper({
         },
 
         isAdminDisplayMode() {
-          return this.displayRole() >= 5;
+          return this.isAdmin() && this.displayRole() >= 5;
         },
 
         getLocalized(obj, entry) {
@@ -44,6 +46,23 @@ const UserInfoRef = makeRefWrapper({
           if (!this.data()) {
             updates.push(this.set_data(userData));
           }
+
+          if (userData.photoURL) {
+            updates.push(this.set_photoURL(userData.photoURL));
+          }
+
+          if (userData.displayName) {
+            updates.push(this.set_displayName(userData.displayName));
+          }
+
+          return Promise.all(updates);
+        },
+
+        updateUserData(userData) {
+          const updates = [];
+
+console.log(userData);
+          updates.push(this.update_data(userData));
 
           if (userData.photoURL) {
             updates.push(this.set_photoURL(userData.photoURL));
@@ -82,15 +101,11 @@ const UserInfoRef = makeRefWrapper({
         },
 
         updateUser(userFormData) {
-          if (this.isAdmin()) {
-            // admins can override other stuff as well
-            delete userFormData.role;
-            return this.update(userFormData);
-          }
-          else {
-            // normal users can only set their personal data
-            return this.setUserData(userFormData.data);
-          }
+          const pblic = userFormData && userFormData.public;
+          if (!pblic) throw new Error('invalid form data: ' + JSON.stringify(userFormData));
+
+          const data = pick(pblic, ['displayName', 'photoURL']);
+          return this.updateUserData(data);
         }
       },
 
@@ -102,7 +117,8 @@ const UserInfoRef = makeRefWrapper({
           children: {
             displayName: 'displayName',
             photoURL: 'photoURL',
-            locale: 'locale'
+            locale: 'locale',
+            role: 'role'
           }
         },
 
@@ -111,7 +127,6 @@ const UserInfoRef = makeRefWrapper({
           pushPathTemplate: 'private',
 
           children: {
-            role: 'role',
             displayRole: 'displayRole',
 
             data: 'data',   // personal user data (we copy this from firebase auth on first use)
