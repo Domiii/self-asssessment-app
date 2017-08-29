@@ -9,6 +9,9 @@ import {
 import { 
   Field, reduxForm, FormSection, FieldArray
 } from 'redux-form';
+import keydown, { Keys } from 'react-keydown';
+import autoBind from 'react-autobind';
+
 import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
 import { ConceptCheckDeleteModal } from 'src/views/components/concept-editor/ConceptDeleteModal';
 
@@ -247,6 +250,24 @@ class _ConceptEditor extends Component {
     deleteConceptCheck: PropTypes.func
   }
 
+  constructor() {
+    super();
+
+    autoBind(this);
+  }
+
+  @keydown( 'ctrl+s', 'command+s' )
+  doSave(e) {
+    const { 
+      handleSubmit, reset
+    } = this.props;
+
+    e.preventDefault();
+    handleSubmit(e);
+    reset();
+    return false;
+  }
+
   render() {
     // data
     const {
@@ -254,21 +275,12 @@ class _ConceptEditor extends Component {
       addConceptCheck, deleteConceptCheck
     } = this.props;
     const { 
-      handleSubmit, reset, pristine, submitting, values
+      reset, pristine, submitting, values
     } = this.props;
-
-    // actions
-    function onSubmit(...args) {
-      handleSubmit(...args);
-      reset();
-    };
-
-    // elements
-    //const tagsEl = this.TagElements(concept);
 
     // render go!
     return (
-      <form className="form-horizontal" onSubmit={onSubmit}>
+      <form className="form-horizontal" onSubmit={this.doSave}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
 
         <div>

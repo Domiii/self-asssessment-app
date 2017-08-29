@@ -46,7 +46,7 @@
     "react-bootstrap": "^0.30.7",
     "react-dom": "^15.3.2",
     "react-flex": "^2.2.8",
-    "react-keydown": "^1.6.5",
+    "react-keydown": "^1.9.4",
     "react-markdown": "^2.4.4",
     "react-moment": "^0.2.2",
     "react-redux": "^4.4.5",
