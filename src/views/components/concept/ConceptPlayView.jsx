@@ -4,6 +4,8 @@ import {
   Grid, Row, Col
 } from 'react-bootstrap';
 import { Flex, Item } from 'react-flex';
+import { Link } from 'react-router';
+
 import { FAIcon } from 'src/views/components/util';
 
 import {
@@ -11,6 +13,8 @@ import {
   ConceptChecksPanel,
   ConceptSubmissionForm
 } from 'src/views/components/concept';
+
+import { hrefConceptView } from 'src/views/href';
 
 import ProgressBar from 'src/views/components/ProgressBar';
 
@@ -97,24 +101,78 @@ export class ConceptPlayView extends Component {
 
 
 export class ConceptPlayViewControls extends Component {
-  static propTypes = {
-    updateUserPrefs: PropTypes.func.isRequired
+  static contextTypes = {
+    lookupLocalized: PropTypes.func
   };
 
-  render() {
+  static propTypes = {
+    userPrefs: PropTypes.object.isRequired,
+
+    ownerId: PropTypes.string.isRequired,
+    conceptId: PropTypes.string.isRequired,
+    previousConcept: PropTypes.object,
+    nextConcept: PropTypes.object,
+
+    updateUserPrefs: PropTypes.func.isRequired,
+  };
+
+  get QuickJumpButtons() {
+    const { lookupLocalized } = this.context;
+    const {
+      ownerId,
+      conceptId,
+      previousConcept,
+      nextConcept
+    } = this.props;
+
+    // TODO: numbering of concept children
+    // TODO: 
+    // TODO: quick jump between previous and next child
+    const prevEl = (!previousConcept || previousConcept.id === conceptId) ? 
+      <div className="max-width" /> : (
+      <Link className="btn btn-sm btn-default btn-block no-margin"
+        to={ hrefConceptView(ownerId, previousConcept.id) }>
+        &lt;&lt;&lt; &nbsp;
+        ({previousConcept.content.num}) &nbsp;
+        {lookupLocalized(previousConcept.content, 'title')}
+      </Link>
+    );
+    const nextEl = (!nextConcept || nextConcept.id === conceptId) ? 
+      <div className="max-width" /> : (
+      <Link className="btn btn-sm btn-default btn-block no-margin"
+        to={ hrefConceptView(ownerId, nextConcept.id) }>
+        ({nextConcept.content.num}) &nbsp;
+        {lookupLocalized(nextConcept.content, 'title')} &nbsp; &nbsp;
+        &gt;&gt;&gt;
+      </Link>
+    );
+
+    return (<div className="spaced-row max-width">
+      {prevEl}
+      {nextEl}
+    </div>);
+  }
+
+  get UserPrefsControls() {
     const { userPrefs, updateUserPrefs } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
 
+    return (<Button bsStyle="primary" 
+      active={conceptPlayViewWideScreen}
+      onClick={() => 
+        updateUserPrefs({
+          conceptPlayViewWideScreen: !conceptPlayViewWideScreen
+        })
+      }>
+      <FAIcon name="arrows-h" />
+    </Button>);
+  }
+
+  render() {
     return (<div className="concept-play-view-controls">
-      <Button bsStyle="primary" 
-        active={conceptPlayViewWideScreen}
-        onClick={() => 
-          updateUserPrefs({
-            conceptPlayViewWideScreen: !conceptPlayViewWideScreen
-          })
-        }>
-        <FAIcon name="arrows-h" />
-      </Button>
+      { this.QuickJumpButtons }
+      <div className="margin-half" />
+      { this.UserPrefsControls }
     </div>);
   }
 }

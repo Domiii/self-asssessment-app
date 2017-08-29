@@ -6,7 +6,7 @@ import {
 } from 'react-bootstrap';
 import Markdown from 'src/views/components/markdown';
 import { Flex, Item } from 'react-flex';
-import { SimpleGrid, FormInputField, FAIcon } from 'src/views/components/util';
+import { FAIcon } from 'src/views/components/util';
 
 import { ConceptCheckResponseTypes } from 'src/core/concepts';
 

@@ -157,15 +157,6 @@ class ConceptSection extends FormSection {
   }
 }
 
-class ConceptCheck extends Component {
-  render() {
-    const { check, remove } = this.props;
-
-//console.log(`${check}.title_en`);
-    //return ();
-  }
-}
-
 class ConceptChecksSection extends FormSection {
   static defaultProps = {
     name: 'checks'
@@ -211,26 +202,27 @@ class ConceptChecksSection extends FormSection {
     ),  'num');
 
     const checkEls = _.map(checkArr, ({check, checkId}) => (
-      //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
       <ListGroupItem key={checkId}>
-        <FormInputField name={`${checkId}.title_en`} label="Check description (EN)"
-        component="textarea"
-        inputProps={{rows: 5}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name={`${checkId}.title_zh`} label="Check description (中文)"
-        component="textarea"
-        inputProps={{rows: 5}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name={`${checkId}.num`} label="Num"
-          type="text" component="input"
+        <FormSection name={checkId}>
+          <FormInputField name="title_en" label="Check description (EN)"
+          component="textarea"
+          inputProps={{rows: 3}}
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        { this.DeleteCheckButton(checkId, check) }
+          />
+          <FormInputField name="title_zh" label="Check description (中文)"
+          component="textarea"
+          inputProps={{rows: 3}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+          />
+          <FormInputField name="num" label="Num"
+            type="text" component="input"
+            labelProps={{xs: 2, className: 'no-padding'}}
+            inputColProps={{xs: 10, className: 'no-padding'}}
+          />
+          { this.DeleteCheckButton(checkId, check) }
+        </FormSection>
       </ListGroupItem>
     ));
 
@@ -278,6 +270,18 @@ class _ConceptEditor extends Component {
     return (
       <form className="form-horizontal" onSubmit={onSubmit}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
+
+        <div>
+          <Button type="submit" disabled={pristine || submitting || busy}>
+            {(!concept ?
+              (<span><FAIcon name="plus" className="color-green" /> add</span>):
+              (<span><FAIcon name="upload" className="color-green" /> save</span>)
+            )}
+          </Button>
+          <span className="margin" />
+          <Button disabled={pristine || submitting || busy} onClick={reset}>reset</Button>
+        </div>
+
         <ConceptSection {...{ conceptId, concept }} />
 
         {addConceptCheck &&

@@ -205,6 +205,42 @@ export default class ConceptsPage extends Component {
       EmptyObject;
   }
 
+  get PreviousConcept() {
+    const {
+      conceptsRef
+    } = this.props;
+
+    const currentConcept = this.currentConcept;
+    const currentId = this.currentConceptId;
+
+    if (currentConcept) {
+      const id = conceptsRef.getPreviousChildId(currentConcept.parentId, currentId, this.IsAdmin);
+      return {
+        id,
+        content: conceptsRef.concept(id)
+      };
+    }
+    return null;
+  }
+
+  get NextConcept() {
+    const {
+      conceptsRef
+    } = this.props;
+
+    const currentConcept = this.currentConcept;
+    const currentId = this.currentConceptId;
+
+    if (currentConcept) {
+      const id = conceptsRef.getNextChildId(currentConcept.parentId, currentId, this.IsAdmin);
+      return {
+        id,
+        content: conceptsRef.concept(id)
+      };
+    }
+    return null;
+  }
+
   computeCurrentConceptProgress() {
     const { conceptCheckResponsesRef } = this.props;
 
@@ -574,11 +610,22 @@ export default class ConceptsPage extends Component {
               ownerConcepts={this.currentLoadedConcepts} 
               currentConceptId={this.currentConceptId} />
 
+            { this.currentConcept &&
+              <ConceptPlayViewControls {...{
+                userPrefs: this.userPrefs,
+
+                ownerId: this.currentOwnerId,
+                conceptId: this.currentConceptId,
+                previousConcept: this.PreviousConcept,
+                nextConcept: this.NextConcept,
+
+                updateUserPrefs: this.updateUserPrefs
+              }} />
+            }
+
+            <div className="margin-half" />
+            
             { toolsEl || <p style={{display: 'inline-block'}}>&nbsp;</p> }
-            { this.currentConcept && <ConceptPlayViewControls {...{
-              userPrefs: this.userPrefs,
-              updateUserPrefs: this.updateUserPrefs
-            }} /> }
           </div>
         </h3>
         { errEl }
@@ -588,6 +635,7 @@ export default class ConceptsPage extends Component {
             userPrefs: this.userPrefs,
             conceptId: this.currentConceptId,
             concept: this.currentConcept,
+
             conceptSubmission: this.currentConceptSubmission,
             conceptChecks: this.currentConceptChecks,
             conceptCheckResponses: this.currentCheckResponses,
