@@ -143,6 +143,10 @@ button:active { outline:none !important; }
   background-image: none;
 }
 
+.background-lightgray {
+  background-color: lightgray !important;
+  background-image: none;
+}
 
 
 .inline {
@@ -188,10 +192,6 @@ button:active { outline:none !important; }
 
 .footer  { order: 3; }
 
-.markdown {
-  font-size: 1.4em;
-}
-
 /**
  * #######################################################
  * App-specific classes: User Profile
@@ -221,11 +221,16 @@ button:active { outline:none !important; }
 }
 
 .markdown {
+  font-size: 1.4em;
   max-width: 100%;
 }
 
 .markdown * {
   max-width: 100%;
+}
+
+.markdown p {
+  margin: 0;
 }
 
 .concept-checks-panel {
@@ -235,6 +240,7 @@ button:active { outline:none !important; }
 .concept-check-item {
   display: flex;
   align-items: stretch;
+  border: 1px solid #ddd;
 }
 
 .concept-play-view-controls {
@@ -258,6 +264,10 @@ button:active { outline:none !important; }
 
 .concept-check-content {
   width: 100%;
+}
+
+.concept-reference {
+  font-size: 1.2em;
 }
 
 .concept-check-deleted {

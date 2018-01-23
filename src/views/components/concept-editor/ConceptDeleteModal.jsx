@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { 
   Alert, Button, Jumbotron, Well,
-  Grid, Row, Col,
-  Popover, Tooltip, Modal
+  Grid, Row, Col, Modal
 } from 'react-bootstrap';
 
 import { 

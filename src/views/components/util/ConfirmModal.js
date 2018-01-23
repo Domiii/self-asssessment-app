@@ -75,7 +75,8 @@ export default class ConfirmModal extends Component {
     // modal setup
     const modalContents = this.state.showModal && (
       <Modal style={modalStyle}
-          show={this.state.showModal} onHide={close}>
+          show={this.state.showModal}
+          onHide={close}>
         <Modal.Header closeButton>
           <Modal.Title>{header}</Modal.Title>
         </Modal.Header>
@@ -104,4 +105,4 @@ export default class ConfirmModal extends Component {
       </span>
     );
   }
-};
+}

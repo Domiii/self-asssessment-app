@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { 
+import {
   Alert, Button, Jumbotron, Well,
   Grid, Row, Col,
   FormGroup, FormControl,
   ListGroup, ListGroupItem
 } from 'react-bootstrap';
-import { 
+import {
   Field, reduxForm, FormSection, FieldArray
 } from 'redux-form';
 import keydown, { Keys } from 'react-keydown';
@@ -23,7 +23,7 @@ import _ from 'lodash';
 //   };
 
 //   renderTags({ fields, meta: { touched, error } }) {
-    
+
 //   }
 
 //   render() {
@@ -126,35 +126,35 @@ class ConceptSection extends FormSection {
           type: 'checkbox',
           component: 'input'
         }}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
       <FormInputField name="title_en" label="Title (English)"
         type="text" component="input"
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
       <FormInputField name="title_zh" label="Title (中文)"
         type="text" component="input"
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
       <FormInputField name="description_en" label="Description (English)"
         component="textarea"
-        inputProps={{rows: '5'}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        inputProps={{ rows: '5' }}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
       <FormInputField name="description_zh" label="Description (中文)"
         component="textarea"
-        inputProps={{rows: '5'}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        inputProps={{ rows: '5' }}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
       <FormInputField name="num" label="Order"
         type="text" component="input"
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
+        labelProps={{ xs: 2, className: 'no-padding' }}
+        inputColProps={{ xs: 10, className: 'no-padding' }}
       />
     </div>);
   }
@@ -190,7 +190,7 @@ class ConceptChecksSection extends FormSection {
     };
 
     return (
-      <ConceptCheckDeleteModal {...modalProps}  />
+      <ConceptCheckDeleteModal {...modalProps} />
     );
   }
 
@@ -201,30 +201,36 @@ class ConceptChecksSection extends FormSection {
     // see: http://redux-form.com/6.1.1/examples/fieldArrays/
 
     const checkArr = _.sortBy(_.map(conceptChecks,
-      (check, checkId) => ({check, checkId, num: check.num})
-    ),  'num');
+      (check, checkId) => ({ check, checkId, num: check.num })
+    ), 'num');
 
-    const checkEls = _.map(checkArr, ({check, checkId}) => (
+    const checkEls = _.map(checkArr, ({ check, checkId }) => (
       <ListGroupItem key={checkId}>
         <FormSection name={checkId}>
           <FormInputField name="title_en" label="Check description (EN)"
-          component="textarea"
-          inputProps={{rows: 3}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
+            component="textarea"
+            inputProps={{ rows: 4 }}
+            labelProps={{ xs: 2, className: 'no-padding' }}
+            inputColProps={{ xs: 10, className: 'no-padding' }}
           />
           <FormInputField name="title_zh" label="Check description (中文)"
-          component="textarea"
-          inputProps={{rows: 3}}
-          labelProps={{xs: 2, className: 'no-padding'}}
-          inputColProps={{xs: 10, className: 'no-padding'}}
+            component="textarea"
+            inputProps={{ rows: 4 }}
+            labelProps={{ xs: 2, className: 'no-padding' }}
+            inputColProps={{ xs: 10, className: 'no-padding' }}
+          />
+          <FormInputField name="referencesRaw" label="References"
+            component="textarea"
+            inputProps={{ rows: 3 }}
+            labelProps={{ xs: 2, className: 'no-padding' }}
+            inputColProps={{ xs: 10, className: 'no-padding' }}
           />
           <FormInputField name="num" label="Num"
             type="text" component="input"
-            labelProps={{xs: 2, className: 'no-padding'}}
-            inputColProps={{xs: 10, className: 'no-padding'}}
+            labelProps={{ xs: 2, className: 'no-padding' }}
+            inputColProps={{ xs: 10, className: 'no-padding' }}
           />
-          { this.DeleteCheckButton(checkId, check) }
+          {this.DeleteCheckButton(checkId, check)}
         </FormSection>
       </ListGroupItem>
     ));
@@ -233,7 +239,7 @@ class ConceptChecksSection extends FormSection {
       <ListGroup className="no-margin">
         {checkEls}
       </ListGroup>
-      { this.AddCheckButton }
+      {this.AddCheckButton}
     </div>);
   }
 }
@@ -256,9 +262,9 @@ class _ConceptEditor extends Component {
     autoBind(this);
   }
 
-  @keydown( 'ctrl+s', 'command+s' )
+  @keydown('ctrl+s', 'command+s')
   doSave(e) {
-    const { 
+    const {
       handleSubmit, reset
     } = this.props;
 
@@ -274,7 +280,7 @@ class _ConceptEditor extends Component {
       busy, conceptId, concept, conceptChecks,
       addConceptCheck, deleteConceptCheck
     } = this.props;
-    const { 
+    const {
       reset, pristine, submitting, values
     } = this.props;
 
@@ -286,7 +292,7 @@ class _ConceptEditor extends Component {
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>
             {(!concept ?
-              (<span><FAIcon name="plus" className="color-green" /> add</span>):
+              (<span><FAIcon name="plus" className="color-green" /> add</span>) :
               (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
           </Button>
@@ -298,15 +304,15 @@ class _ConceptEditor extends Component {
 
         {addConceptCheck &&
           <ConceptChecksSection {...
-            { conceptId, conceptChecks, addConceptCheck, deleteConceptCheck }} /> 
+            { conceptId, conceptChecks, addConceptCheck, deleteConceptCheck }} />
         }
 
-        <div className ="margin" />
+        <div className="margin" />
 
         <div>
           <Button type="submit" disabled={pristine || submitting || busy}>
             {(!concept ?
-              (<span><FAIcon name="plus" className="color-green" /> add</span>):
+              (<span><FAIcon name="plus" className="color-green" /> add</span>) :
               (<span><FAIcon name="upload" className="color-green" /> save</span>)
             )}
           </Button>

@@ -1,6 +1,13 @@
+import map from 'lodash/map';
+import filter from 'lodash/filter';
+import find from 'lodash/find';
+import sortBy from 'lodash/sortBy';
+
+
+
 import React, { Component, PropTypes } from 'react';
 import { 
-  Well, Alert, ListGroup
+  Well, Alert
 } from 'react-bootstrap';
 
 import { EmptyObject } from 'src/util';
@@ -33,40 +40,40 @@ export default class ConceptChecksPanel extends Component {
       );
     }
 
-    const checkArr = _.sortBy(_.map(conceptChecks,
+    const checkArr = sortBy(map(conceptChecks,
       (check, checkId) => ({check, checkId, num: parseFloat(check.num)})
-    ),  'num');
+    ), 'num');
 
-    const checkEls = _.map(checkArr, ({checkId, check}) => (<ConceptCheckItem
+    const checkEls = map(checkArr, ({checkId, check}) => (<ConceptCheckItem
         key={checkId} {...{
           conceptId, checkId, 
           check,
-          selectedResponse: conceptCheckResponses && _.find(conceptCheckResponses, {checkId}),
+          selectedResponse: conceptCheckResponses && find(conceptCheckResponses, {checkId}),
           responseDetails: conceptCheckResponseDetails,
           updateCheckResponse
         }} 
       />
     ));
 
-    const deletedCheckResponseIds = _.filter(_.map(conceptCheckResponses, 'checkId'), 
+    const deletedCheckResponseIds = filter(map(conceptCheckResponses, 'checkId'), 
       checkId => !conceptChecks[checkId]);
 
-    const deletedCheckResponsesEls = _.map(deletedCheckResponseIds, (checkId) => (
+    const deletedCheckResponsesEls = map(deletedCheckResponseIds, (checkId) => (
       <ConceptCheckItem {...{
         key: checkId,
         conceptId, checkId, 
         check: null,
-        selectedResponse: conceptCheckResponses && _.find(conceptCheckResponses, {checkId}),
+        selectedResponse: conceptCheckResponses && find(conceptCheckResponses, {checkId}),
         responseDetails: conceptCheckResponseDetails,
         updateCheckResponse
       }} />
     ));
 
     return (
-      <ListGroup>
+      <div>
         { checkEls }
         { deletedCheckResponsesEls }
-      </ListGroup>
+      </div>
     );
   }
 }

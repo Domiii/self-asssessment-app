@@ -37,8 +37,8 @@ export class ConceptPlayView extends Component {
   get ProgressBar() {
     const { conceptId, conceptProgress } = this.props;
 
-    const progressPct = (conceptProgress && 
-      conceptProgress[conceptId] && 
+    const progressPct = (conceptProgress &&
+      conceptProgress[conceptId] &&
       !isNaN(conceptProgress[conceptId].progress)) ?
       Math.round(conceptProgress[conceptId].progress * 100) :
       NaN;
@@ -49,7 +49,7 @@ export class ConceptPlayView extends Component {
   render() {
     const {
       userPrefs,
-      conceptId, concept, 
+      conceptId, concept,
       conceptSubmission,
       conceptChecks,
       conceptCheckResponses,
@@ -64,35 +64,36 @@ export class ConceptPlayView extends Component {
       [!conceptPlayViewWideScreen && 'row' || 'column']: true
     };
     const itemProps = {
-      className: conceptPlayViewWideScreen && "max-width" || ''
+      className: conceptPlayViewWideScreen && 'max-width' || ''
     };
 
     return (
       <div>
-        { this.ProgressBar }
+        {this.ProgressBar}
         <Flex {...flexProps} alignItems="start">
           <Item {...itemProps}>
             <ConceptDescriptionFull concept={concept} />
           </Item>
           <Item {...itemProps}>
-            <ConceptChecksPanel {...{
-              conceptId,
-              conceptChecks,
-              conceptCheckResponses,
-              conceptCheckResponseDetails,
-              updateCheckResponse
-            }} />
+            <ConceptChecksPanel
+              {...{
+                conceptId,
+                conceptChecks,
+                conceptCheckResponses,
+                conceptCheckResponseDetails,
+                updateCheckResponse
+              }} />
           </Item>
         </Flex>
         {
-          (!!conceptSubmission || concept.expectsSubmission) && 
-            (<div>
-              <ConceptSubmissionForm {...{
-                conceptId,
-                conceptSubmission,
-                onSubmit: updateConceptSubmission
-              }} />
-            </div>)
+          (!!conceptSubmission || concept.expectsSubmission) &&
+          (<div>
+            <ConceptSubmissionForm {...{
+              conceptId,
+              conceptSubmission,
+              onSubmit: updateConceptSubmission
+            }} />
+          </div>)
         }
       </div>
     );
@@ -128,24 +129,24 @@ export class ConceptPlayViewControls extends Component {
     // TODO: numbering of concept children
     // TODO: 
     // TODO: quick jump between previous and next child
-    const prevEl = (!previousConcept || previousConcept.id === conceptId) ? 
+    const prevEl = (!previousConcept || previousConcept.id === conceptId) ?
       <div className="max-width" /> : (
-      <Link className="btn btn-sm btn-default btn-block no-margin"
-        to={ hrefConceptView(ownerId, previousConcept.id) }>
-        &lt;&lt;&lt; &nbsp;
+        <Link className="btn btn-sm btn-default btn-block no-margin"
+          to={hrefConceptView(ownerId, previousConcept.id)}>
+          &lt;&lt;&lt; &nbsp;
         ({previousConcept.content.num}) &nbsp;
         {lookupLocalized(previousConcept.content, 'title')}
-      </Link>
-    );
-    const nextEl = (!nextConcept || nextConcept.id === conceptId) ? 
+        </Link>
+      );
+    const nextEl = (!nextConcept || nextConcept.id === conceptId) ?
       <div className="max-width" /> : (
-      <Link className="btn btn-sm btn-default btn-block no-margin"
-        to={ hrefConceptView(ownerId, nextConcept.id) }>
-        ({nextConcept.content.num}) &nbsp;
+        <Link className="btn btn-sm btn-default btn-block no-margin"
+          to={hrefConceptView(ownerId, nextConcept.id)}>
+          ({nextConcept.content.num}) &nbsp;
         {lookupLocalized(nextConcept.content, 'title')} &nbsp; &nbsp;
         &gt;&gt;&gt;
       </Link>
-    );
+      );
 
     return (<div className="spaced-row max-width">
       {prevEl}
@@ -157,9 +158,9 @@ export class ConceptPlayViewControls extends Component {
     const { userPrefs, updateUserPrefs } = this.props;
     const { conceptPlayViewWideScreen } = userPrefs;
 
-    return (<Button bsStyle="primary" 
+    return (<Button bsStyle="primary"
       active={conceptPlayViewWideScreen}
-      onClick={() => 
+      onClick={() =>
         updateUserPrefs({
           conceptPlayViewWideScreen: !conceptPlayViewWideScreen
         })
@@ -170,9 +171,9 @@ export class ConceptPlayViewControls extends Component {
 
   render() {
     return (<div className="concept-play-view-controls">
-      { this.QuickJumpButtons }
+      {this.QuickJumpButtons}
       <div className="margin-half" />
-      { this.UserPrefsControls }
+      {this.UserPrefsControls}
     </div>);
   }
 }

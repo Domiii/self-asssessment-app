@@ -1,16 +1,85 @@
+import map from 'lodash/map';
+
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { 
-  Alert, ListGroupItem, ListGroup, ButtonGroup, Button,
+import {
+  Alert, Badge, Button,
   OverlayTrigger, Tooltip
 } from 'react-bootstrap';
 import Markdown from 'src/views/components/markdown';
 import { Flex, Item } from 'react-flex';
 import { FAIcon } from 'src/views/components/util';
 
-import { ConceptCheckResponseTypes } from 'src/core/concepts';
+import {
+  ConceptCheckResponseTypes
+} from 'src/core/concepts';
+
+import {
+  //ConceptReferenceType,
+  parseConceptReferences
+} from 'src/core/concepts/ConceptChecksRef';
 
 import { EmptyObject } from 'src/util';
+
+
+export const ConceptReferenceSettings = {
+  i: {
+    name: 'Image',
+    icon: '📷',
+    render: src => (
+      <img src={src} alt={src} />
+    )
+  },
+  l: {
+    name: 'Link',
+    icon: '🔗',
+    render: link => (
+      <a target="_blank" rel="noopener noreferrer" href={link}>
+        [link]({link})
+      </a>
+    )
+  },
+  s: {
+    name: 'Search',
+    icon: '🔍',
+    render: q => {
+      const url = 'https://www.google.com.tw/search?q=' + encodeURIComponent(q).replace('%20', '+');
+      return (<a href={url}>{q}</a>);
+    }
+  },
+  v: {
+    name: 'VideoSearch',
+    icon: '🎥',
+    render: q => {
+      const url = 'https://www.google.com.tw/search?source=lnms&tbm=vid&q=' + encodeURIComponent(q).replace('%20', '+');
+      return (<a href={url}>{q}</a>);
+    }
+  }
+};
+
+export class ConceptReference extends Component {
+  render() {
+    const {
+      type,
+      data
+    } = this.props;
+
+    const settings = ConceptReferenceSettings[type];
+    if (!settings) {
+      return <Alert bsStyle="warn">invalid ref type: {type} </Alert>;
+    }
+    if (!type || !data) {
+      return <Alert bsStyle="warn">empty reference: {type} - {data} </Alert>;
+    }
+
+    return (
+      <Badge className="background-lightgray concept-reference">
+        {settings.icon} &nbsp;
+        {settings.render(data)}
+      </Badge>
+    );
+  }
+}
 
 export default class ConceptCheckItem extends Component {
   static contextTypes = {
@@ -31,7 +100,7 @@ export default class ConceptCheckItem extends Component {
 
   onCheckReponseClick(responseName) {
     // store result
-    const { 
+    const {
       conceptId, checkId, check, updateCheckResponse
     } = this.props;
     const responses = ConceptCheckResponseTypes.default.byName;
@@ -41,12 +110,12 @@ export default class ConceptCheckItem extends Component {
       updateCheckResponse(conceptId, checkId, !!check, response);
     }
 
-    ReactDOM.findDOMNode(this.refs['check-'+responseName]).blur();  // blur it
+    ReactDOM.findDOMNode(this.refs['check-' + responseName]).blur();  // blur it
   }
 
   get CheckButton() {
     const { lookupLocalized } = this.context;
-    const { 
+    const {
       selectedResponse,
       responseDetails
     } = this.props;
@@ -58,26 +127,26 @@ export default class ConceptCheckItem extends Component {
 
     const tooltip = (
       <Tooltip className="in" id="tooltip">
-        { lookupLocalized(response, 'title') || '' }
+        {lookupLocalized(response, 'title') || ''}
       </Tooltip>
     );
 
     const responseEls = (
       <OverlayTrigger placement="left" overlay={tooltip}>
-        <Button 
+        <Button
           bsSize="large"
-          active={ isDone }
-          bsStyle={ isDone ? 'success' : 'danger' }
-          ref={ 'check-'+responseName }
-          onClick={ this.onCheckReponseClick.bind(this, responseName) }
+          active={isDone}
+          bsStyle={isDone ? 'success' : 'danger'}
+          ref={'check-' + responseName}
+          onClick={this.onCheckReponseClick.bind(this, responseName)}
           className={'concept-check-response-button no-padding '}>
-          { response.icon && <FAIcon name={response.icon} /> }
+          {response.icon && <FAIcon name={response.icon} />}
         </Button>
       </OverlayTrigger>
     );
 
     return (
-      <span style={{display: 'flex'}}>{ responseEls }</span>
+      <span style={{ display: 'flex' }}>{responseEls}</span>
     );
 
     // TODO: revamp the complete response system
@@ -118,39 +187,60 @@ export default class ConceptCheckItem extends Component {
     //     { iCategory < responseCategories.length-1 && <span className="margin-half" /> }
     //   </span>);
     // });
-/*
-        <Flex>
-          <Item flexGrow="1" key={name}>
-            {responseEls}
-          </Item>
-        </Flex>
-*/
+    /*
+            <Flex>
+              <Item flexGrow="1" key={name}>
+                {responseEls}
+              </Item>
+            </Flex>
+    */
   }
 
   render() {
     const { lookupLocalized } = this.context;
     const { check } = this.props;
 
-    const content = lookupLocalized(check, 'title');
-    const contentEl = !content ? null : (
-      <span className="concept-check-content">
-        <Markdown source={content} />
-      </span>
-    );
+    const title = lookupLocalized(check, 'title');
+    let contentEl;
+    if (check) {
+      const {
+        referencesRaw
+      } = check;
 
-    const noContentEl = check ? null : (
-      <span className="concept-check-deleted">
-        { '<deleted check>' }
-      </span>
-    );
+      const references = parseConceptReferences(referencesRaw);
+      //const references = null;
+
+      contentEl = (<div className="concept-check-content">
+        {title && (
+          <span>
+            <Markdown source={title} />
+          </span>
+        )}
+        {references && (
+          <span>
+            {map(references, (refs, type) => (
+              <span key={type}>
+                { map(refs, data => <ConceptReference key={data} type={type} data={data} />) }
+              </span>
+            ))}
+          </span>
+        )}
+      </div>);
+    }
+    else {
+      contentEl = (
+        <span className="concept-check-deleted">
+          {'<deleted check>'}
+        </span>
+      );
+    }
 
     return (
-      <ListGroupItem className="no-padding concept-check-item">
-        { this.CheckButton }
+      <div className="no-padding concept-check-item">
+        {this.CheckButton}
         <span className="margin-half" />
-        { contentEl }
-        { noContentEl }
-      </ListGroupItem>
+        {contentEl}
+      </div>
     );
   }
 }
