@@ -80,16 +80,16 @@ const ConceptsRef = makeRefWrapper({
       return this.val && _.pickBy(this.val, {parentId, isPublic: true}) || {};
     },
 
-    getFirstChild(parentId) {
+    getFirstChild(parentId, all) {
       // TODO: this assumes, we have all concepts cached!
-      const firstChildId = this.getFirstChildId(parentId);
+      const firstChildId = this.getFirstChildId(parentId, all);
       return firstChildId && this.concept(firstChildId);
     },
 
-    getFirstChildId(parentId) {
+    getFirstChildId(parentId, all) {
       // TODO: this assumes, we have all concepts cached!
       // TODO: Make this more efficient
-      const concepts = this.ofConcept(parentId);
+      const concepts = this.getChildren(parentId, all);
       if (!concepts) {
         return null;
       }
@@ -105,10 +105,10 @@ const ConceptsRef = makeRefWrapper({
       return firstKey;
     },
 
-    getLastChildId(parentId) {
+    getLastChildId(parentId, all) {
       // TODO: this assumes, we have all concepts cached!
       // TODO: Make this more efficient
-      const concepts = this.ofConcept(parentId);
+      const concepts = this.getChildren(parentId, all);
       if (!concepts) {
         return null;
       }
@@ -124,15 +124,15 @@ const ConceptsRef = makeRefWrapper({
       return lastKey;
     },
 
-    getPreviousChildId(parentId, currentChildId) {
+    getPreviousChildId(parentId, currentChildId, all) {
       // TODO: this assumes, we have all concepts cached!
-      const concepts = this.ofConcept(parentId);
+      const concepts = this.getChildren(parentId, all);
       if (!concepts) {
         return null;
       }
-      const currentChild = this.concept(parentId, currentChildId);
+      const currentChild = this.concept(currentChildId);
       if (!currentChild) {
-        return this.getFirstChildId(parentId);
+        return this.getFirstChildId(parentId, all);
       }
 
       let newNum = -99999999999;
@@ -144,18 +144,18 @@ const ConceptsRef = makeRefWrapper({
           newKey = key;
         }
       }
-      return newKey || this.getLastChildId(parentId);
+      return newKey || this.getLastChildId(parentId, all);
     },
 
-    getNextChildId: function(parentId, currentChildId) {
+    getNextChildId: function(parentId, currentChildId, all) {
       // TODO: this assumes, we have all concepts cached!
-      const concepts = this.ofConcept(parentId);
+      const concepts = this.getChildren(parentId, all);
       if (!concepts) {
         return null;
       }
-      const currentChild = this.concept(parentId, currentChildId);
+      const currentChild = this.concept(currentChildId);
       if (!currentChild) {
-        return this.getFirstChildId(parentId);
+        return this.getFirstChildId(parentId, all);
       }
 
       let newNum = 99999999999;
@@ -167,7 +167,7 @@ const ConceptsRef = makeRefWrapper({
           newKey = key;
         }
       }
-      return newKey || this.getFirstChildId(parentId);
+      return newKey || this.getFirstChildId(parentId, all);
     },
 
     getConceptIdByOrder(parentId, num) {

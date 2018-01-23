@@ -9,6 +9,9 @@ import {
 import { 
   Field, reduxForm, FormSection, FieldArray
 } from 'redux-form';
+import keydown, { Keys } from 'react-keydown';
+import autoBind from 'react-autobind';
+
 import { FormInputField, FormInputFieldArray, FAIcon } from 'src/views/components/util';
 import { ConceptCheckDeleteModal } from 'src/views/components/concept-editor/ConceptDeleteModal';
 
@@ -157,15 +160,6 @@ class ConceptSection extends FormSection {
   }
 }
 
-class ConceptCheck extends Component {
-  render() {
-    const { check, remove } = this.props;
-
-//console.log(`${check}.title_en`);
-    //return ();
-  }
-}
-
 class ConceptChecksSection extends FormSection {
   static defaultProps = {
     name: 'checks'
@@ -211,26 +205,27 @@ class ConceptChecksSection extends FormSection {
     ),  'num');
 
     const checkEls = _.map(checkArr, ({check, checkId}) => (
-      //<ConceptCheck key={index} removeCheck={removeCheck.bind(this, index)} check={check} />
       <ListGroupItem key={checkId}>
-        <FormInputField name={`${checkId}.title_en`} label="Check description (EN)"
-        component="textarea"
-        inputProps={{rows: 5}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name={`${checkId}.title_zh`} label="Check description (中文)"
-        component="textarea"
-        inputProps={{rows: 5}}
-        labelProps={{xs: 2, className: 'no-padding'}}
-        inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        <FormInputField name={`${checkId}.num`} label="Num"
-          type="text" component="input"
+        <FormSection name={checkId}>
+          <FormInputField name="title_en" label="Check description (EN)"
+          component="textarea"
+          inputProps={{rows: 3}}
           labelProps={{xs: 2, className: 'no-padding'}}
           inputColProps={{xs: 10, className: 'no-padding'}}
-        />
-        { this.DeleteCheckButton(checkId, check) }
+          />
+          <FormInputField name="title_zh" label="Check description (中文)"
+          component="textarea"
+          inputProps={{rows: 3}}
+          labelProps={{xs: 2, className: 'no-padding'}}
+          inputColProps={{xs: 10, className: 'no-padding'}}
+          />
+          <FormInputField name="num" label="Num"
+            type="text" component="input"
+            labelProps={{xs: 2, className: 'no-padding'}}
+            inputColProps={{xs: 10, className: 'no-padding'}}
+          />
+          { this.DeleteCheckButton(checkId, check) }
+        </FormSection>
       </ListGroupItem>
     ));
 
@@ -255,6 +250,24 @@ class _ConceptEditor extends Component {
     deleteConceptCheck: PropTypes.func
   }
 
+  constructor() {
+    super();
+
+    autoBind(this);
+  }
+
+  @keydown( 'ctrl+s', 'command+s' )
+  doSave(e) {
+    const { 
+      handleSubmit, reset
+    } = this.props;
+
+    e.preventDefault();
+    handleSubmit(e);
+    reset();
+    return false;
+  }
+
   render() {
     // data
     const {
@@ -262,22 +275,25 @@ class _ConceptEditor extends Component {
       addConceptCheck, deleteConceptCheck
     } = this.props;
     const { 
-      handleSubmit, reset, pristine, submitting, values
+      reset, pristine, submitting, values
     } = this.props;
-
-    // actions
-    function onSubmit(...args) {
-      handleSubmit(...args);
-      reset();
-    };
-
-    // elements
-    //const tagsEl = this.TagElements(concept);
 
     // render go!
     return (
-      <form className="form-horizontal" onSubmit={onSubmit}>
+      <form className="form-horizontal" onSubmit={this.doSave}>
         <Field name="conceptId" value={conceptId} component="input" type="hidden" />
+
+        <div>
+          <Button type="submit" disabled={pristine || submitting || busy}>
+            {(!concept ?
+              (<span><FAIcon name="plus" className="color-green" /> add</span>):
+              (<span><FAIcon name="upload" className="color-green" /> save</span>)
+            )}
+          </Button>
+          <span className="margin" />
+          <Button disabled={pristine || submitting || busy} onClick={reset}>reset</Button>
+        </div>
+
         <ConceptSection {...{ conceptId, concept }} />
 
         {addConceptCheck &&

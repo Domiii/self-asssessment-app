@@ -238,7 +238,8 @@ button:active { outline:none !important; }
 }
 
 .concept-play-view-controls {
-  float: right;
+  display: flex;
+  align-items: stretch;
 }
 
 .concept-check-response-buttons {
@@ -392,4 +393,11 @@ button:active { outline:none !important; }
   height: 100%;
   left: 0;
   top: 0;
+}
+
+
+.spaced-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
 }

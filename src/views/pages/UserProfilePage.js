@@ -36,13 +36,6 @@ class _UserForm extends Component {
           inputProps={{type: 'text', component:'input'}}
           labelProps={{xs: 2}} inputColProps={{xs: 10}}
         />
-        <FormInputField name="public.locale" label="language"
-          inputProps={{component:'select'}}
-          labelProps={{xs: 2}} inputColProps={{xs: 10}}
-        >
-          <option value="en">English</option>
-          <option value="zh">中文</option>
-        </FormInputField>
 
         <div>
           <Button type="submit" disabled={pristine || submitting}>
