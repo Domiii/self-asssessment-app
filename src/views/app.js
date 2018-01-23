@@ -9,7 +9,7 @@ import {
   firebaseConnect, 
   helpers,
   getFirebase
-} from 'react-redux-firebase'
+} from 'react-redux-firebase';
 import Header from './components/header';
 import { FAIcon } from 'src/views/components/util';
 import { lookupLocalized } from 'src/util/localizeUtil';
@@ -71,7 +71,7 @@ export class App extends Component {
     return {
       currentUserRef: this.props.currentUserRef,
       lookupLocalized: this.lookupLocalized
-    }
+    };
   }
 
   constructor(...args) {
