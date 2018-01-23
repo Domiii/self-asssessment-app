@@ -72,12 +72,13 @@ export class ConceptReference extends Component {
       return <Alert bsStyle="warn">empty reference: {type} - {data} </Alert>;
     }
 
-    return (
+    return (<span>
+      &nbsp;
       <Badge className="background-lightgray concept-reference">
         {settings.icon} &nbsp;
         {settings.render(data)}
       </Badge>
-    );
+    </span>);
   }
 }
 
