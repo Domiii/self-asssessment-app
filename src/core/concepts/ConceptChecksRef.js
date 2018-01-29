@@ -5,6 +5,7 @@ export const ConceptReferenceType = {
   i: 'img',
   l: 'link',
   s: 'googleSearch',
+  gi: 'googleImage',
   v: 'googleVideo'
 };
 

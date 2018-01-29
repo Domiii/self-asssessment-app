@@ -54,6 +54,14 @@ export const ConceptReferenceSettings = {
       const url = 'https://www.google.com.tw/search?source=lnms&tbm=vid&q=' + encodeURIComponent(q).replace('%20', '+');
       return (<a href={url}>{q}</a>);
     }
+  },
+  gi: {
+    name: 'ImageSearch',
+    icon: '📷',
+    render: q => {
+      const url = 'https://www.google.com.tw/search?source=lnms&tbm=isch&q=' + encodeURIComponent(q).replace('%20', '+');
+      return (<a href={url}>{q}</a>);
+    }
   }
 };
 
